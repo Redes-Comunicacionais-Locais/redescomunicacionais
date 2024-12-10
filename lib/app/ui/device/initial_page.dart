@@ -1,6 +1,8 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:redescomunicacionais/app/ui/device/splash_page.dart';
+
 class InitialPage extends StatelessWidget {
   const InitialPage({super.key});
   @override
@@ -21,18 +23,18 @@ class InitialPage extends StatelessWidget {
         ),
         AnimatedSplashScreen(
           duration: 5000,
-          splash: const Icon(
-            Icons.ac_unit,
-            size: 100,
-            color: Colors.white,
+          splash: SvgPicture.asset(
+            'assets/RCLLogo.svg',
+            width: 200,
+            height: 200,
           ),
-          nextScreen: const SplashPage(), 
+          nextScreen: const SplashPage(),
           splashTransition: SplashTransition.fadeTransition,
           backgroundColor: Colors.transparent,
         ),
         const Align(
           alignment: Alignment.bottomCenter,
-          child:  Padding(
+          child: Padding(
             padding: EdgeInsets.only(bottom: 50),
           ),
         ),
