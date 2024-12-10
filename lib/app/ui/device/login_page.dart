@@ -1,10 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:redescomunicacionais/app/data/provider/sign_in.dart';
-import 'package:redescomunicacionais/app/ui/device/home_page.dart';
+import 'package:get/get.dart';
+import 'package:redescomunicacionais/app/controller/login_controller.dart';
 import 'package:sign_in_button/sign_in_button.dart';
-
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -12,25 +9,7 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 class _LoginPageState extends State<LoginPage> {
-  loginGoogle() async {
-    try {
-     final user = await SignInService().signInGoogle();
-    } catch (e) {
-      if (!context.mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
-      return;
-    }
-    print(FirebaseAuth.instance.currentUser!.email);
-    if (!context.mounted) {
-      return;
-    }
-    Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomePage()));
-  }
-
+  final LoginController _loginController = Get.put(LoginController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
             style: TextStyle(
                 fontSize: 32, color: Colors.grey, fontWeight: FontWeight.bold),
           ),
-          SignInButton(Buttons.google, onPressed: loginGoogle),
+          SignInButton(Buttons.google, onPressed: _loginController.loginGoogle),
         ],
       ),
     ));

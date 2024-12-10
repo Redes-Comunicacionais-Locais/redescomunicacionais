@@ -11,4 +11,7 @@ class LoginRepository {
   Future<UserModel?> trySignInGoogle(){
     return signInService.trySignInGoogle();
   }
+  logoutGoogle(){
+    signInService.logoutGoogle();
+  }
 }

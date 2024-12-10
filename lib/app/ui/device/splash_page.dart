@@ -1,30 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:redescomunicacionais/app/data/model/user_model.dart';
-import 'package:redescomunicacionais/app/routes/app_routes.dart';
-import 'package:redescomunicacionais/app/data/provider/sign_in.dart';
-
+import 'package:get/get.dart';
+import 'package:redescomunicacionais/app/controller/login_controller.dart';
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
   @override
   State<SplashPage> createState() => _SplashPageState();
 }
-
 class _SplashPageState extends State<SplashPage> {
-  tryLogin() async {
-    var hasLogged = await SignInService().trySignInGoogle();
-    if (!context.mounted) {
-      return;
-    }
-    if (hasLogged != null) {
-      
-      Navigator.pushReplacementNamed(context, Routes.HOME, arguments: hasLogged);
-    } else {
-      Navigator.pushReplacementNamed(context, Routes.LOGIN);
-    }
-  }
-
+  final LoginController _loginController = Get.put(LoginController());
   @override
   void initState() {
     super.initState();
@@ -33,7 +17,7 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: tryLogin(),
+        future: _loginController.tryLogin(),
         builder: (context, snapshot) {
           return const Scaffold(
             body: Column(
