@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:redescomunicacionais/app/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
-import 'package:redescomunicacionais/app/sign_in.dart';
+import 'package:redescomunicacionais/app/data/provider/sign_in.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -15,8 +17,9 @@ class _SplashPageState extends State<SplashPage> {
     if (!context.mounted) {
       return;
     }
-    if (hasLogged) {
-      Navigator.pushReplacementNamed(context, Routes.HOME);
+    if (hasLogged != null) {
+      
+      Navigator.pushReplacementNamed(context, Routes.HOME, arguments: hasLogged);
     } else {
       Navigator.pushReplacementNamed(context, Routes.LOGIN);
     }

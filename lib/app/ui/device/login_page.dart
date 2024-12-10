@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:redescomunicacionais/app/sign_in.dart';
+import 'package:redescomunicacionais/app/data/provider/sign_in.dart';
 import 'package:redescomunicacionais/app/ui/device/home_page.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
@@ -13,9 +13,8 @@ class LoginPage extends StatefulWidget {
 }
 class _LoginPageState extends State<LoginPage> {
   loginGoogle() async {
-    // FirebaseAuth.
     try {
-      await SignInService().signInGoogle();
+     final user = await SignInService().signInGoogle();
     } catch (e) {
       if (!context.mounted) {
         return;

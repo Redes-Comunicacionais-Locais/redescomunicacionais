@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:redescomunicacionais/app/data/model/user_model.dart';
 
 class SignInService {
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
@@ -23,32 +24,37 @@ class SignInService {
     );
   }
 
-  signInGoogle() async {
+   Future<UserModel?> signInGoogle() async {
     var account = await _googleSignIn.signIn();
     var b = await account!.authentication;
     final authCredential = GoogleAuthProvider.credential(accessToken: b.accessToken, idToken: b.idToken);
     try {
       var u = await FirebaseAuth.instance.signInWithCredential(authCredential);
       await _createUserDoc();
+      if (account != null) {
+        return UserModel.fromFirebase(account);
+      }
     } catch (err) {
       debugPrint(err.toString());
     }
+    return null;
   }
 
-  Future<bool> trySignInGoogle() async {
+  Future<UserModel?> trySignInGoogle() async {
     var account = await _googleSignIn.signInSilently();
     if (account == null) {
-      return false;
+      return null;
     }
     var b = await account.authentication;
     final authCredential = GoogleAuthProvider.credential(accessToken: b.accessToken, idToken: b.idToken);
     try {
       var u = await FirebaseAuth.instance.signInWithCredential(authCredential);
       await _createUserDoc();
+      return UserModel.fromFirebase(account);
     } catch (err) {
       debugPrint(err.toString());
     }
-    return true;
+    return null;
   }
 
   logoutGoogle() async {
