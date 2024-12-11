@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/login_controller.dart';
+import 'package:redescomunicacionais/app/routes/app_routes.dart';
+import 'package:redescomunicacionais/app/data/components/news.dart';
 
 import '../../controller/home_controller.dart';
 
@@ -138,19 +140,31 @@ class HomePage extends StatelessWidget {
         ),
       ),
       body: Stack(
-        children: [Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                Colors.blue,
-                Colors.black,
-              ],
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  Colors.blue,
+                  Colors.black,
+                ],
+              ),
             ),
           ),
-        )]
-         
+           News(),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        color: Colors.white,
+        height: 56.0,
+        child: const Center(
+          child: Text(
+            "São Sebastião do Alto",
+            style: TextStyle(fontSize: 18.0),
+          ),
+        ),
       ),
     );
   }
