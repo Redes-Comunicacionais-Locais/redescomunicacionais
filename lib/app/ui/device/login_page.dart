@@ -1,4 +1,3 @@
-import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -17,14 +16,25 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
+  body: Container(
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topRight,
+        end: Alignment.bottomLeft,
+        colors: [
+          Colors.blue,
+          Colors.black,
+        ],
+      ),
+    ),
+    child: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           const Text(
             "Redes Comunicacionais Locais",
             style: TextStyle(
-                fontSize: 32, color: Colors.grey, fontWeight: FontWeight.bold),
+                fontSize: 32, color: Colors.white, fontWeight: FontWeight.bold),
           ),
           SvgPicture.asset(
             'assets/RCLLogo.svg',
@@ -40,6 +50,9 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: _loginController.loginGoogle),
         ],
       ),
-    ));
+    ),
+  ),
+);
+
   }
 }

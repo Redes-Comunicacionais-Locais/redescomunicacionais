@@ -16,7 +16,7 @@ class InitialPage extends StatelessWidget {
               end: Alignment.bottomLeft,
               colors: [
                 Colors.blue,
-                Colors.red,
+                Colors.black,
               ],
             ),
           ),
@@ -25,8 +25,6 @@ class InitialPage extends StatelessWidget {
           duration: 5000,
           splash: SvgPicture.asset(
             'assets/RCLLogo.svg',
-            width: 200,
-            height: 200,
           ),
           nextScreen: const SplashPage(),
           splashTransition: SplashTransition.fadeTransition,
