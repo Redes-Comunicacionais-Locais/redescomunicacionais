@@ -32,6 +32,7 @@ class _NewsPageState extends State<NewsPage> {
             ),
             onPressed: () {
               print("VOltando");
+              print("Voltando");
               Get.back();
             }
             ,),
