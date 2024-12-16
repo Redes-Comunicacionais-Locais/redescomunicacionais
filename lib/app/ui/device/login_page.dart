@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
             height: 200,
           ),
           SignInButton(Buttons.google,
-              text: 'Entrar com o Google',
+              text: 'Entrar com Google',
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(50.0),
               ),

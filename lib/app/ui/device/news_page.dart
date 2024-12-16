@@ -31,7 +31,7 @@ class _NewsPageState extends State<NewsPage> {
               color: Colors.white,
             ),
             onPressed: () {
-              print("VOltando");
+              print("Voltando");
               Get.back();
             }
             ,),
