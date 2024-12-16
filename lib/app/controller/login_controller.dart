@@ -20,7 +20,7 @@ class LoginController extends GetxController {
     }
   } catch (e) {
     Get.snackbar(
-      "Erro de Login",
+      "Erro de Login 2",
       e.toString(),
       snackPosition: SnackPosition.BOTTOM,
     );
