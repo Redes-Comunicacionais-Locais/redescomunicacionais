@@ -6,18 +6,27 @@ class LoginController extends GetxController {
   final LoginRepository repository = LoginRepository();
 
   void loginGoogle() async {
-    try {
-      repository.logoutGoogle();
-      final user = await repository.signInGoogle();
+  try {
+    repository.logoutGoogle();
+    final user = await repository.signInGoogle();
+    if (user != null) {
       Get.offNamed(Routes.HOME, arguments: user);
-    } catch (e) {
+    } else {
       Get.snackbar(
         "Erro de Login",
-        e.toString(),
+        "Falha ao autenticar o usuário.",
         snackPosition: SnackPosition.BOTTOM,
       );
     }
+  } catch (e) {
+    Get.snackbar(
+      "Erro de Login",
+      e.toString(),
+      snackPosition: SnackPosition.BOTTOM,
+    );
   }
+}
+
 
   tryLogin() async {
     var hasLogged = await repository.trySignInGoogle();
