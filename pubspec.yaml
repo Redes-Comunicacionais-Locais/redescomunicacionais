@@ -45,6 +45,7 @@ dependencies:
   firebase_storage: ^12.3.7
   firebase_auth: ^5.3.4
   flutter_svg: ^2.0.16
+  vertical_card_pager: ^1.6.2
 
 dev_dependencies:
   flutter_test:
