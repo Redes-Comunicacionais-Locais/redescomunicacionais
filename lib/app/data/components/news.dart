@@ -53,7 +53,7 @@ class News extends StatelessWidget {
       ],
      
       onSelectedItem: (index) {
-        Get.toNamed(Routes.NEWSPAGE);
+        Get.toNamed(Routes.NEWS_PAGE);
       },
     );
   }

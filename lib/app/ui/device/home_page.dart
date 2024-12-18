@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/login_controller.dart';
-import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/data/components/news.dart';
 
 import '../../controller/home_controller.dart';
@@ -47,7 +46,8 @@ class HomePage extends StatelessWidget {
               color: Colors.white,
             ),
             onPressed: () {
-              showDialog(
+              _homeController.goDoc();
+              /*showDialog(
                 context: context,
                 builder: (context) {
                   return AlertDialog(
@@ -64,7 +64,7 @@ class HomePage extends StatelessWidget {
                     ],
                   );
                 },
-              );
+              );*/
             },
           ),
         ],

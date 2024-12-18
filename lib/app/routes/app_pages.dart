@@ -8,6 +8,7 @@ import 'package:redescomunicacionais/app/ui/device/initial_page.dart';
 import 'package:redescomunicacionais/app/ui/device/login_page.dart';
 import 'package:redescomunicacionais/app/data/components/news.dart';
 import 'package:redescomunicacionais/app/ui/device/news_page.dart';
+import 'package:redescomunicacionais/app/web_view/webview_page.dart';
 
 class AppPages {
   static final routes = [
@@ -15,6 +16,7 @@ class AppPages {
     GetPage(name: Routes.LOGIN, page: () => LoginPage(), binding: LoginBinding()),
     GetPage(name: Routes.HOME, page: () => HomePage(), binding: HomeBinding()),
     GetPage(name: Routes.NEWS, page: () => News(),),
-    GetPage(name: Routes.NEWSPAGE, page: ()=> NewsPage(),),
+    GetPage(name: Routes.NEWS_PAGE, page: ()=> NewsPage(),),
+    GetPage(name: Routes.WEB_VIEW, page: () => WebViewPage()),
   ];
 }
