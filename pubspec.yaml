@@ -50,13 +50,42 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^4.0.0
+  flutter_native_splash: ^2.0.5
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  background_color_ios: "#ffffff"
+  image_path: "assets/icons/RCLIcon.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/icons/RCLIcon.png"
+    background_color: "#ffffff"
+    theme_color: "#ffffff"
+
+flutter_native_splash:
+  color: "#FFFFFF" 
+  image: "assets/icons/RCLIcon.png"
+  android: true 
+  ios: true 
+  web: true
+  fullscreen: true 
+
+  android_12:
+    icon_background_color: "#FFFFFF"
+    image: "assets/icons/RCLIcon.png"
+    icon_background_color_dark: "#1a1a1a"
+    image_dark: "assets/icons/RCLIcon.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^4.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -72,6 +101,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
+    - assets/icons/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

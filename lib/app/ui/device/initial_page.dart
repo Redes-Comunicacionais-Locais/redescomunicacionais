@@ -25,6 +25,8 @@ class InitialPage extends StatelessWidget {
           duration: 5000,
           splash: SvgPicture.asset(
             'assets/RCLLogo.svg',
+            color: Colors.white,
+
           ),
           nextScreen: const SplashPage(),
           splashTransition: SplashTransition.fadeTransition,

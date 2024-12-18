@@ -1,10 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:redescomunicacionais/app/routes/app_routes.dart';
-
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
 
@@ -23,20 +19,8 @@ class _NewsPageState extends State<NewsPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: const Text("Noticia completa"),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.reset_tv_rounded,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              print("VOltando");
-              print("Voltando");
-              Get.back();
-            }
-            ,),
-        ],
       ),
       body: ListView(
         children: [
@@ -69,10 +53,10 @@ class _NewsPageState extends State<NewsPage> {
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+               Expanded(
                 child: Text(
                   "Eleições 2024: Claudiane Pietrani, do SOLIDARIEDADE, é eleita prefeita de São Sebastião do Alto no 1º turno",
-                  style: const TextStyle(
+                  style:  TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 22),
@@ -89,7 +73,7 @@ class _NewsPageState extends State<NewsPage> {
             height: 20,
           ),
           const Text("Claudiane Pietrani, do SOLIDARIEDADE, foi eleita prefeita de São Sebastião do Alto (RJ) neste domingo (6), com 3.474 votos, correspondendo a 51,22% dos votos válidos. A eleição teve 7.041 votos totais, incluindo 68 votos brancos (0,97%) e 191 nulos (2,71%). Aledio Rezende, do PL, obteve 3.308 votos, 48,78% dos votos válidos. Esses dados foram divulgados pelo Tribunal Superior Eleitoral (TSE).",
-              style: const TextStyle(
+              style:  TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 16)),
