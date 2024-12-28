@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/login_controller.dart';
 import 'package:redescomunicacionais/app/data/components/news.dart';
+import 'package:redescomunicacionais/app/data/sobre_texto.dart';
 
 import '../../controller/home_controller.dart';
 
@@ -133,9 +134,7 @@ class HomePage extends StatelessWidget {
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: const Text('Sobre o Aplicativo'),
-                      content: const Text(
-                        'Sobre o Aplicativo Sobre o Aplicativo Sobre o Aplicativo Sobre o Aplicativo.',
-                      ),
+                      content: const Text(textoSobre),
                       actions: [
                         TextButton(
                           onPressed: () {
