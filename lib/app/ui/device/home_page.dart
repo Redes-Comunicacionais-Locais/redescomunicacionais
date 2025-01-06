@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/login_controller.dart';
 import 'package:redescomunicacionais/app/data/components/news.dart';
+import 'package:redescomunicacionais/app/data/sobre_texto.dart';
 
 import '../../controller/home_controller.dart';
 
@@ -126,7 +127,25 @@ class HomePage extends StatelessWidget {
               leading: const Icon(Icons.info_outline),
               title: const Text('Sobre'),
               onTap: () {
-                Navigator.pop(context); // Fecha o Drawer
+                Navigator.pop(context);
+
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Sobre o Aplicativo'),
+                      content: const Text(textoSobre),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Fechar'),
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
             ),
             ListTile(
@@ -153,7 +172,7 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ),
-           News(),
+          News(),
         ],
       ),
       bottomNavigationBar: Container(
