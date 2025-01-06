@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/login_controller.dart';
 import 'package:redescomunicacionais/app/data/components/news.dart';
 import 'package:redescomunicacionais/app/data/sobre_texto.dart';
+import 'package:redescomunicacionais/app/routes/app_routes.dart';
 
 import '../../controller/home_controller.dart';
 
@@ -146,6 +147,14 @@ class HomePage extends StatelessWidget {
                     );
                   },
                 );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.article_outlined),
+              title: const Text('Criar Notícia'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, Routes.CREATE_NEWS);
               },
             ),
             ListTile(
