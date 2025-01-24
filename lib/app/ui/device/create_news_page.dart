@@ -88,6 +88,7 @@ class CreateNewsPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
+                      // Ecolha multiplas categorias
                       DropdownButtonFormField<String>(
                         value: selectedCategory,
                         style: const TextStyle(color: Colors.white),
@@ -193,30 +194,6 @@ class CreateNewsPage extends StatelessWidget {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "O corpo da notícia é obrigatório.";
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: authorController,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          labelText: "Autor",
-                          labelStyle: const TextStyle(color: Colors.white),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.white),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: Colors.white, width: 2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "O nome do autor é obrigatório.";
                           }
                           return null;
                         },
