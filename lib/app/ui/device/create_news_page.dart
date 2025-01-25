@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class CreateNewsPage extends StatelessWidget {
+class CreateNewsPage extends StatefulWidget {
+  const CreateNewsPage({Key? key}) : super(key: key);
+
+  @override
+  _CreateNewsPageState createState() => _CreateNewsPageState();
+}
+
+class _CreateNewsPageState extends State<CreateNewsPage> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController subtitleController = TextEditingController();
   final TextEditingController bodyController = TextEditingController();
-  final TextEditingController authorController = TextEditingController();
 
+  List<String> selectedCategories = [];
   String? selectedCategory;
   String? selectedCity;
-
-  CreateNewsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -88,43 +93,37 @@ class CreateNewsPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      // Ecolha multiplas categorias
-                      DropdownButtonFormField<String>(
-                        value: selectedCategory,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          labelText: "Categoria",
-                          labelStyle: const TextStyle(color: Colors.white),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.white),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: Colors.white, width: 2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        dropdownColor: Colors.black,
-                        items: const [
-                          DropdownMenuItem(
-                              value: "Política", child: Text("Política")),
-                          DropdownMenuItem(
-                              value: "Esporte", child: Text("Esporte")),
-                          DropdownMenuItem(
-                              value: "Economia", child: Text("Economia")),
-                          DropdownMenuItem(
-                              value: "Tecnologia", child: Text("Tecnologia")),
-                        ],
-                        onChanged: (value) {
-                          selectedCategory = value;
-                        },
-                        validator: (value) {
-                          if (value == null) {
-                            return "Selecione uma categoria.";
-                          }
-                          return null;
-                        },
+                      // Seleção múltipla de categorias com FilterChip
+                      Wrap(
+                        spacing: 8.0,
+                        runSpacing: 4.0,
+                        children: [
+                          'Política',
+                          'Esporte',
+                          'Economia',
+                          'Tecnologia',
+                        ]
+                            .map((category) => FilterChip(
+                                  label: Text(
+                                    category,
+                                    style: const TextStyle(color: Colors.black),
+                                  ),
+                                  selected:
+                                      selectedCategories.contains(category),
+                                  selectedColor: Colors.blue[100],
+                                  checkmarkColor: Colors.black,
+                                  backgroundColor: Colors.grey[300],
+                                  onSelected: (bool isSelected) {
+                                    setState(() {
+                                      if (isSelected) {
+                                        selectedCategories.add(category);
+                                      } else {
+                                        selectedCategories.remove(category);
+                                      }
+                                    });
+                                  },
+                                ))
+                            .toList(),
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
@@ -209,16 +208,15 @@ class CreateNewsPage extends StatelessWidget {
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             final String title = titleController.text;
-                            final String city =
-                                selectedCity ?? "Nenhuma cidade selecionada";
-                            final String category = selectedCategory ??
-                                "Nenhuma categoria selecionada";
+                            final String? city = selectedCity;
+                            final String category =
+                                selectedCategories.join(", ");
 
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: Text("Notícia Publicada!"),
+                                  title: const Text("Notícia Publicada!"),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     crossAxisAlignment:
