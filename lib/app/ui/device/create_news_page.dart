@@ -94,37 +94,52 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                       ),
                       const SizedBox(height: 16),
                       // Seleção múltipla de categorias com FilterChip
-                      Wrap(
-                        spacing: 8.0,
-                        runSpacing: 4.0,
-                        children: [
-                          'Política',
-                          'Esporte',
-                          'Economia',
-                          'Tecnologia',
-                        ]
-                            .map((category) => FilterChip(
-                                  label: Text(
-                                    category,
-                                    style: const TextStyle(color: Colors.black),
-                                  ),
-                                  selected:
-                                      selectedCategories.contains(category),
-                                  selectedColor: Colors.blue[100],
-                                  checkmarkColor: Colors.black,
-                                  backgroundColor: Colors.grey[300],
-                                  onSelected: (bool isSelected) {
-                                    setState(() {
-                                      if (isSelected) {
-                                        selectedCategories.add(category);
-                                      } else {
-                                        selectedCategories.remove(category);
-                                      }
-                                    });
-                                  },
-                                ))
-                            .toList(),
-                      ),
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment
+                              .start, // Alinha os filhos à esquerda
+                          children: [
+                            const Text(
+                              'Categorias',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8.0,
+                              runSpacing: 4.0,
+                              children: [
+                                'Política',
+                                'Esporte',
+                                'Economia',
+                                'Tecnologia',
+                              ]
+                                  .map((category) => FilterChip(
+                                        label: Text(
+                                          category,
+                                          style: const TextStyle(
+                                              color: Colors.black),
+                                        ),
+                                        selected: selectedCategories
+                                            .contains(category),
+                                        selectedColor: Colors.blue[100],
+                                        checkmarkColor: Colors.black,
+                                        backgroundColor: Colors.grey[300],
+                                        onSelected: (bool isSelected) {
+                                          setState(() {
+                                            if (isSelected) {
+                                              selectedCategories.add(category);
+                                            } else {
+                                              selectedCategories
+                                                  .remove(category);
+                                            }
+                                          });
+                                        },
+                                      ))
+                                  .toList(),
+                            ),
+                          ]),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         value: selectedCity,
