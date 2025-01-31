@@ -17,7 +17,45 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
 
   List<String> selectedCategories = [];
   String? selectedCategory;
+  bool showCategoryError = false;
   String? selectedCity;
+
+  void validateAndPublish() {
+    setState(() {
+      showCategoryError = selectedCategories.isEmpty; // Marca erro se vazio
+    });
+
+    if (_formKey.currentState!.validate() && selectedCategories.isNotEmpty) {
+      final String title = titleController.text;
+      final String category = selectedCategories.join(", ");
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Notícia Publicada!"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Título: $title"),
+                Text("Cidade: ${selectedCity ?? 'Não informada'}"),
+                Text("Categoria: $category"),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("Fechar"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,6 +168,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                           setState(() {
                                             if (isSelected) {
                                               selectedCategories.add(category);
+                                              showCategoryError = false;
                                             } else {
                                               selectedCategories
                                                   .remove(category);
@@ -139,6 +178,15 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                       ))
                                   .toList(),
                             ),
+                            if (showCategoryError)
+                              const Padding(
+                                padding: EdgeInsets.only(top: 8),
+                                child: Text(
+                                  "Selecione pelo menos uma categoria!",
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 14),
+                                ),
+                              ),
                           ]),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
@@ -220,43 +268,9 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            final String title = titleController.text;
-                            final String? city = selectedCity;
-                            final String category =
-                                selectedCategories.join(", ");
-
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text("Notícia Publicada!"),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Título: $title"),
-                                      Text("Cidade: $city"),
-                                      Text("Categoria: $category"),
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text("Fechar"),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          }
-                        },
+                        onPressed: validateAndPublish,
                         style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 50),
+                          minimumSize: const Size(double.infinity, 50),
                           backgroundColor: Colors.blue,
                         ),
                         child: const Text("Publicar Notícia"),
