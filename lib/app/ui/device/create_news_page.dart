@@ -21,6 +21,27 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
   bool showCategoryError = false;
   String? selectedCity;
 
+  String textoExemploMarkdown = """
+  # Título1: Este é um exemplo de texto em Markdown
+  ## Título2: O que é o Markdown?
+  
+  **Markdown** é uma linguagem de marcação leve usada para formatar texto de forma simples e intuitiva.
+
+  Este é um parágrafo de exemplo que contém um pouco de **negrito** e *itálico* para destacar algumas palavras.
+  
+  ### Título3: Lista de Itens:
+   - **Item 1**: Explicação sobre o primeiro item.
+   - *Item 2*: Explicação sobre o segundo item.
+   - `Item 3`: Um trecho de código destacado.
+   
+  > Esta é uma citação para dar mais ênfase a uma ideia.
+   
+  ### Links Úteis:
+  [Acesse o Google](https://www.google.com)
+  
+  [Visite o GitHub](https://www.github.com)
+  """;
+
   void validateAndPublish() {
     setState(() {
       showCategoryError = selectedCategories.isEmpty; // Marca erro se vazio
@@ -237,10 +258,14 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      // Corpo em markdown
+                      // Texto em markdown
                       Column(children: [
                         TextFormField(
-                          controller: bodyController,
+                          controller: bodyController
+                            ..text = bodyController.text.isEmpty
+                                ? textoExemploMarkdown
+                                : bodyController
+                                    .text, // Texto padrão quando vazio
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             labelText: "Corpo da Notícia",
@@ -263,7 +288,8 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                             return null;
                           },
                         ),
-                        // TESTO EM MARKDOWN
+
+                        // Convertendo texto para markdown
                         const SizedBox(height: 16),
 
                         Container(
@@ -271,7 +297,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.white),
                             borderRadius: BorderRadius.circular(8),
-                            color: const Color.fromARGB(137, 86, 42, 42),
+                            color: Colors.white,
                           ),
                           child: ValueListenableBuilder<TextEditingValue>(
                             valueListenable: bodyController,
@@ -279,7 +305,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                               return MarkdownBody(
                                 data: value
                                     .text, // Atualiza o Markdown em tempo real
-                                styleSheet: MarkdownStyleSheet(
+                                /*styleSheet: MarkdownStyleSheet(
                                   p: const TextStyle(color: Colors.white),
                                   h1: const TextStyle(
                                       color: Colors.white,
@@ -302,12 +328,12 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                   blockquote: TextStyle(
                                       color: Colors.grey[400],
                                       fontStyle: FontStyle.italic),
-                                  code: TextStyle(
+                                  code: const TextStyle(
                                       color: Colors.greenAccent,
                                       fontFamily: "monospace"),
                                   listBullet:
                                       const TextStyle(color: Colors.white),
-                                ),
+                                ),*/
                               );
                             },
                           ),
