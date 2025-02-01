@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
 
 class CreateNewsPage extends StatefulWidget {
@@ -236,30 +237,82 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      TextFormField(
-                        controller: bodyController,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          labelText: "Corpo da Notícia",
-                          labelStyle: const TextStyle(color: Colors.white),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.white),
-                            borderRadius: BorderRadius.circular(8),
+                      // Corpo em markdown
+                      Column(children: [
+                        TextFormField(
+                          controller: bodyController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: "Corpo da Notícia",
+                            labelStyle: const TextStyle(color: Colors.white),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                  color: Colors.white, width: 2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: Colors.white, width: 2),
+                          maxLines: 6,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "O corpo da notícia é obrigatório.";
+                            }
+                            return null;
+                          },
+                        ),
+                        // TESTO EM MARKDOWN
+                        const SizedBox(height: 16),
+
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white),
                             borderRadius: BorderRadius.circular(8),
+                            color: const Color.fromARGB(137, 86, 42, 42),
+                          ),
+                          child: ValueListenableBuilder<TextEditingValue>(
+                            valueListenable: bodyController,
+                            builder: (context, value, child) {
+                              return MarkdownBody(
+                                data: value
+                                    .text, // Atualiza o Markdown em tempo real
+                                styleSheet: MarkdownStyleSheet(
+                                  p: const TextStyle(color: Colors.white),
+                                  h1: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold),
+                                  h2: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold),
+                                  h3: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                  strong: const TextStyle(
+                                      color: Colors.yellow,
+                                      fontWeight: FontWeight.bold),
+                                  em: const TextStyle(
+                                      color: Colors.cyan,
+                                      fontStyle: FontStyle.italic),
+                                  blockquote: TextStyle(
+                                      color: Colors.grey[400],
+                                      fontStyle: FontStyle.italic),
+                                  code: TextStyle(
+                                      color: Colors.greenAccent,
+                                      fontFamily: "monospace"),
+                                  listBullet:
+                                      const TextStyle(color: Colors.white),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                        maxLines: 6,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "O corpo da notícia é obrigatório.";
-                          }
-                          return null;
-                        },
-                      ),
+                      ]),
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
                         onPressed: () {},
