@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:get/get.dart';
 
 class CreateNewsPage extends StatefulWidget {
@@ -19,6 +20,27 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
   String? selectedCategory;
   bool showCategoryError = false;
   String? selectedCity;
+
+  String textoExemploMarkdown = """
+  # Título1: Este é um exemplo de texto em Markdown
+  ## Título2: O que é o Markdown?
+  
+  **Markdown** é uma linguagem de marcação leve usada para formatar texto de forma simples e intuitiva.
+
+  Este é um parágrafo de exemplo que contém um pouco de **negrito** e *itálico* para destacar algumas palavras.
+  
+  ### Título3: Lista de Itens:
+   - **Item 1**: Explicação sobre o primeiro item.
+   - *Item 2*: Explicação sobre o segundo item.
+   - `Item 3`: Um trecho de código destacado.
+   
+  > Esta é uma citação para dar mais ênfase a uma ideia.
+   
+  ### Links Úteis:
+  [Acesse o Google](https://www.google.com)
+  
+  [Visite o GitHub](https://www.github.com)
+  """;
 
   void validateAndPublish() {
     setState(() {
@@ -236,30 +258,87 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      TextFormField(
-                        controller: bodyController,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          labelText: "Corpo da Notícia",
-                          labelStyle: const TextStyle(color: Colors.white),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.white),
-                            borderRadius: BorderRadius.circular(8),
+                      // Texto em markdown
+                      Column(children: [
+                        TextFormField(
+                          controller: bodyController
+                            ..text = bodyController.text.isEmpty
+                                ? textoExemploMarkdown
+                                : bodyController
+                                    .text, // Texto padrão quando vazio
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: "Corpo da Notícia",
+                            labelStyle: const TextStyle(color: Colors.white),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                  color: Colors.white, width: 2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: Colors.white, width: 2),
+                          maxLines: 6,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "O corpo da notícia é obrigatório.";
+                            }
+                            return null;
+                          },
+                        ),
+
+                        // Convertendo texto para markdown
+                        const SizedBox(height: 16),
+
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white),
                             borderRadius: BorderRadius.circular(8),
+                            color: Colors.white,
+                          ),
+                          child: ValueListenableBuilder<TextEditingValue>(
+                            valueListenable: bodyController,
+                            builder: (context, value, child) {
+                              return MarkdownBody(
+                                data: value
+                                    .text, // Atualiza o Markdown em tempo real
+                                /*styleSheet: MarkdownStyleSheet(
+                                  p: const TextStyle(color: Colors.white),
+                                  h1: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold),
+                                  h2: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold),
+                                  h3: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                  strong: const TextStyle(
+                                      color: Colors.yellow,
+                                      fontWeight: FontWeight.bold),
+                                  em: const TextStyle(
+                                      color: Colors.cyan,
+                                      fontStyle: FontStyle.italic),
+                                  blockquote: TextStyle(
+                                      color: Colors.grey[400],
+                                      fontStyle: FontStyle.italic),
+                                  code: const TextStyle(
+                                      color: Colors.greenAccent,
+                                      fontFamily: "monospace"),
+                                  listBullet:
+                                      const TextStyle(color: Colors.white),
+                                ),*/
+                              );
+                            },
                           ),
                         ),
-                        maxLines: 6,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "O corpo da notícia é obrigatório.";
-                          }
-                          return null;
-                        },
-                      ),
+                      ]),
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
                         onPressed: () {},
