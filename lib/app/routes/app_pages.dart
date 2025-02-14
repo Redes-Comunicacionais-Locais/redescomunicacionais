@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/bindings/home_bindings.dart';
 import 'package:redescomunicacionais/app/bindings/login_bindings.dart';
+import 'package:redescomunicacionais/app/bindings/news_bindings.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/ui/device/create_news_page.dart';
 import 'package:redescomunicacionais/app/ui/device/home_page.dart';
@@ -22,15 +23,16 @@ class AppPages {
     GetPage(
       name: Routes.NEWS,
       page: () => News(),
+      binding: NewsBinding(),
     ),
     GetPage(
       name: Routes.NEWS_PAGE,
       page: () => NewsPage(),
     ),
     GetPage(
-      name: Routes.CREATE_NEWS,
-      page: () => CreateNewsPage(),
-    ),
+        name: Routes.CREATE_NEWS,
+        page: () => CreateNewsPage(),
+        binding: NewsBinding()),
     GetPage(name: Routes.WEB_VIEW, page: () => WebViewPage()),
   ];
 }

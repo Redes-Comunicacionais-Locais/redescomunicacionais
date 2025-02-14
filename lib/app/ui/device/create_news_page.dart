@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import 'package:get/get.dart';
 
 class CreateNewsPage extends StatefulWidget {
@@ -12,6 +13,7 @@ class CreateNewsPage extends StatefulWidget {
 class _CreateNewsPageState extends State<CreateNewsPage> {
   final _formKey = GlobalKey<FormState>();
 
+  final NewsController newsController = Get.find<NewsController>();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController subtitleController = TextEditingController();
   final TextEditingController bodyController = TextEditingController();
@@ -50,6 +52,11 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
     if (_formKey.currentState!.validate() && selectedCategories.isNotEmpty) {
       final String title = titleController.text;
       final String category = selectedCategories.join(", ");
+
+      // ====== Adicionar notícia/FireStore ======
+      newsController.adicionarNews(title, selectedCity ?? '');
+      // tituloController.clear();
+      // cidadeController.clear();
 
       showDialog(
         context: context,
