@@ -63,9 +63,12 @@ class News extends StatelessWidget {
           ),
         ),
         onSelectedItem: (index) {
-          Get.toNamed(Routes.NEWS_PAGE);
+          Get.toNamed(
+            Routes.NEWS_PAGE,
+            arguments: {"titulo": newsController.newss[index].titulo},
+          );
         },
       );
-    }); // ✅ Correto fechamento do Obx()
-  } // ✅ Correto fechamento do build()
+    });
+  }
 }

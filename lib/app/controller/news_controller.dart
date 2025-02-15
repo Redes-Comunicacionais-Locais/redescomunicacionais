@@ -8,10 +8,29 @@ class NewsController extends GetxController {
   var isLoading = false.obs;
 
   // Adicionar notícias
-  Future<void> adicionarNews(String titulo, String cidade) async {
+  Future<void> adicionarNews(
+      String titulo,
+      String subtitulo,
+      String cidade,
+      String categoria,
+      String corpo,
+      String imgurl,
+      String autor,
+      String email,
+      String dataCriacao) async {
     try {
       isLoading(true);
-      NewsModel news = NewsModel(titulo: titulo, cidade: cidade);
+      NewsModel news = NewsModel(
+          titulo: titulo,
+          subtitulo: subtitulo,
+          cidade: cidade,
+          categoria: categoria,
+          corpo: corpo,
+          imgurl: imgurl,
+          autor: autor,
+          email: email,
+          dataCriacao: dataCriacao);
+
       await _repository.adicionarNews(news);
       newss.add(news);
       Get.snackbar('Sucesso', 'Notícias cadastrado com sucesso!',

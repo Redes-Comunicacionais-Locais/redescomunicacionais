@@ -10,7 +10,7 @@ class NewsRepository {
     try {
       await _firestore.collection(collectionPath).add(news.toMap());
     } catch (e) {
-      throw Exception("Erro ao adicionar News: $e");
+      throw Exception("Erro ao adicionar notícias: $e");
     }
   }
 

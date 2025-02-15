@@ -32,7 +32,7 @@ class AppPages {
     GetPage(
         name: Routes.CREATE_NEWS,
         page: () => CreateNewsPage(),
-        binding: NewsBinding()),
+        bindings: [NewsBinding(), HomeBinding()]),
     GetPage(name: Routes.WEB_VIEW, page: () => WebViewPage()),
   ];
 }

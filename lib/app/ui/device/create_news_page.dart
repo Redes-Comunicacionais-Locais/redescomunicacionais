@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
+import '../../controller/home_controller.dart';
 import 'package:get/get.dart';
 
 class CreateNewsPage extends StatefulWidget {
@@ -13,7 +14,9 @@ class CreateNewsPage extends StatefulWidget {
 class _CreateNewsPageState extends State<CreateNewsPage> {
   final _formKey = GlobalKey<FormState>();
 
+  final HomeController homeController = Get.find<HomeController>();
   final NewsController newsController = Get.find<NewsController>();
+
   final TextEditingController titleController = TextEditingController();
   final TextEditingController subtitleController = TextEditingController();
   final TextEditingController bodyController = TextEditingController();
@@ -37,11 +40,6 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
    - `Item 3`: Um trecho de código destacado.
    
   > Esta é uma citação para dar mais ênfase a uma ideia.
-   
-  ### Links Úteis:
-  [Acesse o Google](https://www.google.com)
-  
-  [Visite o GitHub](https://www.github.com)
   """;
 
   void validateAndPublish() {
@@ -51,10 +49,18 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
 
     if (_formKey.currentState!.validate() && selectedCategories.isNotEmpty) {
       final String title = titleController.text;
+      final String subtitle = subtitleController.text;
       final String category = selectedCategories.join(", ");
+      final String bodyNews = bodyController.text;
+      String imageUrl =
+          "https://avatars.githubusercontent.com/u/190403325?s=400&u=badaaa8fa393825cf58b7e7a81a1865c79e9d2e0&v=4";
+      final String autor = homeController.user.name!;
+      final String email = homeController.user.email!;
+      final String dataCriacao = DateTime.now().toString();
 
       // ====== Adicionar notícia/FireStore ======
-      newsController.adicionarNews(title, selectedCity ?? '');
+      newsController.adicionarNews(title, subtitle, selectedCity ?? '',
+          category, bodyNews, imageUrl, autor, email, dataCriacao);
       // tituloController.clear();
       // cidadeController.clear();
 
