@@ -35,8 +35,7 @@ class News extends StatelessWidget {
                 Expanded(
                   flex: 3,
                   child: Image.network(
-                    //newsController.newss[index],
-                    "https://avatars.githubusercontent.com/u/190403325?s=400&u=badaaa8fa393825cf58b7e7a81a1865c79e9d2e0&v=4",
+                    newsController.newss[index].imgurl,
                     fit: BoxFit.cover,
                     width: double.infinity,
                   ),
@@ -58,6 +57,22 @@ class News extends StatelessWidget {
                     ),
                   ),
                 ),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    color: Colors.white,
+                    child: Center(
+                      child: Text(
+                        newsController.newss[index].subtitulo,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 14.0,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -65,7 +80,16 @@ class News extends StatelessWidget {
         onSelectedItem: (index) {
           Get.toNamed(
             Routes.NEWS_PAGE,
-            arguments: {"titulo": newsController.newss[index].titulo},
+            arguments: {
+              "titulo": newsController.newss[index].titulo,
+              "subtitulo": newsController.newss[index].subtitulo,
+              "cidade": newsController.newss[index].cidade,
+              "categoria": newsController.newss[index].categoria,
+              "corpo": newsController.newss[index].corpo,
+              "imgurl": newsController.newss[index].imgurl,
+              "autor": newsController.newss[index].autor,
+              "dataCriacao": newsController.newss[index].dataCriacao
+            },
           );
         },
       );

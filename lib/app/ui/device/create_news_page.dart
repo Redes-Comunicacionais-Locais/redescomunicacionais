@@ -53,7 +53,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
       final String category = selectedCategories.join(", ");
       final String bodyNews = bodyController.text;
       String imageUrl =
-          "https://avatars.githubusercontent.com/u/190403325?s=400&u=badaaa8fa393825cf58b7e7a81a1865c79e9d2e0&v=4";
+          "https://www.pedagogiaaopedaletra.com/wp-content/uploads/2017/07/Jornal-Corrente-Alternativa1.jpg";
       final String autor = homeController.user.name!;
       final String email = homeController.user.email!;
       final String dataCriacao = DateTime.now().toString();
@@ -61,8 +61,8 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
       // ====== Adicionar notícia/FireStore ======
       newsController.adicionarNews(title, subtitle, selectedCity ?? '',
           category, bodyNews, imageUrl, autor, email, dataCriacao);
-      // tituloController.clear();
-      // cidadeController.clear();
+      titleController.clear();
+      subtitleController.clear();
 
       showDialog(
         context: context,
