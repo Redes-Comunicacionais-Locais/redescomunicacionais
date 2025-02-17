@@ -27,14 +27,13 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
   String? selectedCity;
 
   String textoExemploMarkdown = """
-  # Título1: Este é um exemplo de texto em Markdown
-  ## Título2: O que é o Markdown?
+  ### Este é um exemplo de texto em Markdown
   
-  **Markdown** é uma linguagem de marcação leve usada para formatar texto de forma simples e intuitiva.
+  **O que é o Markdown?** É uma linguagem de marcação leve usada para formatar texto de forma simples e intuitiva.
 
   Este é um parágrafo de exemplo que contém um pouco de **negrito** e *itálico* para destacar algumas palavras.
   
-  ### Título3: Lista de Itens:
+  ### Lista de Itens:
    - **Item 1**: Explicação sobre o primeiro item.
    - *Item 2*: Explicação sobre o segundo item.
    - `Item 3`: Um trecho de código destacado.
@@ -90,6 +89,78 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
         },
       );
     }
+  }
+
+  void _showCategorySelectionDialog() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.black,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        List<String> categorias = [
+          'Política',
+          'Esporte',
+          'Economia',
+          'Tecnologia'
+        ];
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Selecione as Categorias",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const Divider(color: Colors.white),
+                  Expanded(
+                    child: ListView(
+                      children: categorias.map((category) {
+                        return CheckboxListTile(
+                          title: Text(category,
+                              style: const TextStyle(color: Colors.white)),
+                          value: selectedCategories.contains(category),
+                          onChanged: (bool? isChecked) {
+                            setModalState(() {
+                              if (isChecked == true) {
+                                selectedCategories.add(category);
+                              } else {
+                                selectedCategories.remove(category);
+                              }
+                            });
+                          },
+                          activeColor: Colors.blue,
+                          checkColor: Colors.white,
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Fecha o modal
+                      setState(() {}); // Atualiza o estado da tela principal
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                    ),
+                    child: const Text("Confirmar"),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -166,63 +237,39 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      // Seleção múltipla de categorias com FilterChip
-                      Column(
-                          crossAxisAlignment: CrossAxisAlignment
-                              .start, // Alinha os filhos à esquerda
-                          children: [
-                            const Text(
-                              'Categorias',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                      // ########## Seleção de Categoria ##########
+
+                      GestureDetector(
+                        onTap: _showCategorySelectionDialog,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                selectedCategories.isEmpty
+                                    ? "Selecione as categorias"
+                                    : selectedCategories.join(", "),
+                                style: const TextStyle(color: Colors.white),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8.0,
-                              runSpacing: 4.0,
-                              children: [
-                                'Política',
-                                'Esporte',
-                                'Economia',
-                                'Tecnologia',
-                              ]
-                                  .map((category) => FilterChip(
-                                        label: Text(
-                                          category,
-                                          style: const TextStyle(
-                                              color: Colors.black),
-                                        ),
-                                        selected: selectedCategories
-                                            .contains(category),
-                                        selectedColor: Colors.blue[100],
-                                        checkmarkColor: Colors.black,
-                                        backgroundColor: Colors.grey[300],
-                                        onSelected: (bool isSelected) {
-                                          setState(() {
-                                            if (isSelected) {
-                                              selectedCategories.add(category);
-                                              showCategoryError = false;
-                                            } else {
-                                              selectedCategories
-                                                  .remove(category);
-                                            }
-                                          });
-                                        },
-                                      ))
-                                  .toList(),
-                            ),
-                            if (showCategoryError)
-                              const Padding(
-                                padding: EdgeInsets.only(top: 8),
-                                child: Text(
-                                  "Selecione pelo menos uma categoria!",
-                                  style: TextStyle(
-                                      color: Colors.red, fontSize: 14),
-                                ),
-                              ),
-                          ]),
+                              const Icon(Icons.arrow_drop_down,
+                                  color: Colors.white),
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (showCategoryError)
+                        const Padding(
+                          padding: EdgeInsets.only(top: 8),
+                          child: Text(
+                            "Selecione pelo menos uma categoria!",
+                            style: TextStyle(color: Colors.red, fontSize: 14),
+                          ),
+                        ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         value: selectedCity,
@@ -241,6 +288,8 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                           ),
                         ),
                         dropdownColor: Colors.black,
+                        icon: const Icon(Icons.arrow_drop_down,
+                            color: Colors.white),
                         items: const [
                           DropdownMenuItem(
                               value: "São Sebastião do Alto",
