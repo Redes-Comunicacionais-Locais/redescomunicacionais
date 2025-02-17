@@ -2,59 +2,97 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:vertical_card_pager/vertical_card_pager.dart';
+import 'package:redescomunicacionais/app/controller/news_controller.dart';
 
 class News extends StatelessWidget {
   News({super.key});
-  
-  final List<String> titles = [
-    "Eleições 2024: Claudiane Pietrani, do SOLIDARIEDADE, é eleita prefeita de São Sebastião do Alto no 1º turno",
-  ];
 
-  final List<Widget> images = [
-  ];
+  final NewsController newsController =
+      Get.put(NewsController()); // Adiciona manualmente
 
   @override
   Widget build(BuildContext context) {
-    return VerticalCardPager(
-      titles: [""],
-      images: [
-        Container(
-          color: Colors.black,
-          child: Column(
-            children: [
-              Expanded(
-                flex: 3, // A imagem ocupará 3 partes
-                child: Image.network(
-                  "https://cmssalto.rj.gov.br/wp-content/uploads/2020/10/FOTO-SAO-SEBASTIAO-DO-ALTO.jpg",
-                  fit: BoxFit.cover,
-                  width: double.infinity,
+    // Garante que as notícias sejam carregadas quando o widget for construído
+    newsController.buscarNews();
+
+    return Obx(() {
+      if (newsController.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      if (newsController.newss.isEmpty) {
+        return const Center(child: Text("Nenhuma notícia encontrada"));
+      }
+
+      return VerticalCardPager(
+        titles: List.filled(newsController.newss.length, ""),
+        images: List.generate(
+          newsController.newss.length,
+          (index) => Container(
+            color: Colors.white,
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Image.network(
+                    newsController.newss[index].imgurl,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  ),
                 ),
-              ),
-              Expanded(
-                flex: 2, // O fundo preto ocupará 2 partes
-                child: Container(
-                  color: Colors.black,
-                  child: Center(
-                    child: Text(
-                      titles[0],  // Aqui estamos passando o título da lista `titles`
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16.0,
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    color: Colors.white,
+                    child: Center(
+                      child: Text(
+                        newsController.newss[index].titulo,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,  // Centraliza o texto
                     ),
                   ),
                 ),
-              ),
-            ],
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    color: Colors.white,
+                    child: Center(
+                      child: Text(
+                        newsController.newss[index].subtitulo,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 14.0,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ],
-     
-      onSelectedItem: (index) {
-        Get.toNamed(Routes.NEWS_PAGE);
-      },
-    );
+        onSelectedItem: (index) {
+          Get.toNamed(
+            Routes.NEWS_PAGE,
+            arguments: {
+              "titulo": newsController.newss[index].titulo,
+              "subtitulo": newsController.newss[index].subtitulo,
+              "cidade": newsController.newss[index].cidade,
+              "categoria": newsController.newss[index].categoria,
+              "corpo": newsController.newss[index].corpo,
+              "imgurl": newsController.newss[index].imgurl,
+              "autor": newsController.newss[index].autor,
+              "dataCriacao": newsController.newss[index].dataCriacao
+            },
+          );
+        },
+      );
+    });
   }
 }

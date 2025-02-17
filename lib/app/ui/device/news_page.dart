@@ -1,6 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
 
@@ -9,13 +10,19 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> {
-  final db = FirebaseFirestore.instance;
-  final storage = FirebaseStorage.instance;
-
   @override
   Widget build(BuildContext context) {
+    final String titulo = Get.arguments["titulo"] ?? "";
+    final String subtitulo = Get.arguments["subtitulo"] ?? "";
+    final String imgurl = Get.arguments["imgurl"] ?? "";
+    final String autor = Get.arguments["autor"] ?? "";
+    final String dataCriacao = Get.arguments["dataCriacao"] ?? "";
+    final String categoria = Get.arguments["categoria"] ?? "";
+    final String cidade = Get.arguments["cidade"] ?? "";
+    final String corpo = Get.arguments["corpo"] ?? "";
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: const Text("Noticia completa"),
@@ -40,7 +47,7 @@ class _NewsPageState extends State<NewsPage> {
                         width: double.infinity,
                       ),*/
                 child: Image.network(
-                  "https://cmssalto.rj.gov.br/wp-content/uploads/2020/10/FOTO-SAO-SEBASTIAO-DO-ALTO.jpg", // Substitua com a URL da imagem desejada
+                  imgurl, // Substitua com a URL da imagem desejada
                   fit: BoxFit.cover,
                   width: double.infinity,
                 ),
@@ -50,33 +57,51 @@ class _NewsPageState extends State<NewsPage> {
           const SizedBox(
             height: 10,
           ),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Expanded(
+              Expanded(
                 child: Text(
-                  "Eleições 2024: Claudiane Pietrani, do SOLIDARIEDADE, é eleita prefeita de São Sebastião do Alto no 1º turno",
-                  style:  TextStyle(
-                      color: Colors.white,
+                  titulo,
+                  style: const TextStyle(
+                      color: Colors.black,
                       fontWeight: FontWeight.bold,
-                      fontSize: 22),
+                      fontSize: 25),
                 ),
               ),
             ],
           ),
-          const Text("Fontinele sinistro",
-              style: TextStyle(
-                  color: Colors.white,
+          Text(
+            subtitulo,
+            style: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          Text(autor,
+              style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w100,
+                  fontSize: 12)),
+          Text(categoria,
+              style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w100,
+                  fontSize: 12)),
+          Text(cidade,
+              style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w100,
+                  fontSize: 12)),
+          Text(dataCriacao,
+              style: const TextStyle(
+                  color: Colors.black,
                   fontWeight: FontWeight.w100,
                   fontSize: 12)),
           const SizedBox(
             height: 20,
           ),
-          const Text("Claudiane Pietrani, do SOLIDARIEDADE, foi eleita prefeita de São Sebastião do Alto (RJ) neste domingo (6), com 3.474 votos, correspondendo a 51,22% dos votos válidos. A eleição teve 7.041 votos totais, incluindo 68 votos brancos (0,97%) e 191 nulos (2,71%). Aledio Rezende, do PL, obteve 3.308 votos, 48,78% dos votos válidos. Esses dados foram divulgados pelo Tribunal Superior Eleitoral (TSE).",
-              style:  TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16)),
+          MarkdownBody(
+            data: corpo,
+          ),
         ],
       ),
     );
