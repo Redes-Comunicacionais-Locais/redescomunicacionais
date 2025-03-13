@@ -48,25 +48,9 @@ class HomePage extends StatelessWidget {
               color: Colors.white,
             ),
             onPressed: () {
-              _homeController.goDoc();
-              /*showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: const Text("Ajuda"),
-                    content: const Text(
-                      "Esta tela exibe informações sobre redes comunicacionais locais. "
-                      "Se precisar de mais informações, entre em contato com o suporte.",
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text("Fechar"),
-                      ),
-                    ],
-                  );
-                },
-              );*/
+             
+                                          _homeController.goUserGuide();
+
             },
           ),
         ],
@@ -133,15 +117,53 @@ class HomePage extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Sobre o Aplicativo'),
-                      content: const Text(textoSobre),
-                      actions: [
-                        TextButton(
+                    return SimpleDialog(
+                      title: const Text('Sobre'),
+                      children: <Widget>[
+                        SimpleDialogOption(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            Navigator.pop(context);
+                             _homeController.goInfo();
+                            
                           },
-                          child: const Text('Fechar'),
+                          child: const Text('Informações do Projeto'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _homeController.goInfoTeam();
+
+                           
+                          },
+                          child: const Text('Equipe'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _homeController.goProjectStructure();
+                          },
+                          child: const Text('Estrutura do Projeto'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _homeController.goUserGuide();
+                          },
+                          child: const Text('Guia do Usuário'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _homeController.goInstallationConfig();
+                          },
+                          child: const Text('Instalação e Configuração'),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _homeController.goFAQ();
+                          },
+                          child: const Text('Perguntas Frequentes'),
                         ),
                       ],
                     );
