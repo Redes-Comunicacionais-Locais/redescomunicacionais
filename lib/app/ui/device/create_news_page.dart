@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
+import 'package:redescomunicacionais/app/ui/components/icon_base64.dart';
 import '../../controller/home_controller.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -29,7 +30,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
   String? selectedCategory;
   bool showCategoryError = false;
   String? selectedCity;
-  String base64String = "";
+  String base64String = iconBase64();
 
   String textoExemploMarkdown = """
   ### Este é um exemplo de texto em Markdown
@@ -56,8 +57,6 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
       final String subtitle = subtitleController.text;
       final String category = selectedCategories.join(", ");
       final String bodyNews = bodyController.text;
-      //String imageUrl =
-          "https://www.pedagogiaaopedaletra.com/wp-content/uploads/2017/07/Jornal-Corrente-Alternativa1.jpg";
       String imageUrl = base64String;
       final String autor = homeController.user.name!;
       final String email = homeController.user.email!;
@@ -408,7 +407,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                         ),
                       ]),
                       const SizedBox(height: 16),
-                      //----------
+                      // >>>>> Buscando imagem na galeria e convertendo para base 64 <<<<<
                       ElevatedButton.icon(
                         onPressed: () async {
                           final ImagePicker picker = ImagePicker(); // Instancia o seletor de imagens
