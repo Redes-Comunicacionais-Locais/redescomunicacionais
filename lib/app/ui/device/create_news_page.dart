@@ -3,6 +3,10 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import '../../controller/home_controller.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:typed_data';
+import 'dart:convert';
+
 
 class CreateNewsPage extends StatefulWidget {
   const CreateNewsPage({Key? key}) : super(key: key);
@@ -25,6 +29,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
   String? selectedCategory;
   bool showCategoryError = false;
   String? selectedCity;
+  String base64String = "";
 
   String textoExemploMarkdown = """
   ### Este é um exemplo de texto em Markdown
@@ -51,8 +56,9 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
       final String subtitle = subtitleController.text;
       final String category = selectedCategories.join(", ");
       final String bodyNews = bodyController.text;
-      String imageUrl =
+      //String imageUrl =
           "https://www.pedagogiaaopedaletra.com/wp-content/uploads/2017/07/Jornal-Corrente-Alternativa1.jpg";
+      String imageUrl = base64String;
       final String autor = homeController.user.name!;
       final String email = homeController.user.email!;
       final String dataCriacao = DateTime.now().toString();
@@ -402,8 +408,17 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                         ),
                       ]),
                       const SizedBox(height: 16),
+                      //----------
                       ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () async {
+                          final ImagePicker picker = ImagePicker(); // Instancia o seletor de imagens
+                          final XFile? image = await picker.pickImage(source: ImageSource.gallery); // O usuário escolhe uma imagem da galeria
+                          if (image != null) {
+                            Uint8List bytes = await image.readAsBytes(); // Obtém os bytes diretamente
+                            base64String = base64Encode(bytes); // Converte para base64
+                           
+                          }
+                        },
                         icon: const Icon(Icons.image),
                         label: const Text("Adicionar Imagem"),
                       ),
