@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -46,8 +47,8 @@ class _NewsPageState extends State<NewsPage> {
                         fit: BoxFit.cover,
                         width: double.infinity,
                       ),*/
-                child: Image.network(
-                  imgurl, // Substitua com a URL da imagem desejada
+                child: Image.memory(
+                  base64Decode(imgurl),
                   fit: BoxFit.cover,
                   width: double.infinity,
                 ),
