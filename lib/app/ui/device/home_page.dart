@@ -211,7 +211,7 @@ class HomePage extends StatelessWidget {
         height: 56.0,
         child: const Center(
           child: Text(
-            "São Sebastião do Alto",
+            "Cidade: ...",
             style: TextStyle(fontSize: 18.0),
           ),
         ),

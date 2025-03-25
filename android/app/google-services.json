@@ -12,7 +12,44 @@
           "package_name": "com.example.redescomunicacionais"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "792922518433-0tul09c6dofgcsmp6fs6a8unq93l2g5u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.redescomunicacionais",
+            "certificate_hash": "e58718e9bac00432c0def6c506b0743f5ce43c11"
+          }
+        },
+        {
+          "client_id": "792922518433-115dua0vbddf6mfp5qt8cu5hmmgql0cf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.redescomunicacionais",
+            "certificate_hash": "e169aa159f7ce3ca914526aa1720bf0f5721d629"
+          }
+        },
+        {
+          "client_id": "792922518433-c222dvh31et7cj43bcjf8e0oon6pqdvv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.redescomunicacionais",
+            "certificate_hash": "29f639f8d9e5674bbdb7c9ba1c27892d7c3b3379"
+          }
+        },
+        {
+          "client_id": "792922518433-kj94ek3bm52s39a6a6m99pkehds5abel.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.redescomunicacionais",
+            "certificate_hash": "3445f52ab39d33104dde42c0bf6d30cc634129da"
+          }
+        },
+        {
+          "client_id": "792922518433-tk5k4cforsr5l2r1bsi2n9mfftn8njlj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBO5t2GpdYhX_fQPbHc4YNOK--d6a3qekk"
@@ -20,7 +57,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792922518433-tk5k4cforsr5l2r1bsi2n9mfftn8njlj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "792922518433-qjp00cfou7jadhop1j8qqseq0q83eu4l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.redescomunicacionais"
+              }
+            }
+          ]
         }
       }
     }
