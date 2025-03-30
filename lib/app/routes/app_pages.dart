@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/bindings/home_bindings.dart';
+import 'package:redescomunicacionais/app/bindings/image_bindings.dart';
 import 'package:redescomunicacionais/app/bindings/login_bindings.dart';
 import 'package:redescomunicacionais/app/bindings/news_bindings.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
@@ -32,7 +33,7 @@ class AppPages {
     GetPage(
         name: Routes.CREATE_NEWS,
         page: () => CreateNewsPage(),
-        bindings: [NewsBinding(), HomeBinding()]),
+        bindings: [NewsBinding(), HomeBinding(), ImageBinding()]),
     GetPage(name: Routes.WEB_VIEW, page: () => WebViewPage()),
   ];
 }

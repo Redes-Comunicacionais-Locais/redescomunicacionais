@@ -3,9 +3,10 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/ui/components/icon_base64.dart';
 import '../../controller/home_controller.dart';
+import 'package:redescomunicacionais/app/controller/image_controller.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:typed_data';
+//import 'package:image_picker/image_picker.dart';
+//import 'dart:typed_data';
 import 'dart:convert';
 
 
@@ -21,6 +22,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
 
   final HomeController homeController = Get.find<HomeController>();
   final NewsController newsController = Get.find<NewsController>();
+  final ImageController imageController = Get.find<ImageController>();
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController subtitleController = TextEditingController();
@@ -30,7 +32,6 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
   String? selectedCategory;
   bool showCategoryError = false;
   String? selectedCity;
-  String base64String = iconBase64();
 
   String textoExemploMarkdown = """
   ### Este é um exemplo de texto em Markdown
@@ -57,7 +58,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
       final String subtitle = subtitleController.text;
       final String category = selectedCategories.join(", ");
       final String bodyNews = bodyController.text;
-      String imageUrl = base64String;
+      String imageUrl = imageController.base64String ?? iconBase64();
       final String autor = homeController.user.name!;
       final String email = homeController.user.email!;
       final String dataCriacao = DateTime.now().toString();
@@ -409,18 +410,29 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                       const SizedBox(height: 16),
                       // >>>>> Buscando imagem na galeria e convertendo para base 64 <<<<<
                       ElevatedButton.icon(
-                        onPressed: () async {
-                          final ImagePicker picker = ImagePicker(); // Instancia o seletor de imagens
-                          final XFile? image = await picker.pickImage(source: ImageSource.gallery); // O usuário escolhe uma imagem da galeria
-                          if (image != null) {
-                            Uint8List bytes = await image.readAsBytes(); // Obtém os bytes diretamente
-                            base64String = base64Encode(bytes); // Converte para base64
-                           
-                          }
-                        },
+                        onPressed: () => imageController.pickImage(),
                         icon: const Icon(Icons.image),
                         label: const Text("Adicionar Imagem"),
                       ),
+                      const SizedBox(height: 10),
+                      Obx(() {
+                        if (imageController.base64String != null) {
+                          return Column(
+                            children: [
+                              Image.memory(
+                                base64Decode(imageController.base64String!),
+                                height: 150,
+                              ),
+                            ],
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      }),
+                      const SizedBox(height: 10),
+                      Obx(() => Text(
+                        imageController.message, // Acessa via getter
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
+                      )),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: validateAndPublish,
