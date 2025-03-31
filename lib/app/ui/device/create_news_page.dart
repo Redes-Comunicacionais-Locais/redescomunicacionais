@@ -73,7 +73,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text("Notícia Publicada!"),
+            title: const Text("Publicando notícia ..."),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,11 +404,15 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                 ),*/
                               );
                             },
-                          ),
+                         ),
                         ),
                       ]),
                       const SizedBox(height: 16),
                       // >>>>> Buscando imagem na galeria e convertendo para base 64 <<<<<
+                      const Text(
+                        "A imagem deve estar no formato JPG ou JPEG e, preferencialmente, ter um tamanho máximo de 500 KB. Imagens maiores serão comprimidas, o que pode causar perda de qualidade e lentidão no carregamento. Para uma melhor visualização, recomenda-se o uso de imagens com orientação paisagem.",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                      ),
                       ElevatedButton.icon(
                         onPressed: () => imageController.pickImage(),
                         icon: const Icon(Icons.image),
@@ -431,7 +435,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                       const SizedBox(height: 10),
                       Obx(() => Text(
                         imageController.message, // Acessa via getter
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
                       )),
                       const SizedBox(height: 16),
                       ElevatedButton(

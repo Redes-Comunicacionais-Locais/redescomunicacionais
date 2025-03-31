@@ -21,10 +21,12 @@ class ImageController extends GetxController {
       return;
     }
 
+    _base64String.value = null;
+    _message.value = "Processando sua imagem... Isso pode levar alguns segundos.";
+
     if (!imageFile.path.toLowerCase().endsWith('.jpg') && 
         !imageFile.path.toLowerCase().endsWith('.jpeg')) {
       _message.value = "A imagem deve ser no formato JPG ou JPEG.";
-      _base64String.value = null;
       return;
     }
 
@@ -38,7 +40,6 @@ class ImageController extends GetxController {
     img.Image? image = img.decodeImage(imageBytes);
     if (image == null) {
       _message.value = "Erro ao processar a imagem.";
-      _base64String.value = null;
       return;
     }
 
@@ -46,7 +47,6 @@ class ImageController extends GetxController {
     
     if (compressedImage.lengthInBytes > maxSizeBytes) {
       _message.value = "A imagem ainda é muito grande!";
-      _base64String.value = null;
     } else {
       _base64String.value = base64Encode(compressedImage);
       _message.value = "A imagem ultrapassou o limite de 500KB e foi comprimida. Esse processo pode resultar em perda de qualidade na imagem.";
