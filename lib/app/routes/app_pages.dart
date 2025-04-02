@@ -4,12 +4,12 @@ import 'package:redescomunicacionais/app/bindings/image_bindings.dart';
 import 'package:redescomunicacionais/app/bindings/login_bindings.dart';
 import 'package:redescomunicacionais/app/bindings/news_bindings.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
-import 'package:redescomunicacionais/app/ui/device/create_news_page.dart';
-import 'package:redescomunicacionais/app/ui/device/home_page.dart';
-import 'package:redescomunicacionais/app/ui/device/initial_page.dart';
-import 'package:redescomunicacionais/app/ui/device/login_page.dart';
+import 'package:redescomunicacionais/app/ui/device/forms/create_news_form.dart';
+import 'package:redescomunicacionais/app/ui/device/pages/home_page.dart';
+import 'package:redescomunicacionais/app/ui/device/pages/initial_page.dart';
+import 'package:redescomunicacionais/app/ui/device/pages/login_page.dart';
 import 'package:redescomunicacionais/app/data/components/news.dart';
-import 'package:redescomunicacionais/app/ui/device/news_page.dart';
+import 'package:redescomunicacionais/app/ui/device/pages/news_page.dart';
 import 'package:redescomunicacionais/app/web_view/webview_page.dart';
 
 class AppPages {

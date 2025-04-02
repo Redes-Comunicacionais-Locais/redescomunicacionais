@@ -5,7 +5,7 @@ import 'package:redescomunicacionais/app/data/components/news.dart';
 import 'package:redescomunicacionais/app/data/sobre_texto.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 
-import '../../controller/home_controller.dart';
+import '../../../controller/home_controller.dart';
 
 class HomePage extends StatelessWidget {
   final HomeController _homeController = Get.put(HomeController());

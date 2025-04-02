@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/ui/components/icon_base64.dart';
-import '../../controller/home_controller.dart';
+import '../../../controller/home_controller.dart';
 import 'package:redescomunicacionais/app/controller/image_controller.dart';
 import 'package:get/get.dart';
 //import 'package:image_picker/image_picker.dart';
