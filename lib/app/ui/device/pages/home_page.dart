@@ -206,12 +206,12 @@ class HomePage extends StatelessWidget {
         ],
       ),
       bottomNavigationBar: Container(
-        color: Colors.white,
+        color: Colors.black,
         height: 56.0,
         child: const Center(
           child: Text(
             "Cidade: ...",
-            style: TextStyle(fontSize: 18.0),
+            style: TextStyle(fontSize: 18.0, color: Colors.white),
           ),
         ),
       ),

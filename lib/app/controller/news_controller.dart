@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/data/model/news_model.dart';
 import 'package:redescomunicacionais/app/data/repository/news_repository.dart';
@@ -33,11 +34,21 @@ class NewsController extends GetxController {
 
       await _repository.adicionarNews(news);
       newss.add(news);
-      Get.snackbar('Sucesso', 'Notícias cadastrado com sucesso!',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Sucesso',
+        'Notícia cadastrada com sucesso!',
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.green, // Fundo verde para sucesso
+      );
     } catch (e) {
-      Get.snackbar('Erro', 'Não foi possível cadastrar a notícias.',
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(
+        'Erro',
+        'Não foi possível cadastrar a notícia.',
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.red, // Fundo vermelho para erro
+      );
     } finally {
       isLoading(false);
     }
