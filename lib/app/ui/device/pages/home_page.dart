@@ -47,15 +47,13 @@ class HomePage extends StatelessWidget {
               color: Colors.white,
             ),
             onPressed: () {
-             
-                                          _homeController.goUserGuide();
-
+              _homeController.goUserGuide();
             },
           ),
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -75,9 +73,8 @@ class HomePage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: NetworkImage(_homeController
-                            .user.urlImage ??
-                        'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'), // Substitua pela URL da sua imagem
+                    backgroundImage: NetworkImage(_homeController.user.urlImage ??
+                        'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'),
                   ),
                   const SizedBox(width: 16),
                   Column(
@@ -108,79 +105,116 @@ class HomePage extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: const Text('Sobre'),
+              leading: const Icon(Icons.info_outline, color: Colors.white),
+              title: const Text(
+                'Sobre',
+                style: TextStyle(color: Colors.white),
+              ),
               onTap: () {
                 Navigator.pop(context);
 
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return SimpleDialog(
-                      title: const Text('Sobre'),
-                      children: <Widget>[
-                        SimpleDialogOption(
-                          onPressed: () {
-                            Navigator.pop(context);
-                             _homeController.goInfo();
-                            
-                          },
-                          child: const Text('Informações do Projeto'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _homeController.goInfoTeam();
-
-                           
-                          },
-                          child: const Text('Equipe'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _homeController.goProjectStructure();
-                          },
-                          child: const Text('Estrutura do Projeto'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _homeController.goUserGuide();
-                          },
-                          child: const Text('Guia do Usuário'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _homeController.goInstallationConfig();
-                          },
-                          child: const Text('Instalação e Configuração'),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _homeController.goFAQ();
-                          },
-                          child: const Text('Perguntas Frequentes'),
-                        ),
-                      ],
+                    return AlertDialog(
+                      backgroundColor: Colors.black,
+                      title: const Text(
+                        'Sobre',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: const Icon(Icons.info, color: Colors.blue),
+                            title: const Text(
+                              'Informações do Projeto',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _homeController.goInfo();
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.group, color: Colors.blue),
+                            title: const Text(
+                              'Equipe',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _homeController.goInfoTeam();
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.folder, color: Colors.blue),
+                            title: const Text(
+                              'Estrutura do Projeto',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _homeController.goProjectStructure();
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.book, color: Colors.blue),
+                            title: const Text(
+                              'Guia do Usuário',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _homeController.goUserGuide();
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.settings, color: Colors.blue),
+                            title: const Text(
+                              'Instalação e Configuração',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _homeController.goInstallationConfig();
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.help, color: Colors.blue),
+                            title: const Text(
+                              'Perguntas Frequentes',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _homeController.goFAQ();
+                            },
+                          ),
+                        ],
+                      ),
                     );
                   },
                 );
               },
             ),
             ListTile(
-              leading: const Icon(Icons.article_outlined),
-              title: const Text('Criar Notícia'),
+              leading: const Icon(Icons.article_outlined, color: Colors.white),
+              title: const Text(
+                'Criar Notícia',
+                style: TextStyle(color: Colors.white),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, Routes.CREATE_NEWS);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.exit_to_app),
-              title: const Text('Sair'),
+              leading: const Icon(Icons.exit_to_app, color: Colors.white),
+              title: const Text(
+                'Sair',
+                style: TextStyle(color: Colors.white),
+              ),
               onTap: () {
                 LoginController().logout();
               },
