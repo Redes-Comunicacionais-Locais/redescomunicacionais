@@ -25,6 +25,7 @@ class InitialPage extends StatelessWidget {
           duration: 5000,
           splash: SvgPicture.asset(
             'assets/RCLLogo.svg',
+            // ignore: deprecated_member_use
             color: Colors.white,
 
           ),

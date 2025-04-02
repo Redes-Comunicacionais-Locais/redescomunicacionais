@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/login_controller.dart';
 import 'package:redescomunicacionais/app/data/components/news.dart';
-import 'package:redescomunicacionais/app/data/sobre_texto.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 
 import '../../../controller/home_controller.dart';

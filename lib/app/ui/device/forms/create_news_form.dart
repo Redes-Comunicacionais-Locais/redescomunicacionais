@@ -11,9 +11,10 @@ import 'dart:convert';
 
 
 class CreateNewsPage extends StatefulWidget {
-  const CreateNewsPage({Key? key}) : super(key: key);
+  const CreateNewsPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CreateNewsPageState createState() => _CreateNewsPageState();
 }
 

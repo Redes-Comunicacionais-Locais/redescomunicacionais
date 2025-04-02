@@ -40,6 +40,7 @@ class _LoginPageState extends State<LoginPage> {
             'assets/RCLLogo.svg',
             width: 200,
             height: 200,
+            // ignore: deprecated_member_use
             color: Colors.white,
           ),
           SignInButton(Buttons.google,

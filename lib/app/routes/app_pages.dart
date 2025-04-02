@@ -16,10 +16,10 @@ class AppPages {
   static final routes = [
     GetPage(
       name: Routes.INITIAL,
-      page: () => InitialPage(),
+      page: () => const InitialPage(),
     ),
     GetPage(
-        name: Routes.LOGIN, page: () => LoginPage(), binding: LoginBinding()),
+        name: Routes.LOGIN, page: () => const LoginPage(), binding: LoginBinding()),
     GetPage(name: Routes.HOME, page: () => HomePage(), binding: HomeBinding()),
     GetPage(
       name: Routes.NEWS,
@@ -28,12 +28,12 @@ class AppPages {
     ),
     GetPage(
       name: Routes.NEWS_PAGE,
-      page: () => NewsPage(),
+      page: () => const NewsPage(),
     ),
     GetPage(
         name: Routes.CREATE_NEWS,
-        page: () => CreateNewsPage(),
+        page: () => const CreateNewsPage(),
         bindings: [NewsBinding(), HomeBinding(), ImageBinding()]),
-    GetPage(name: Routes.WEB_VIEW, page: () => WebViewPage()),
+    GetPage(name: Routes.WEB_VIEW, page: () => const WebViewPage()),
   ];
 }
