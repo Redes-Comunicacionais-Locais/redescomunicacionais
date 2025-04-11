@@ -3,6 +3,7 @@ import 'package:redescomunicacionais/app/bindings/home_bindings.dart';
 import 'package:redescomunicacionais/app/bindings/image_bindings.dart';
 import 'package:redescomunicacionais/app/bindings/login_bindings.dart';
 import 'package:redescomunicacionais/app/bindings/news_bindings.dart';
+import 'package:redescomunicacionais/app/bindings/user_bindings.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/ui/device/create_news_page.dart';
 import 'package:redescomunicacionais/app/ui/device/home_page.dart';
@@ -20,7 +21,7 @@ class AppPages {
     ),
     GetPage(
         name: Routes.LOGIN, page: () => LoginPage(), binding: LoginBinding()),
-    GetPage(name: Routes.HOME, page: () => HomePage(), binding: HomeBinding()),
+    GetPage(name: Routes.HOME, page: () => HomePage(), bindings: [HomeBinding(), UserBinding()]),
     GetPage(
       name: Routes.NEWS,
       page: () => News(),
