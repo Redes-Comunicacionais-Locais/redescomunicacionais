@@ -9,6 +9,7 @@ class LoginController extends GetxController {
   try {
     repository.logoutGoogle();
     final user = await repository.signInGoogle();
+    
     if (user != null) {
       Get.offNamed(Routes.HOME, arguments: user);
     } else {

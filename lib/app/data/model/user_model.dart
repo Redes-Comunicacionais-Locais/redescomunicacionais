@@ -1,10 +1,10 @@
 class UserModel {
   String? id;
   String? name;
-  String? email;
+  String email;
   String? urlImage;
 
-  UserModel({this.id, this.name, this.email, this.urlImage});
+  UserModel({this.id, this.name, required this.email, this.urlImage});
 
   factory UserModel.fromFirebase(user) {
     return UserModel(

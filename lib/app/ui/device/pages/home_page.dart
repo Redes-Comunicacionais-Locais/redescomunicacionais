@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/login_controller.dart';
+import 'package:redescomunicacionais/app/controller/user_controller.dart';
 import 'package:redescomunicacionais/app/data/components/news.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 
@@ -8,6 +9,8 @@ import '../../../controller/home_controller.dart';
 
 class HomePage extends StatelessWidget {
   final HomeController _homeController = Get.put(HomeController());
+  final UserController _userController = Get.put(UserController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -198,17 +201,29 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.article_outlined, color: Colors.white),
-              title: const Text(
-                'Criar Notícia',
-                style: TextStyle(color: Colors.white),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, Routes.CREATE_NEWS);
-              },
-            ),
+            Obx(() {
+              _userController.loadUserRole(_homeController.user.email);
+              if (_userController.isAdmin.value || _userController.isSuperAdmin.value) {
+                return ListTile(
+                  leading: const Icon(Icons.article_outlined, color: Colors.white),
+                  title: const Text(
+                    'Criar Notícia',
+                    style: TextStyle(color: Colors.white)
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, Routes.CREATE_NEWS);
+                  },
+                );
+              } else {
+                return const ListTile(
+                  leading: Icon(Icons.lock_outline, color: Colors.red),
+                  title: Text('Criar Notícia',
+                  style: TextStyle(color: Colors.white)
+                ),
+                );
+              }
+            }),
             ListTile(
               leading: const Icon(Icons.exit_to_app, color: Colors.white),
               title: const Text(
@@ -219,8 +234,8 @@ class HomePage extends StatelessWidget {
                 LoginController().logout();
               },
             ),
-          ],
-        ),
+        
+       ] ),
       ),
       body: Stack(
         children: [
