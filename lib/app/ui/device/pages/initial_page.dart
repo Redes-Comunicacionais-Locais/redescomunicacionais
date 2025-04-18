@@ -1,7 +1,7 @@
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:redescomunicacionais/app/ui/device/splash_page.dart';
+import 'package:redescomunicacionais/app/ui/device/pages/splash_page.dart';
 
 class InitialPage extends StatelessWidget {
   const InitialPage({super.key});
@@ -25,6 +25,7 @@ class InitialPage extends StatelessWidget {
           duration: 5000,
           splash: SvgPicture.asset(
             'assets/RCLLogo.svg',
+            // ignore: deprecated_member_use
             color: Colors.white,
 
           ),

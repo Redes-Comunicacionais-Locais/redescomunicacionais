@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/ui/components/icon_base64.dart';
-import '../../controller/home_controller.dart';
+import '../../../controller/home_controller.dart';
 import 'package:redescomunicacionais/app/controller/image_controller.dart';
 import 'package:get/get.dart';
 //import 'package:image_picker/image_picker.dart';
@@ -11,9 +11,10 @@ import 'dart:convert';
 
 
 class CreateNewsPage extends StatefulWidget {
-  const CreateNewsPage({Key? key}) : super(key: key);
+  const CreateNewsPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CreateNewsPageState createState() => _CreateNewsPageState();
 }
 
@@ -64,40 +65,15 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
       final String dataCriacao = DateTime.now().toString();
 
       // ====== Adicionar notícia/FireStore ======
-      newsController.adicionarNews(title, subtitle, selectedCity ?? '',
-          category, bodyNews, imageUrl, autor, email, dataCriacao);
       titleController.clear();
       subtitleController.clear();
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Publicando notícia ..."),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Título: $title"),
-                Text("Cidade: ${selectedCity ?? 'Não informada'}"),
-                Text("Categoria: $category"),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text("Fechar"),
-              ),
-            ],
-          );
-        },
-      );
+      newsController.adicionarNews(title, subtitle, selectedCity ?? '',
+          category, bodyNews, imageUrl, autor, email, dataCriacao);
+      Get.back();
     }
   }
 
-  void _showCategorySelectionDialog() {
+  /*void _showCategorySelectionDialog() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -167,7 +143,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
         );
       },
     );
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -245,37 +221,79 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                       const SizedBox(height: 16),
                       // ########## Seleção de Categoria ##########
 
-                      GestureDetector(
-                        onTap: _showCategorySelectionDialog,
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white),
-                            borderRadius: BorderRadius.circular(8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Categorias",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                selectedCategories.isEmpty
-                                    ? "Selecione as categorias"
-                                    : selectedCategories.join(", "),
-                                style: const TextStyle(color: Colors.white),
+                          const SizedBox(height: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ExpansionTile(
+                              title: const Text(
+                                "Selecione as Categorias",
+                                style: TextStyle(color: Colors.white),
                               ),
-                              const Icon(Icons.arrow_drop_down,
-                                  color: Colors.white),
-                            ],
+                              iconColor: Colors.white,
+                              collapsedIconColor: Colors.white,
+                              children: [
+                                Column(
+                                  children: [
+                                    ...[
+                                      'Política',
+                                      'Esporte',
+                                      'Economia',
+                                      'Tecnologia',
+                                    ].map((category) {
+                                      return CheckboxListTile(
+                                        title: Text(
+                                          category,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        value: selectedCategories
+                                            .contains(category),
+                                        onChanged: (bool? isChecked) {
+                                          setState(() {
+                                            if (isChecked == true) {
+                                              selectedCategories.add(category);
+                                            } else {
+                                              selectedCategories
+                                                  .remove(category);
+                                            }
+                                          });
+                                        },
+                                        activeColor: Colors.blue,
+                                        checkColor: Colors.white, // Marcação branca
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                          if (showCategoryError)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Selecione pelo menos uma categoria.",
+                                style: TextStyle(
+                                    color: Colors.red, fontSize: 12),
+                              ),
+                            ),
+                        ],
                       ),
-                      if (showCategoryError)
-                        const Padding(
-                          padding: EdgeInsets.only(top: 8),
-                          child: Text(
-                            "Selecione pelo menos uma categoria!",
-                            style: TextStyle(color: Colors.red, fontSize: 14),
-                          ),
-                        ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         value: selectedCity,
@@ -409,33 +427,38 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                       ]),
                       const SizedBox(height: 16),
                       // >>>>> Buscando imagem na galeria e convertendo para base 64 <<<<<
-                      const Text(
+                     
+                      Center(
+                        child: ElevatedButton.icon(
+                          onPressed: () => imageController.pickImage(),
+                          icon: const Icon(Icons.image, ),
+                          label: const Text("Adicionar Imagem", style: TextStyle(color: Colors.black),),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                       const Text(
                         "A imagem deve estar no formato JPG ou JPEG e, preferencialmente, ter um tamanho máximo de 500 KB. Imagens maiores serão comprimidas, o que pode causar perda de qualidade e lentidão no carregamento. Para uma melhor visualização, recomenda-se o uso de imagens com orientação paisagem.",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                       ),
-                      ElevatedButton.icon(
-                        onPressed: () => imageController.pickImage(),
-                        icon: const Icon(Icons.image),
-                        label: const Text("Adicionar Imagem"),
+                      Center(
+                        child: Obx(() {
+                          if (imageController.base64String != null) {
+                            return Column(
+                              children: [
+                                Image.memory(
+                                  base64Decode(imageController.base64String!),
+                                  height: 150,
+                                ),
+                              ],
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        }),
                       ),
-                      const SizedBox(height: 10),
-                      Obx(() {
-                        if (imageController.base64String != null) {
-                          return Column(
-                            children: [
-                              Image.memory(
-                                base64Decode(imageController.base64String!),
-                                height: 150,
-                              ),
-                            ],
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      }),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                       Obx(() => Text(
                         imageController.message, // Acessa via getter
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.yellow),
                       )),
                       const SizedBox(height: 16),
                       ElevatedButton(
@@ -444,7 +467,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                           minimumSize: const Size(double.infinity, 50),
                           backgroundColor: Colors.blue,
                         ),
-                        child: const Text("Publicar Notícia"),
+                        child: const Text("Publicar Notícia", style: TextStyle(color: Colors.white),),
                       ),
                     ],
                   ),

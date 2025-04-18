@@ -1,5 +1,3 @@
-import 'package:redescomunicacionais/app/ui/device/news_page.dart';
-
 abstract class Routes {
   static const INITIAL = '/';
   static const LOGIN = '/login';
