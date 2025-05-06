@@ -4,12 +4,14 @@ import 'package:redescomunicacionais/app/controller/login_controller.dart';
 import 'package:redescomunicacionais/app/controller/user_controller.dart';
 import 'package:redescomunicacionais/app/data/components/news.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
+import 'package:redescomunicacionais/app/controller/version_controller.dart'; // Import necessário
 
 import '../../../controller/home_controller.dart';
 
 class HomePage extends StatelessWidget {
   final HomeController _homeController = Get.put(HomeController());
   final UserController _userController = Get.put(UserController());
+  final VersionController _versionController = Get.put(VersionController()); // Instância do VersionController
 
   @override
   Widget build(BuildContext context) {
@@ -224,6 +226,21 @@ class HomePage extends StatelessWidget {
                 );
               }
             }),
+             ListTile(
+              leading: const Icon(Icons.info, color: Colors.white),
+              title: const Text(
+                'Versão',
+                style: TextStyle(color: Colors.white),
+              ),
+              subtitle: Text(
+                _versionController.version, // Acessa diretamente a versão
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             ListTile(
               leading: const Icon(Icons.exit_to_app, color: Colors.white),
               title: const Text(
@@ -234,8 +251,9 @@ class HomePage extends StatelessWidget {
                 LoginController().logout();
               },
             ),
-        
-       ] ),
+           
+          ],
+        ),
       ),
       body: Stack(
         children: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/login_controller.dart';
+import 'package:redescomunicacionais/app/controller/version_controller.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
 class LoginPage extends StatefulWidget {
@@ -13,6 +14,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final LoginController _loginController = Get.put(LoginController());
+  final versionController = Get.find<VersionController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,6 +53,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
               padding: const EdgeInsets.all(16.0),
               onPressed: _loginController.loginGoogle),
+          Text(versionController.version, style: const TextStyle(
+                fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),),
         ],
       ),
     ),
