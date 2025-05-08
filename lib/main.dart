@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/route_manager.dart';
 import 'package:redescomunicacionais/app/controller/version_controller.dart';
 import 'package:redescomunicacionais/app/routes/app_pages.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';

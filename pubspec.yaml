@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.1
+version: 1.0.2
 
 environment:
   sdk: ^3.5.4
@@ -70,17 +70,17 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   background_color_ios: "#ffffff"
-  image_path: "assets/icons/RCLIcon.png"
+  image_path: "assets/icons/RCLWhiteIcon.png"
   min_sdk_android: 21
   web:
     generate: true
-    image_path: "assets/icons/RCLIcon.png"
+    image_path: "assets/icons/RCLWhiteIcon.png"
     background_color: "#ffffff"
     theme_color: "#ffffff"
 
 flutter_native_splash:
-  color: "#FFFFFF" 
-  image: "assets/icons/RCLIcon.png"
+  color: "#000000" 
+  image: "assets/icons/RCLWhiteIcon.png"
   android: true 
   ios: true 
   web: true
@@ -88,9 +88,9 @@ flutter_native_splash:
 
   android_12:
     icon_background_color: "#FFFFFF"
-    image: "assets/icons/RCLIcon.png"
+    image: "assets/icons/RCLWhiteIcon.png"
     icon_background_color_dark: "#1a1a1a"
-    image_dark: "assets/icons/RCLIcon.png"
+    image_dark: "assets/icons/RCLWhiteIcon.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

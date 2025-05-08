@@ -17,7 +17,7 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(
-              Icons.wifi,
+              Icons.cloud_queue,
               color: Colors.white,
             ),
             onPressed: () {
@@ -25,9 +25,9 @@ class HomePage extends StatelessWidget {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: const Text("Wifi"),
+                    title: const Text("Sincronismo"),
                     content: const Text(
-                      "Esta tela exibe informações sobre sua conexão.",
+                      "Módulo em desenvolvimento, em breve teremos novidades.",
                     ),
                     actions: [
                       TextButton(
