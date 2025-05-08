@@ -9,7 +9,7 @@ import 'package:redescomunicacionais/app/ui/device/forms/create_news_form.dart';
 import 'package:redescomunicacionais/app/ui/device/pages/home_page.dart';
 import 'package:redescomunicacionais/app/ui/device/pages/initial_page.dart';
 import 'package:redescomunicacionais/app/ui/device/pages/login_page.dart';
-import 'package:redescomunicacionais/app/data/components/news.dart';
+import 'package:redescomunicacionais/app/ui/theme/news_widget.dart';
 import 'package:redescomunicacionais/app/ui/device/pages/news_page.dart';
 import 'package:redescomunicacionais/app/web_view/webview_page.dart';
 
@@ -25,7 +25,7 @@ class AppPages {
 
     GetPage(
       name: Routes.NEWS,
-      page: () => News(),
+      page: () => NewsWidget(),
       binding: NewsBinding(),
     ),
     GetPage(
