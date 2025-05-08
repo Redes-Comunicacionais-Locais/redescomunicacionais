@@ -51,21 +51,11 @@ class _NewsPageState extends State<NewsPage> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(10), // Bordas arredondadas
-                child: ShaderMask(
-                  shaderCallback: (rect) {
-                    return const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Colors.black, Colors.transparent],
-                    ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
-                  },
-                  blendMode: BlendMode.dstIn,
-                  child: Image.memory(
-                    base64Decode(imgurl),
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: 200, // Altura ajustada para melhor visualização
-                  ),
+                child: Image.memory(
+                  base64Decode(imgurl),
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 200, // Altura ajustada para melhor visualização
                 ),
               ),
             ],
