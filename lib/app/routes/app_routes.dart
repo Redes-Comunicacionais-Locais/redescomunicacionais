@@ -6,5 +6,6 @@ abstract class Routes {
   static const NEWS = '/news';
   static const NEWS_PAGE = '/newsPage';
   static const CREATE_NEWS = '/createNews';
+  static const ADMIN = '/admin';
   static const WEB_VIEW = '/web_view';
 }

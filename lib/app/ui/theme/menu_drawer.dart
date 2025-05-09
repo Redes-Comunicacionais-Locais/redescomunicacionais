@@ -183,6 +183,30 @@ class MenuPage extends StatelessWidget {
               );
             }
           }),
+          Obx(() {
+            _userController.loadUserRole(_homeController.user.email);
+            if (_userController.isAdmin.value || _userController.isSuperAdmin.value) {
+              return ListTile(
+                leading: const Icon(Icons.person_outline, color: Colors.white),
+                title: const Text(
+                  'Admin',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, Routes.ADMIN);
+                },
+              );
+            } else {
+              return const ListTile(
+                leading: Icon(Icons.lock_outline, color: Colors.red),
+                title: Text(
+                  'Admin',
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            }
+          }),
           ListTile(
             leading: const Icon(Icons.info, color: Colors.white),
             title: const Text(
