@@ -5,6 +5,14 @@ enum UserRole { user, admin, superAdmin }
 class UserRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Future<void> addProfile(String email) async {
+    try {
+      await _firestore.collection('admin').doc(email).set({});
+    } catch (e) {
+      throw Exception("Erro ao criar admin vazio: $e");
+    }
+  }
+
   Future<UserRole> getUserRole(String email) async {
     final isSuperAdmin = await _firestore.collection('super_admin').doc(email).get();
     if (isSuperAdmin.exists) return UserRole.superAdmin;

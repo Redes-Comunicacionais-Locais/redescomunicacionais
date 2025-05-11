@@ -6,6 +6,10 @@ class UserController extends GetxController {
   var isAdmin = false.obs;
   var isSuperAdmin = false.obs;
 
+  Future<void> addProfile(String email) async {
+    await _repository.addProfile(email);
+  }
+
   Future<void> loadUserRole(String email) async {
     final role = await _repository.getUserRole(email);
     if (role == UserRole.admin) {
