@@ -6,6 +6,7 @@ import 'package:redescomunicacionais/app/bindings/news_bindings.dart';
 import 'package:redescomunicacionais/app/bindings/user_bindings.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/ui/device/forms/create_news_form.dart';
+import 'package:redescomunicacionais/app/ui/device/pages/admin_page.dart';
 import 'package:redescomunicacionais/app/ui/device/pages/home_page.dart';
 import 'package:redescomunicacionais/app/ui/device/pages/initial_page.dart';
 import 'package:redescomunicacionais/app/ui/device/pages/login_page.dart';
@@ -20,6 +21,8 @@ class AppPages {
       page: () => const InitialPage(),
     ),
     GetPage(name: Routes.LOGIN, page: () => const LoginPage(), binding: LoginBinding()),
+    
+    GetPage(name: Routes.ADMIN, page: () => AdminPage()),
     
     GetPage(name: Routes.HOME, page: () => HomePage(), bindings: [HomeBinding(), UserBinding()]),
 

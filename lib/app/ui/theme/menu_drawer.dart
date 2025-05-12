@@ -161,7 +161,7 @@ class MenuPage extends StatelessWidget {
           ),
           Obx(() {
             _userController.loadUserRole(_homeController.user.email);
-            if (_userController.isAdmin.value || _userController.isSuperAdmin.value) {
+            if (_userController.isAdmin.value || _userController.isEditor.value) {
               return ListTile(
                 leading: const Icon(Icons.article_outlined, color: Colors.white),
                 title: const Text(
@@ -178,6 +178,30 @@ class MenuPage extends StatelessWidget {
                 leading: Icon(Icons.lock_outline, color: Colors.red),
                 title: Text(
                   'Criar Notícia',
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            }
+          }),
+          Obx(() {
+            _userController.loadUserRole(_homeController.user.email);
+            if (_userController.isAdmin.value) {
+              return ListTile(
+                leading: const Icon(Icons.person_outline, color: Colors.white),
+                title: const Text(
+                  'Admin',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, Routes.ADMIN);
+                },
+              );
+            } else {
+              return const ListTile(
+                leading: Icon(Icons.lock_outline, color: Colors.red),
+                title: Text(
+                  'Admin',
                   style: TextStyle(color: Colors.white),
                 ),
               );
