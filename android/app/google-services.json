@@ -7,6 +7,42 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:792922518433:android:e67395651f4d58ccc891e0",
+        "android_client_info": {
+          "package_name": "br.uff.redescomunicacionais"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "792922518433-tk5k4cforsr5l2r1bsi2n9mfftn8njlj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBO5t2GpdYhX_fQPbHc4YNOK--d6a3qekk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792922518433-tk5k4cforsr5l2r1bsi2n9mfftn8njlj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "792922518433-qjp00cfou7jadhop1j8qqseq0q83eu4l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.redescomunicacionais"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:792922518433:android:22a21920187fe4b1c891e0",
         "android_client_info": {
           "package_name": "com.example.redescomunicacionais"
@@ -35,6 +71,14 @@
           "android_info": {
             "package_name": "com.example.redescomunicacionais",
             "certificate_hash": "29f639f8d9e5674bbdb7c9ba1c27892d7c3b3379"
+          }
+        },
+        {
+          "client_id": "792922518433-i4i52sind0bsmphc09laru4phge4l0aj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.redescomunicacionais",
+            "certificate_hash": "27e0f45efaa96258f66534cf16602132cbe35575"
           }
         },
         {
