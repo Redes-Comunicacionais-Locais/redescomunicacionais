@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   firebase_core: ^3.8.1
   get: ^4.6.6
-  get_storage: 
+  get_storage: ^2.1.1
   animated_splash_screen: ^1.3.0
   sign_in_button: ^3.2.0
   cloud_firestore: ^5.5.1
@@ -54,7 +54,7 @@ dependencies:
   image: ^4.5.4
   intl: ^0.20.2
   package_info_plus: ^8.3.0
-  geolocator: ^14.0.0
+  geolocator: ^14.0.1
   geocoding: ^3.0.0
 
 dev_dependencies:
