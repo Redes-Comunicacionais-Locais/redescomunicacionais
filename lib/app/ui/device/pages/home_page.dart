@@ -4,8 +4,21 @@ import 'package:redescomunicacionais/app/controller/home_controller.dart';
 import 'package:redescomunicacionais/app/ui/theme/news_widget.dart';
 import 'package:redescomunicacionais/app/ui/theme/menu_drawer.dart';
 
-class HomePage extends StatelessWidget {
-  final HomeController _homeController = Get.put(HomeController());
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final HomeController _homeController = Get.find<HomeController>();
+
+  @override
+  void initState() {
+    super.initState();
+    _homeController.requestLocation(context);
+  }
 
   @override
   Widget build(BuildContext context) {
