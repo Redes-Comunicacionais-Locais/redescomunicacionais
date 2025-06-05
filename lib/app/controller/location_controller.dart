@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:redescomunicacionais/app/routes/app_routes.dart';
 
 class LocationController extends GetxController {
   var city = ''.obs;

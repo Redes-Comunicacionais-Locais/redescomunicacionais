@@ -7,8 +7,6 @@ class HomeController extends GetxController {
   final UserModel user = Get.arguments;
   final LocationController locationController = Get.put(LocationController());
 
-  var city = "Carregando...".obs;
-
   @override
   void onInit() {
     super.onInit();

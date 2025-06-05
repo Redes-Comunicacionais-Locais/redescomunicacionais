@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> {
         height: 30.0,
         child: Center(
           child: Obx(() => Text(
-                _homeController.city.value,
+                _locationController.city.value,
                 style: const TextStyle(fontSize: 18.0, color: Colors.white),
               )),
         ),
