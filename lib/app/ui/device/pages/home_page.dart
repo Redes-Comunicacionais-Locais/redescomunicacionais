@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/home_controller.dart';
+import 'package:redescomunicacionais/app/controller/location_controller.dart';
 import 'package:redescomunicacionais/app/ui/theme/news_widget.dart';
 import 'package:redescomunicacionais/app/ui/theme/menu_drawer.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final HomeController _homeController = Get.put(HomeController());
+  final LocationController _locationController = Get.put(LocationController());
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +76,22 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ),
-          NewsWidget(),
+          FutureBuilder(
+            future: _locationController.requestLocation(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasData && snapshot.data == true) {
+                return NewsWidget();
+              } else {
+                return const Center(
+                    child: Text(
+                  "Localização não disponível. Verifique as permissões.",
+                  style: TextStyle(color: Colors.white),
+                ));
+              }
+            },
+          ),
         ],
       ),
       bottomNavigationBar: Container(
@@ -74,7 +99,7 @@ class HomePage extends StatelessWidget {
         height: 30.0,
         child: Center(
           child: Obx(() => Text(
-                _homeController.city.value,
+                _locationController.city.value,
                 style: const TextStyle(fontSize: 18.0, color: Colors.white),
               )),
         ),

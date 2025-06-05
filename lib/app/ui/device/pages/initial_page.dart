@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/login_controller.dart';
-import 'package:redescomunicacionais/app/ui/device/pages/home_page.dart';
 
 class InitialPage extends StatefulWidget {
   const InitialPage({super.key});
@@ -17,11 +16,10 @@ class _InitialPageState extends State<InitialPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.delayed(const Duration(seconds: 3), () async {
-        return await _loginController.tryLogin();
-      }),
-      builder: (context, snapshot) {
-        
+        future: Future.delayed(const Duration(seconds: 3), () async {
+          return await _loginController.tryLogin();
+        }),
+        builder: (context, snapshot) {
           return Stack(
             children: [
               Container(
@@ -47,14 +45,14 @@ class _InitialPageState extends State<InitialPage> {
                       height: 200,
                     ),
                     const SizedBox(height: 100),
-                    const CircularProgressIndicator(color: Colors.white, strokeWidth: 5),
+                    const CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 5),
                     const SizedBox(height: 20),
                   ],
                 ),
               ),
             ],
           );
-        } 
-    );
+        });
   }
 }
