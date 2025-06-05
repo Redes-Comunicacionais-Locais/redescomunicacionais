@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/home_controller.dart';
+import 'package:redescomunicacionais/app/controller/location_controller.dart';
 import 'package:redescomunicacionais/app/ui/theme/news_widget.dart';
 import 'package:redescomunicacionais/app/ui/theme/menu_drawer.dart';
 
@@ -12,13 +14,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final HomeController _homeController = Get.find<HomeController>();
-
-  @override
-  void initState() {
-    super.initState();
-    _homeController.requestLocation(context);
-  }
+  final HomeController _homeController = Get.put(HomeController());
+  final LocationController _locationController = Get.put(LocationController());
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +76,22 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          NewsWidget(),
+          FutureBuilder(
+            future: _locationController.requestLocation(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasData && snapshot.data == true) {
+                return NewsWidget();
+              } else {
+                return const Center(
+                    child: Text(
+                  "Localização não disponível. Verifique as permissões.",
+                  style: TextStyle(color: Colors.white),
+                ));
+              }
+            },
+          ),
         ],
       ),
       bottomNavigationBar: Container(

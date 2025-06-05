@@ -13,53 +13,59 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final LoginController _loginController = Get.put(LoginController());
+  final LoginController _loginController = Get.find<LoginController>();
   final versionController = Get.find<VersionController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-  body: Container(
-    decoration: const BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topRight,
-        end: Alignment.bottomLeft,
-        colors: [
-          Colors.blue,
-          Colors.black,
-        ],
-      ),
-    ),
-    child: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          const Text(
-            "Redes Comunicacionais Locais",
-            style: TextStyle(
-                fontSize: 32, color: Colors.white, fontWeight: FontWeight.bold),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              Colors.blue,
+              Colors.black,
+            ],
           ),
-          SvgPicture.asset(
-            'assets/RCLLogo.svg',
-            width: 200,
-            height: 200,
-            // ignore: deprecated_member_use
-            color: Colors.white,
-          ),
-          SignInButton(Buttons.google,
-              text: 'Entrar com Google',
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(50.0),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              const Text(
+                "Redes Comunicacionais Locais",
+                style: TextStyle(
+                    fontSize: 32,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),
               ),
-              padding: const EdgeInsets.all(16.0),
-              onPressed: _loginController.loginGoogle),
-          Text(versionController.version, style: const TextStyle(
-                fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),),
-        ],
+              SvgPicture.asset(
+                'assets/RCLLogo.svg',
+                width: 200,
+                height: 200,
+                // ignore: deprecated_member_use
+                color: Colors.white,
+              ),
+              SignInButton(Buttons.google,
+                  text: 'Entrar com Google',
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50.0),
+                  ),
+                  padding: const EdgeInsets.all(16.0),
+                  onPressed: _loginController.loginGoogle),
+              Text(
+                versionController.version,
+                style: const TextStyle(
+                    fontSize: 10,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
       ),
-    ),
-  ),
-);
-
+    );
   }
 }

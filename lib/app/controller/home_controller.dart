@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/location_controller.dart';
 import 'package:redescomunicacionais/app/data/model/user_model.dart';
@@ -13,10 +12,6 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-  }
-
-  void requestLocation(BuildContext context) {
-    locationController.requestLocation(context);
   }
 
   void goInfo() {
