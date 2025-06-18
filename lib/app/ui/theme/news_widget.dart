@@ -9,7 +9,7 @@ class NewsWidget extends StatelessWidget {
   NewsWidget({super.key});
 
   final NewsController newsController = Get.put(NewsController());
-  
+
   @override
   Widget build(BuildContext context) {
     newsController.buscarNews();
@@ -63,7 +63,8 @@ class NewsWidget extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ClipRRect(
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(8.0)),
+                              borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(8.0)),
                               child: Image.memory(
                                 base64Decode(news.imgurl),
                                 fit: BoxFit.cover,
@@ -94,7 +95,9 @@ class NewsWidget extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16.0), // Espaço entre os cards horizontais e a lista vertical
+          const SizedBox(
+              height:
+                  16.0), // Espaço entre os cards horizontais e a lista vertical
 
           // Lista vertical de notícias
           ...newsController.newss.map((news) {
@@ -116,7 +119,8 @@ class NewsWidget extends StatelessWidget {
               },
               child: Card(
                 color: Colors.black,
-                margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 elevation: 4.0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.0),
@@ -126,7 +130,8 @@ class NewsWidget extends StatelessWidget {
                   children: [
                     // Imagem da notícia
                     ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12.0)),
+                      borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(12.0)),
                       child: Image.memory(
                         base64Decode(news.imgurl),
                         fit: BoxFit.cover,

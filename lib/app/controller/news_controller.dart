@@ -59,6 +59,8 @@ class NewsController extends GetxController {
     try {
       isLoading(true);
       newss.value = await _repository.buscarNews();
+      newss.sort((a, b) => DateTime.parse(b.dataCriacao)
+          .compareTo(DateTime.parse(a.dataCriacao)));
     } catch (e) {
       Get.snackbar('Erro', 'Não foi possível carregar as notícias.',
           snackPosition: SnackPosition.BOTTOM);
