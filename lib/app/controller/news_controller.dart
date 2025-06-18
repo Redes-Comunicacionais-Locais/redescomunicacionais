@@ -18,6 +18,7 @@ class NewsController extends GetxController {
       String imgurl,
       String autor,
       String email,
+      String type,
       String dataCriacao) async {
     try {
       isLoading(true);
@@ -30,6 +31,7 @@ class NewsController extends GetxController {
           imgurl: imgurl,
           autor: autor,
           email: email,
+          type: type,
           dataCriacao: dataCriacao);
 
       await _repository.adicionarNews(news);

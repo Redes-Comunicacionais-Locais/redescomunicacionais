@@ -9,6 +9,7 @@ class NewsModel {
   String autor;
   String email;
   String dataCriacao;
+  String type;
 
   NewsModel(
       {this.id = '',
@@ -20,6 +21,7 @@ class NewsModel {
       required this.imgurl,
       required this.autor,
       required this.email,
+      required this.type,
       required this.dataCriacao});
 
   // Converter para Map (para enviar ao Firebase)
@@ -50,6 +52,7 @@ class NewsModel {
       autor: data['autor'] ?? '',
       email: data['email'] ?? '',
       dataCriacao: data['dataCriacao'] ?? '',
+      type: data['type'] ?? '',
     );
   }
 }
