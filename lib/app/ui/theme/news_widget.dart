@@ -46,7 +46,8 @@ class NewsWidget extends StatelessWidget {
                           "corpo": news.corpo,
                           "imgurl": news.imgurl,
                           "autor": news.autor,
-                          "dataCriacao": news.dataCriacao
+                          "dataCriacao": news.dataCriacao,
+                          "type": news.type,
                         },
                       );
                     },
@@ -113,7 +114,8 @@ class NewsWidget extends StatelessWidget {
                     "corpo": news.corpo,
                     "imgurl": news.imgurl,
                     "autor": news.autor,
-                    "dataCriacao": news.dataCriacao
+                    "dataCriacao": news.dataCriacao,
+                    "type": news.type,
                   },
                 );
               },

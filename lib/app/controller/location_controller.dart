@@ -7,34 +7,40 @@ import 'package:geocoding/geocoding.dart';
 
 class LocationController extends GetxController {
   var city = ''.obs;
+  bool dialogShow = true; // Variável para controlar a exibição do diálogo
 
   Future<bool> requestLocation() async {
     final completer = Completer<bool>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Get.dialog(
-        AlertDialog(
-          title: Text("Solicitação de Localização"),
-          content: Text(
-              "Este aplicativo precisa acessar sua localização para fornecer informações relevantes à sua área. Para continuar, selecione 'Confirmar'. Caso não deseje prosseguir, selecione 'Sair'."),
-          actions: [
-            TextButton(
-              onPressed: () {
-                completer.complete(false); // Usuário escolheu "Sair"
-                Get.back();
-              },
-              child: Text("Sair"),
-            ),
-            TextButton(
-              onPressed: () async {
-                await getUserLocation(); // Solicita permissão e obtém localização
-                completer.complete(true); // Usuário confirmou a solicitação
-                Get.back();
-              },
-              child: Text("Confirmar"),
-            ),
-          ],
-        ),
-      );
+      if (dialogShow) {
+        await Get.dialog(
+          AlertDialog(
+            title: Text("Solicitação de Localização"),
+            content: Text(
+                "Este aplicativo precisa acessar sua localização para fornecer informações relevantes à sua área. Para continuar, selecione 'Confirmar'. Caso não deseje prosseguir, selecione 'Sair'."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  completer.complete(false); // Usuário escolheu "Sair"
+                  Get.back();
+                },
+                child: Text("Sair"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await getUserLocation(); // Solicita permissão e obtém localização
+                  completer.complete(true); // Usuário confirmou a solicitação
+                  Get.back();
+                },
+                child: Text("Confirmar"),
+              ),
+            ],
+          ),
+        );
+      } else {
+        completer.complete(true);
+        await getUserLocation();
+      }
     });
     return completer.future;
   }
@@ -45,9 +51,10 @@ class LocationController extends GetxController {
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         city.value = "Permissão negada";
+        dialogShow = true;
         return;
       }
-
+      dialogShow = false;
       // Obtém a posição atual
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,

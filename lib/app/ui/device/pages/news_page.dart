@@ -22,6 +22,7 @@ class _NewsPageState extends State<NewsPage> {
     final String categoria = Get.arguments["categoria"] ?? "";
     final String cidade = Get.arguments["cidade"] ?? "";
     final String corpo = Get.arguments["corpo"] ?? "";
+    final String type = Get.arguments["type"] ?? "";
 
     // Formata a data
     String formatData(String data) {
@@ -92,7 +93,7 @@ class _NewsPageState extends State<NewsPage> {
                 ),
               ),
               Text(
-                "Categoria: $categoria",
+                "Data: ${formatData(dataCriacao)}", // Formata a data
                 style: const TextStyle(
                   color: Colors.white54,
                   fontSize: 12,
@@ -112,7 +113,14 @@ class _NewsPageState extends State<NewsPage> {
                 ),
               ),
               Text(
-                "Data: ${formatData(dataCriacao)}", // Formata a data
+                "Categoria: $categoria",
+                style: const TextStyle(
+                  color: Colors.white54,
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                "Tipo: $type",
                 style: const TextStyle(
                   color: Colors.white54,
                   fontSize: 12,

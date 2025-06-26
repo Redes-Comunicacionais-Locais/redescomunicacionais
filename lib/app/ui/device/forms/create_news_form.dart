@@ -44,7 +44,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
   ### Lista de Itens:
    - **Item 1**: Explicação sobre o primeiro item.
    - *Item 2*: Explicação sobre o segundo item.
-   - `Item 3`: Um trecho de código destacado.
+   - *Item 3*: Um trecho de código destacado.
    
   > Esta é uma citação para dar mais ênfase a uma ideia.
   """;
@@ -68,16 +68,17 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
       titleController.clear();
       subtitleController.clear();
       newsController.adicionarNews(
-          title,
-          subtitle,
-          selectedCity ?? '',
-          selectedType ?? '',
-          category,
-          bodyNews,
-          imageUrl,
-          autor,
-          email,
-          dataCriacao);
+        title,
+        subtitle,
+        selectedCity ?? '',
+        category,
+        bodyNews,
+        imageUrl,
+        autor,
+        email,
+        dataCriacao,
+        selectedType ?? '',
+      );
       Get.back();
     }
   }
