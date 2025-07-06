@@ -412,11 +412,18 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                       color: Colors.cyan,
                                       fontStyle: FontStyle.italic),
                                   blockquote: TextStyle(
-                                      color: Colors.grey[400],
+                                      color: Colors.white,
                                       fontStyle: FontStyle.italic),
+                                  blockquotePadding: const EdgeInsets.all(12),
+                                  blockquoteDecoration: BoxDecoration(
+                                    color: const Color.fromARGB(255, 27, 27, 27),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+
                                   code: const TextStyle(
                                       color: Colors.greenAccent,
                                       fontFamily: "monospace"),
+                                  
                                   listBullet:
                                       const TextStyle(color: Colors.white),
                                 ),*/

@@ -133,7 +133,15 @@ class _NewsPageState extends State<NewsPage> {
               h2: const TextStyle(color: Colors.white, fontSize: 22),
               h3: const TextStyle(color: Colors.white, fontSize: 20),
               strong: const TextStyle(color: Colors.white),
-              blockquote: const TextStyle(color: Colors.white70),
+              blockquote: TextStyle(
+                color: Colors.white,
+                fontStyle: FontStyle.italic
+              ),
+              blockquotePadding: const EdgeInsets.all(12),
+              blockquoteDecoration: BoxDecoration(
+                color: const Color.fromARGB(255, 27, 27, 27),
+                borderRadius: BorderRadius.circular(4),
+              ),
             ),
           ),
         ],
