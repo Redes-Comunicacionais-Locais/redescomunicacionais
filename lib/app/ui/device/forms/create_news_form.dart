@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/ui/components/icon_base64.dart';
+import 'package:redescomunicacionais/app/ui/components/markdown_styles.dart';
 import '../../../controller/home_controller.dart';
 import 'package:redescomunicacionais/app/controller/image_controller.dart';
 import 'package:get/get.dart';
@@ -383,50 +384,14 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.white),
                             borderRadius: BorderRadius.circular(8),
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                           child: ValueListenableBuilder<TextEditingValue>(
                             valueListenable: bodyController,
                             builder: (context, value, child) {
                               return MarkdownBody(
-                                data: value
-                                    .text, // Atualiza o Markdown em tempo real
-                                /*styleSheet: MarkdownStyleSheet(
-                                  p: const TextStyle(color: Colors.white),
-                                  h1: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold),
-                                  h2: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold),
-                                  h3: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                  strong: const TextStyle(
-                                      color: Colors.yellow,
-                                      fontWeight: FontWeight.bold),
-                                  em: const TextStyle(
-                                      color: Colors.cyan,
-                                      fontStyle: FontStyle.italic),
-                                  blockquote: TextStyle(
-                                      color: Colors.white,
-                                      fontStyle: FontStyle.italic),
-                                  blockquotePadding: const EdgeInsets.all(12),
-                                  blockquoteDecoration: BoxDecoration(
-                                    color: const Color.fromARGB(255, 27, 27, 27),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-
-                                  code: const TextStyle(
-                                      color: Colors.greenAccent,
-                                      fontFamily: "monospace"),
-                                  
-                                  listBullet:
-                                      const TextStyle(color: Colors.white),
-                                ),*/
+                                data: value.text, // Atualiza o Markdown em tempo real
+                                styleSheet: customMarkdownStyle
                               );
                             },
                          ),
