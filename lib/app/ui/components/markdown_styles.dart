@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 final customMarkdownStyle = MarkdownStyleSheet(
-  p: const TextStyle(color: Colors.red),
+  p: const TextStyle(color: Colors.white),
   h1: const TextStyle(color: Colors.white),
   h2: const TextStyle(color: Colors.white),
   h3: const TextStyle(color: Colors.white,),
