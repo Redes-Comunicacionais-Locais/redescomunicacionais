@@ -10,27 +10,31 @@ class NewsController extends GetxController {
 
   // Adicionar notícias
   Future<void> adicionarNews(
-      String titulo,
-      String subtitulo,
-      String cidade,
-      String categoria,
-      String corpo,
-      String imgurl,
-      String autor,
-      String email,
-      String dataCriacao) async {
+    String titulo,
+    String subtitulo,
+    String cidade,
+    String categoria,
+    String corpo,
+    String imgurl,
+    String autor,
+    String email,
+    String dataCriacao,
+    String type,
+  ) async {
     try {
       isLoading(true);
       NewsModel news = NewsModel(
-          titulo: titulo,
-          subtitulo: subtitulo,
-          cidade: cidade,
-          categoria: categoria,
-          corpo: corpo,
-          imgurl: imgurl,
-          autor: autor,
-          email: email,
-          dataCriacao: dataCriacao);
+        titulo: titulo,
+        subtitulo: subtitulo,
+        cidade: cidade,
+        categoria: categoria,
+        corpo: corpo,
+        imgurl: imgurl,
+        autor: autor,
+        email: email,
+        dataCriacao: dataCriacao,
+        type: type,
+      );
 
       await _repository.adicionarNews(news);
       newss.add(news);
@@ -59,6 +63,8 @@ class NewsController extends GetxController {
     try {
       isLoading(true);
       newss.value = await _repository.buscarNews();
+      newss.sort((a, b) => DateTime.parse(b.dataCriacao)
+          .compareTo(DateTime.parse(a.dataCriacao)));
     } catch (e) {
       Get.snackbar('Erro', 'Não foi possível carregar as notícias.',
           snackPosition: SnackPosition.BOTTOM);

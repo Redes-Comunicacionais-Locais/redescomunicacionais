@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/ui/components/icon_base64.dart';
+import 'package:redescomunicacionais/app/ui/components/markdown_styles.dart';
 import '../../../controller/home_controller.dart';
 import 'package:redescomunicacionais/app/controller/image_controller.dart';
 import 'package:get/get.dart';
 //import 'package:image_picker/image_picker.dart';
 //import 'dart:typed_data';
 import 'dart:convert';
-
 
 class CreateNewsPage extends StatefulWidget {
   const CreateNewsPage({super.key});
@@ -33,6 +33,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
   String? selectedCategory;
   bool showCategoryError = false;
   String? selectedCity;
+  String? selectedType;
 
   String textoExemploMarkdown = """
   ### Este é um exemplo de texto em Markdown
@@ -44,7 +45,7 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
   ### Lista de Itens:
    - **Item 1**: Explicação sobre o primeiro item.
    - *Item 2*: Explicação sobre o segundo item.
-   - `Item 3`: Um trecho de código destacado.
+   - *Item 3*: Um trecho de código destacado.
    
   > Esta é uma citação para dar mais ênfase a uma ideia.
   """;
@@ -67,83 +68,21 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
       // ====== Adicionar notícia/FireStore ======
       titleController.clear();
       subtitleController.clear();
-      newsController.adicionarNews(title, subtitle, selectedCity ?? '',
-          category, bodyNews, imageUrl, autor, email, dataCriacao);
+      newsController.adicionarNews(
+        title,
+        subtitle,
+        selectedCity ?? '',
+        category,
+        bodyNews,
+        imageUrl,
+        autor,
+        email,
+        dataCriacao,
+        selectedType ?? '',
+      );
       Get.back();
     }
   }
-
-  /*void _showCategorySelectionDialog() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.black,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (BuildContext context) {
-        List<String> categorias = [
-          'Política',
-          'Esporte',
-          'Economia',
-          'Tecnologia'
-        ];
-
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    "Selecione as Categorias",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const Divider(color: Colors.white),
-                  Expanded(
-                    child: ListView(
-                      children: categorias.map((category) {
-                        return CheckboxListTile(
-                          title: Text(category,
-                              style: const TextStyle(color: Colors.white)),
-                          value: selectedCategories.contains(category),
-                          onChanged: (bool? isChecked) {
-                            setModalState(() {
-                              if (isChecked == true) {
-                                selectedCategories.add(category);
-                              } else {
-                                selectedCategories.remove(category);
-                              }
-                            });
-                          },
-                          activeColor: Colors.blue,
-                          checkColor: Colors.white,
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Fecha o modal
-                      setState(() {}); // Atualiza o estado da tela principal
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                    ),
-                    child: const Text("Confirmar"),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -220,18 +159,9 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                       ),
                       const SizedBox(height: 16),
                       // ########## Seleção de Categoria ##########
-
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Categorias",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                           const SizedBox(height: 8),
                           Container(
                             decoration: BoxDecoration(
@@ -273,7 +203,11 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                           });
                                         },
                                         activeColor: Colors.blue,
-                                        checkColor: Colors.white, // Marcação branca
+                                        side: BorderSide(
+                                            color: Colors.white,
+                                            width: 2), // borda branca
+                                        checkColor:
+                                            Colors.white, // Marcação branca
                                         controlAffinity:
                                             ListTileControlAffinity.leading,
                                       );
@@ -288,62 +222,156 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                               padding: EdgeInsets.only(top: 8.0),
                               child: Text(
                                 "Selecione pelo menos uma categoria.",
-                                style: TextStyle(
-                                    color: Colors.red, fontSize: 12),
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
                               ),
                             ),
                         ],
                       ),
+
                       const SizedBox(height: 16),
-                      DropdownButtonFormField<String>(
-                        value: selectedCity,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          labelText: "Cidade",
-                          labelStyle: const TextStyle(color: Colors.white),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Colors.white),
-                            borderRadius: BorderRadius.circular(8),
+
+                      // ########## Seleção de Cidade ##########
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ExpansionTile(
+                              title: const Text(
+                                "Selecione a Cidade",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              iconColor: Colors.white,
+                              collapsedIconColor: Colors.white,
+                              children: [
+                                Column(
+                                  children: [
+                                    ...[
+                                      'São Sebastião do Alto',
+                                      'Macuco',
+                                      'Rio das Flores',
+                                      'Comendador Levy Gasparian',
+                                      'Laje do Muriaé',
+                                      'São José de Ubá',
+                                    ].map((city) {
+                                      return CheckboxListTile(
+                                        title: Text(
+                                          city,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        value: selectedCity ==
+                                            city, // Apenas uma pode ser selecionada
+                                        onChanged: (bool? isChecked) {
+                                          setState(() {
+                                            if (isChecked == true) {
+                                              selectedCity = city;
+                                            } else {
+                                              selectedCity = null;
+                                            }
+                                          });
+                                        },
+                                        activeColor: Colors.blue,
+                                        side: const BorderSide(
+                                            color: Colors.white, width: 2),
+                                        checkColor: Colors.white,
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                const BorderSide(color: Colors.white, width: 2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        dropdownColor: Colors.black,
-                        icon: const Icon(Icons.arrow_drop_down,
-                            color: Colors.white),
-                        items: const [
-                          DropdownMenuItem(
-                              value: "São Sebastião do Alto",
-                              child: Text("São Sebastião do Alto")),
-                          DropdownMenuItem(
-                              value: "Macuco", child: Text("Macuco")),
-                          DropdownMenuItem(
-                              value: "Rio das Flores",
-                              child: Text("Rio das Flores")),
-                          DropdownMenuItem(
-                              value: "Comendador Levy Gasparian",
-                              child: Text("Comendador Levy Gasparian")),
-                          DropdownMenuItem(
-                              value: "Laje do Muriaé",
-                              child: Text("Laje do Muriaé")),
-                          DropdownMenuItem(
-                              value: "São José de Ubá",
-                              child: Text("São José de Ubá")),
+                          if (showCategoryError)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Selecione pelo menos uma cidade.",
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
+                              ),
+                            ),
                         ],
-                        onChanged: (value) {
-                          selectedCity = value;
-                        },
-                        validator: (value) {
-                          if (value == null) {
-                            return "Selecione a cidade.";
-                          }
-                          return null;
-                        },
                       ),
+
                       const SizedBox(height: 16),
+
+                      // ########## Seleção do tipo ##########
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ExpansionTile(
+                              title: const Text(
+                                "Selecione o Tipo",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              iconColor: Colors.white,
+                              collapsedIconColor: Colors.white,
+                              children: [
+                                Column(
+                                  children: [
+                                    ...[
+                                      'Notícia',
+                                      'Opnião',
+                                    ].map((type) {
+                                      return CheckboxListTile(
+                                        title: Text(
+                                          type,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        value: selectedType ==
+                                            type, // Apenas uma pode ser selecionada
+                                        onChanged: (bool? isChecked) {
+                                          setState(() {
+                                            if (isChecked == true) {
+                                              selectedType = type;
+                                            } else {
+                                              selectedType = null;
+                                            }
+                                          });
+                                        },
+                                        activeColor: Colors.blue,
+                                        side: const BorderSide(
+                                            color: Colors.white, width: 2),
+                                        checkColor: Colors.white,
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (showCategoryError)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Selecione pelo menos um tipo.",
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
+                              ),
+                            ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
                       // Texto em markdown
                       Column(children: [
                         TextFormField(
@@ -383,62 +411,41 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.white),
                             borderRadius: BorderRadius.circular(8),
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                           child: ValueListenableBuilder<TextEditingValue>(
                             valueListenable: bodyController,
                             builder: (context, value, child) {
                               return MarkdownBody(
-                                data: value
-                                    .text, // Atualiza o Markdown em tempo real
-                                /*styleSheet: MarkdownStyleSheet(
-                                  p: const TextStyle(color: Colors.white),
-                                  h1: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold),
-                                  h2: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold),
-                                  h3: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                  strong: const TextStyle(
-                                      color: Colors.yellow,
-                                      fontWeight: FontWeight.bold),
-                                  em: const TextStyle(
-                                      color: Colors.cyan,
-                                      fontStyle: FontStyle.italic),
-                                  blockquote: TextStyle(
-                                      color: Colors.grey[400],
-                                      fontStyle: FontStyle.italic),
-                                  code: const TextStyle(
-                                      color: Colors.greenAccent,
-                                      fontFamily: "monospace"),
-                                  listBullet:
-                                      const TextStyle(color: Colors.white),
-                                ),*/
+                                data: value.text, // Atualiza o Markdown em tempo real
+                                styleSheet: customMarkdownStyle
                               );
                             },
-                         ),
+                          ),
                         ),
                       ]),
                       const SizedBox(height: 16),
                       // >>>>> Buscando imagem na galeria e convertendo para base 64 <<<<<
-                     
+
                       Center(
                         child: ElevatedButton.icon(
                           onPressed: () => imageController.pickImage(),
-                          icon: const Icon(Icons.image, ),
-                          label: const Text("Adicionar Imagem", style: TextStyle(color: Colors.black),),
+                          icon: const Icon(
+                            Icons.image,
+                          ),
+                          label: const Text(
+                            "Adicionar Imagem",
+                            style: TextStyle(color: Colors.black),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
-                       const Text(
+                      const Text(
                         "A imagem deve estar no formato JPG ou JPEG e, preferencialmente, ter um tamanho máximo de 500 KB. Imagens maiores serão comprimidas, o que pode causar perda de qualidade e lentidão no carregamento. Para uma melhor visualização, recomenda-se o uso de imagens com orientação paisagem.",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
                       ),
                       Center(
                         child: Obx(() {
@@ -457,9 +464,12 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                       ),
                       const SizedBox(height: 16),
                       Obx(() => Text(
-                        imageController.message, // Acessa via getter
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.yellow),
-                      )),
+                            imageController.message, // Acessa via getter
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.yellow),
+                          )),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: validateAndPublish,
@@ -467,7 +477,10 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                           minimumSize: const Size(double.infinity, 50),
                           backgroundColor: Colors.blue,
                         ),
-                        child: const Text("Publicar Notícia", style: TextStyle(color: Colors.white),),
+                        child: const Text(
+                          "Publicar Notícia",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ],
                   ),

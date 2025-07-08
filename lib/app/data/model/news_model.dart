@@ -9,18 +9,21 @@ class NewsModel {
   String autor;
   String email;
   String dataCriacao;
+  String type;
 
-  NewsModel(
-      {this.id = '',
-      required this.titulo,
-      required this.subtitulo,
-      required this.cidade,
-      required this.categoria,
-      required this.corpo,
-      required this.imgurl,
-      required this.autor,
-      required this.email,
-      required this.dataCriacao});
+  NewsModel({
+    this.id = '',
+    required this.titulo,
+    required this.subtitulo,
+    required this.cidade,
+    required this.categoria,
+    required this.corpo,
+    required this.imgurl,
+    required this.autor,
+    required this.email,
+    required this.dataCriacao,
+    required this.type,
+  });
 
   // Converter para Map (para enviar ao Firebase)
   Map<String, dynamic> toMap() {
@@ -33,7 +36,8 @@ class NewsModel {
       'imgurl': imgurl,
       'autor': autor,
       'email': email,
-      'dataCriacao': dataCriacao
+      'dataCriacao': dataCriacao,
+      'type': type,
     };
   }
 
@@ -50,6 +54,7 @@ class NewsModel {
       autor: data['autor'] ?? '',
       email: data['email'] ?? '',
       dataCriacao: data['dataCriacao'] ?? '',
+      type: data['type'] ?? '',
     );
   }
 }
