@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart'; // Adicione esta importação
+import 'package:redescomunicacionais/app/ui/components/markdown_styles.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
@@ -131,18 +132,7 @@ class _NewsPageState extends State<NewsPage> {
           const SizedBox(height: 20),
           MarkdownBody(
             data: corpo,
-            styleSheet: MarkdownStyleSheet(
-              p: const TextStyle(
-                color: Colors.white, // Texto do corpo claro
-                fontSize: 16, // Tamanho ajustado para leitura
-                height: 1.5, // Espaçamento entre linhas
-              ),
-              h1: const TextStyle(color: Colors.white, fontSize: 24),
-              h2: const TextStyle(color: Colors.white, fontSize: 22),
-              h3: const TextStyle(color: Colors.white, fontSize: 20),
-              strong: const TextStyle(color: Colors.white),
-              blockquote: const TextStyle(color: Colors.white70),
-            ),
+            styleSheet: customMarkdownStyle
           ),
         ],
       ),
