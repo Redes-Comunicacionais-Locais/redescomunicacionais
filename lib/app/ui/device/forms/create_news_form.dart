@@ -251,9 +251,20 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                   children: [
                                     ...[
                                       'Política',
-                                      'Esporte',
+                                      'Segurança',
+                                      'Educação',
+                                      'Saúde',
+                                      'Transporte público e trânsito',
                                       'Economia',
+                                      'Emprego e oportunidades',
+                                      'Cultura',
+                                      'Turismo e lazer',
+                                      'Esportes',
+                                      'Meio Ambiente',
+                                      'Infraestrutura da cidade',
+                                      'Habitação',
                                       'Tecnologia',
+                                      'Ação comunitária'
                                     ].map((category) {
                                       return CheckboxListTile(
                                         title: Text(
