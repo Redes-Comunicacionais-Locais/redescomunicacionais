@@ -65,105 +65,13 @@ class MenuPage extends StatelessWidget {
               ],
             ),
           ),
-          ListTile(
-            leading: const Icon(Icons.info_outline, color: Colors.white),
-            title: const Text(
-              'Sobre',
-              style: TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    backgroundColor: Colors.black,
-                    title: const Text(
-                      'Sobre',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          leading: const Icon(Icons.info, color: Colors.blue),
-                          title: const Text(
-                            'Informações do Projeto',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-                            _homeController.goInfo();
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.group, color: Colors.blue),
-                          title: const Text(
-                            'Equipe',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-                            _homeController.goInfoTeam();
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.folder, color: Colors.blue),
-                          title: const Text(
-                            'Estrutura do Projeto',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-                            _homeController.goProjectStructure();
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.book, color: Colors.blue),
-                          title: const Text(
-                            'Guia do Usuário',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-                            _homeController.goUserGuide();
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.settings, color: Colors.blue),
-                          title: const Text(
-                            'Instalação e Configuração',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-                            _homeController.goInstallationConfig();
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.help, color: Colors.blue),
-                          title: const Text(
-                            'Perguntas Frequentes',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-                            _homeController.goFAQ();
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-          ),
           Obx(() {
             _userController.loadUserRole(_homeController.user.email);
-            if (_userController.isAdmin.value || _userController.isEditor.value) {
+            if (_userController.isAdmin.value ||
+                _userController.isEditor.value) {
               return ListTile(
-                leading: const Icon(Icons.article_outlined, color: Colors.white),
+                leading:
+                    const Icon(Icons.article_outlined, color: Colors.white),
                 title: const Text(
                   'Criar Notícia',
                   style: TextStyle(color: Colors.white),
@@ -208,19 +116,76 @@ class MenuPage extends StatelessWidget {
             }
           }),
           ListTile(
-            leading: const Icon(Icons.info, color: Colors.white),
+            leading: const Icon(Icons.info_outline, color: Colors.white),
             title: const Text(
-              'Versão',
+              'Sobre',
               style: TextStyle(color: Colors.white),
             ),
-            subtitle: Text(
-              _versionController.version,
-              style: const TextStyle(
-                fontSize: 10,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            onTap: () {
+              Navigator.pop(context);
+
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    backgroundColor: Colors.black,
+                    title: const Text(
+                      'Sobre',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.info, color: Colors.blue),
+                          title: const Text(
+                            'Quem Somos?',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _homeController.goAboutUs();
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.book, color: Colors.blue),
+                          title: const Text(
+                            'Guia do Usuário',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _homeController.goUserGuide();
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.help, color: Colors.blue),
+                          title: const Text(
+                            'Perguntas Frequentes',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _homeController.goFAQ();
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Center(
+                          child: Text(
+                            'Versão: ${_versionController.version}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.exit_to_app, color: Colors.white),
