@@ -35,21 +35,6 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
   String? selectedCity;
   String? selectedType;
 
-  String textoExemploMarkdown = """
-  ### Este é um exemplo de texto em Markdown
-  
-  **O que é o Markdown?** É uma linguagem de marcação leve usada para formatar texto de forma simples e intuitiva.
-
-  Este é um parágrafo de exemplo que contém um pouco de **negrito** e *itálico* para destacar algumas palavras.
-  
-  ### Lista de Itens:
-   - **Item 1**: Explicação sobre o primeiro item.
-   - *Item 2*: Explicação sobre o segundo item.
-   - *Item 3*: Um trecho de código destacado.
-   
-  > Esta é uma citação para dar mais ênfase a uma ideia.
-  """;
-
   void validateAndPublish() {
     setState(() {
       showCategoryError = selectedCategories.isEmpty; // Marca erro se vazio
