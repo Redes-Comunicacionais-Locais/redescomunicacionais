@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/ui/components/icon_base64.dart';
-import 'package:redescomunicacionais/app/ui/components/markdown_styles.dart';
+import 'package:redescomunicacionais/app/ui/components/markdown_editor.dart';
 import '../../../controller/home_controller.dart';
 import 'package:redescomunicacionais/app/controller/image_controller.dart';
 import 'package:get/get.dart';
@@ -384,57 +384,10 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                       const SizedBox(height: 16),
 
                       // Texto em markdown
-                      Column(children: [
-                        TextFormField(
-                          controller: bodyController
-                            ..text = bodyController.text.isEmpty
-                                ? textoExemploMarkdown
-                                : bodyController
-                                    .text, // Texto padrão quando vazio
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            labelText: "Corpo da Notícia",
-                            labelStyle: const TextStyle(color: Colors.white),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.white),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Colors.white, width: 2),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          maxLines: 6,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "O corpo da notícia é obrigatório.";
-                            }
-                            return null;
-                          },
-                        ),
+                      Expanded(
+                        child: MarkdownEditor(controller: bodyController),
+                      ),
 
-                        // Convertendo texto para markdown
-                        const SizedBox(height: 16),
-
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white),
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.black,
-                          ),
-                          child: ValueListenableBuilder<TextEditingValue>(
-                            valueListenable: bodyController,
-                            builder: (context, value, child) {
-                              return MarkdownBody(
-                                data: value.text, // Atualiza o Markdown em tempo real
-                                styleSheet: customMarkdownStyle
-                              );
-                            },
-                          ),
-                        ),
-                      ]),
                       const SizedBox(height: 16),
                       // >>>>> Buscando imagem na galeria e convertendo para base 64 <<<<<
 
