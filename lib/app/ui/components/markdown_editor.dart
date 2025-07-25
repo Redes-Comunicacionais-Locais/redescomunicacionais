@@ -48,27 +48,27 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
             children: [
               IconButton(
                 tooltip: 'Negrito',
-                icon: const Icon(Icons.format_bold),
+                icon: const Icon(Icons.format_bold, color: Colors.white),
                 onPressed: () => applyFormatting('**'),
               ),
               IconButton(
                 tooltip: 'Itálico',
-                icon: const Icon(Icons.format_italic),
+                icon: const Icon(Icons.format_italic, color: Colors.white),
                 onPressed: () => applyFormatting('_'),
               ),
               IconButton(
                 tooltip: 'Citação',
-                icon: const Icon(Icons.chat_bubble_outline),
+                icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
                 onPressed: () => applyFormatting('> ', ''),
               ),
               IconButton(
                 tooltip: 'Lista',
-                icon: const Icon(Icons.format_list_bulleted),
+                icon: const Icon(Icons.format_list_bulleted, color: Colors.white),
                 onPressed: () => applyFormatting('- ', ''),
               ),
               IconButton(
                 tooltip: 'Código',
-                icon: const Icon(Icons.code),
+                icon: const Icon(Icons.code, color: Colors.white),
                 onPressed: () => applyFormatting('`'),
               ),
             ],
