@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/home_controller.dart';
@@ -16,44 +17,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final HomeController _homeController = Get.put(HomeController());
   final LocationController _locationController = Get.put(LocationController());
+  int timeRefresh = 30; // Intervalo de refresh automático em minutos
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
-  Future<void> _onRefresh() async {
-    try {
-      // Se a localização não está disponível, chama requestLocation que mostrará o popup
-      if (_locationController.city.value.isEmpty ||
-          _locationController.city.value == "Permissão negada" ||
-          _locationController.city.value == "Erro ao obter localização") {
-        bool locationResult = await _locationController.requestLocation();
+  Timer? _refreshTimer;
 
-        // Se o usuário escolheu "Sair", não continua com a atualização
-        if (!locationResult) {
-          return;
-        }
-      }
-
-      // Recarrega as notícias se o controller existir
-      try {
-        final newsController = Get.find<NewsController>();
-        await newsController.buscarNews();
-      } catch (e) {
-        // NewsController ainda não foi inicializado, ignore
-      }
-
-      // Força a reconstrução da interface
-      setState(() {});
-    } catch (e) {
-      // Tratamento de erro geral
-      Get.snackbar(
-        'Erro',
-        'Erro ao atualizar dados',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
+  @override
+  void initState() {
+    super.initState();
+    _startAutoRefresh();
   }
 
   @override
@@ -156,5 +130,77 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startAutoRefresh() {
+    _refreshTimer = Timer.periodic(Duration(minutes: timeRefresh), (timer) {
+      _onRefreshSilent();
+    });
+  }
+
+  Future<void> _onRefreshSilent() async {
+    try {
+      await _locationController.getUserLocation();
+
+      try {
+        final newsController = Get.find<NewsController>();
+        await newsController.buscarNews();
+      } catch (e) {
+        // NewsController ainda não foi inicializado, ignore
+      }
+
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      // Falha silenciosa para não incomodar o usuário
+      print("Erro no refresh automático: $e");
+    }
+  }
+
+  Future<void> _onRefresh() async {
+    try {
+      // Sempre atualiza a localização no refresh manual
+      // Se a localização não está disponível, chama requestLocation que mostrará o popup
+      if (_locationController.city.value.isEmpty ||
+          _locationController.city.value == "Permissão negada" ||
+          _locationController.city.value == "Erro ao obter localização") {
+        bool locationResult = await _locationController.requestLocation();
+
+        // Se o usuário escolheu "Sair", não continua com a atualização
+        if (!locationResult) {
+          return;
+        }
+      } else {
+        // Se já tem localização, atualiza silenciosamente
+        await _locationController.getUserLocation();
+      }
+
+      // Recarrega as notícias se o controller existir
+      try {
+        final newsController = Get.find<NewsController>();
+        await newsController.buscarNews();
+      } catch (e) {
+        // NewsController ainda não foi inicializado, ignore
+      }
+
+      // Força a reconstrução da interface
+      setState(() {});
+    } catch (e) {
+      // Tratamento de erro geral
+      Get.snackbar(
+        'Erro',
+        'Erro ao atualizar dados',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 }
