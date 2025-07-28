@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/home_controller.dart';
 import 'package:redescomunicacionais/app/controller/location_controller.dart';
