@@ -37,7 +37,7 @@ class NewsController extends GetxController {
       );
 
       await _repository.adicionarNews(news);
-      newss.add(news);
+      newss.insert(0, news); // Insere no início da lista
       Get.snackbar(
         'Sucesso',
         'Notícia cadastrada com sucesso!',
