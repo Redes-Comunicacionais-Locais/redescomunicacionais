@@ -27,13 +27,25 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
     final selection = _controller.selection;
 
     final selectedText = selection.textInside(text);
-    final newText = startTag + selectedText + endTag;
+
+    String newText;
+    int cursorOffset;
+
+    if (selectedText.isEmpty && (startTag == '**' || startTag == '_' || startTag == '`')) {
+      // Insere tags e posiciona cursor entre elas
+      newText = startTag + endTag;
+      cursorOffset = selection.start + startTag.length;
+    } else {
+      // Com seleção, insere tags ao redor
+      newText = startTag + selectedText + endTag;
+      cursorOffset = selection.start + newText.length;
+    }
 
     final updatedText = text.replaceRange(selection.start, selection.end, newText);
 
     _controller.value = TextEditingValue(
       text: updatedText,
-      selection: TextSelection.collapsed(offset: selection.start + newText.length),
+      selection: TextSelection.collapsed(offset: cursorOffset),
     );
   }
 
