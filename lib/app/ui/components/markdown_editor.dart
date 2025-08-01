@@ -31,12 +31,11 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
     String newText;
     int cursorOffset;
 
-    if (selectedText.isEmpty && (startTag == '**' || startTag == '_' || startTag == '`')) {
-      // Insere tags e posiciona cursor entre elas
+    // Só verifica negrito e itálico
+    if (selectedText.isEmpty && (startTag == '**' || startTag == '_')) {
       newText = startTag + endTag;
       cursorOffset = selection.start + startTag.length;
     } else {
-      // Com seleção, insere tags ao redor
       newText = startTag + selectedText + endTag;
       cursorOffset = selection.start + newText.length;
     }
@@ -78,11 +77,7 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
                 icon: const Icon(Icons.format_list_bulleted, color: Colors.white),
                 onPressed: () => applyFormatting('- ', ''),
               ),
-              IconButton(
-                tooltip: 'Código',
-                icon: const Icon(Icons.code, color: Colors.white),
-                onPressed: () => applyFormatting('`'),
-              ),
+              
             ],
           ),
         ),
