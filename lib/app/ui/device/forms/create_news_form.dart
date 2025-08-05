@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+//import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/ui/components/icon_base64.dart';
 import 'package:redescomunicacionais/app/ui/components/markdown_editor.dart';
@@ -74,9 +74,10 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
     bodyController = QuillController.basic(); // Altere esta linha
   }
 
-  // Se você tem um método para obter o texto, altere para:
+  
+  // Formato Delta
   String getBodyText() {
-    return bodyController.document.toPlainText();
+    return jsonEncode(bodyController.document.toDelta().toJson());
   }
 
   @override
