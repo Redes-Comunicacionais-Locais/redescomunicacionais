@@ -1,5 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/version_controller.dart';
 import 'package:redescomunicacionais/app/routes/app_pages.dart';
@@ -16,10 +18,20 @@ Future<void> main() async {
   runApp(
     GetMaterialApp(
       title: 'Redes Comunicacionais',
-      debugShowCheckedModeBanner: false, //Etiqueta de Debug
+      debugShowCheckedModeBanner: false,
       getPages: AppPages.routes,
       initialRoute: Routes.INITIAL,
       theme: appThemeData,
+      // ADICIONE ESTAS LINHAS AQUI:
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        FlutterQuillLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('pt', 'BR'),
+      ],
     ),
   );
 }
