@@ -1,43 +1,118 @@
+import 'package:hive/hive.dart';
+part 'news_model.g.dart';
+
+@HiveType(typeId: 1)
 class NewsModel {
+  @HiveField(0)
   String id;
-  String titulo;
-  String subtitulo;
-  String cidade;
-  String categoria;
-  String corpo;
-  String imgurl;
+
+  @HiveField(1)
+  String title;
+
+  @HiveField(2)
+  String? subtitle;
+
+  @HiveField(3)
+  List<String> cities;
+
+  @HiveField(4)
+  List<String> categories;
+
+  @HiveField(5)
+  String body;
+
+  @HiveField(6)
+  List<String> urlImages;
+
+  @HiveField(7)
   String autor;
-  String email;
-  String dataCriacao;
+
+  @HiveField(8)
+  String createdBy;
+
+  @HiveField(9)
+  DateTime createdAt;
+
+  @HiveField(10)
   String type;
 
+  @HiveField(11)
+  String status;
+
+  @HiveField(12)
+  String? validatedBy;
+
+  @HiveField(13)
+  DateTime? validatedAt;
+
+  @HiveField(14)
+  String? editedBy;
+
+  @HiveField(15)
+  DateTime? editedAt;
+
+  @HiveField(16)
+  String? excluedBy;
+
+  @HiveField(17)
+  DateTime? excluedAt;
+
+  @HiveField(18)
+  String? editedObservation;
+
+  @HiveField(19)
+  String? validatedObservation;
+
+  @HiveField(20)
+  String? excludedObservation;
+
   NewsModel({
-    this.id = '',
-    required this.titulo,
-    required this.subtitulo,
-    required this.cidade,
-    required this.categoria,
-    required this.corpo,
-    required this.imgurl,
+    required this.id,
+    required this.title,
+    this.subtitle,
+    required this.cities,
+    required this.categories,
+    required this.body,
+    required this.urlImages,
     required this.autor,
-    required this.email,
-    required this.dataCriacao,
+    required this.createdBy,
+    required this.createdAt,
     required this.type,
+    required this.status,
+    this.validatedBy,
+    this.validatedAt,
+    this.editedBy,
+    this.editedAt,
+    this.excluedBy,
+    this.excluedAt,
+    this.editedObservation,
+    this.validatedObservation,
+    this.excludedObservation,
   });
 
-  // Converter para Map (para enviar ao Firebase)
   Map<String, dynamic> toMap() {
     return {
-      'titulo': titulo,
-      'subtitulo': subtitulo,
-      'cidade': cidade,
-      'categoria': categoria,
-      'corpo': corpo,
-      'imgurl': imgurl,
+      'id': id,
+      'title': title,
+      'subtitle': subtitle,
+      'cities': cities,
+      'categories': categories,
+      'body': body,
+      'urlImages': urlImages,
       'autor': autor,
-      'email': email,
-      'dataCriacao': dataCriacao,
+      'createdBy': createdBy,
+      'createdAt': createdAt.toIso8601String(),
       'type': type,
+      'status': status,
+      'validatedBy': validatedBy,
+      'validatedAt': validatedAt?.toIso8601String(),
+      'editedBy': editedBy,
+      'editedAt': editedAt?.toIso8601String(),
+      'excluedBy': excluedBy,
+      'excluedAt': excluedAt?.toIso8601String(),
+      'editedObservation': editedObservation,
+      'validatedObservation': validatedObservation,
+      'excludedObservation': excludedObservation,
     };
   }
 
@@ -45,16 +120,32 @@ class NewsModel {
   factory NewsModel.fromMap(String id, Map<String, dynamic> data) {
     return NewsModel(
       id: id,
-      titulo: data['titulo'] ?? '',
-      subtitulo: data['subtitulo'] ?? '',
-      cidade: data['cidade'] ?? '',
-      categoria: data['categoria'] ?? '',
-      corpo: data['corpo'] ?? '',
-      imgurl: data['imgurl'] ?? '',
+      title: data['title'] ?? '',
+      subtitle: data['subtitle'],
+      cities: List<String>.from(data['cities'] ?? []),
+      categories: List<String>.from(data['categories'] ?? []),
+      body: data['body'] ?? '',
+      urlImages: List<String>.from(data['urlImages'] ?? []),
       autor: data['autor'] ?? '',
-      email: data['email'] ?? '',
-      dataCriacao: data['dataCriacao'] ?? '',
+      createdBy: data['createdBy'] ?? '',
+      createdAt: data['createdAt'] != null
+          ? DateTime.parse(data['createdAt'])
+          : DateTime.now(),
       type: data['type'] ?? '',
+      status: data['status'] ?? '',
+      validatedBy: data['validatedBy'],
+      validatedAt: data['validatedAt'] != null
+          ? DateTime.parse(data['validatedAt'])
+          : null,
+      editedBy: data['editedBy'],
+      editedAt:
+          data['editedAt'] != null ? DateTime.parse(data['editedAt']) : null,
+      excluedBy: data['excluedBy'],
+      excluedAt:
+          data['excluedAt'] != null ? DateTime.parse(data['excluedAt']) : null,
+      editedObservation: data['editedObservation'],
+      validatedObservation: data['validatedObservation'],
+      excludedObservation: data['excludedObservation'],
     );
   }
 }
