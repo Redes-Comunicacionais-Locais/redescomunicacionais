@@ -4,25 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:redescomunicacionais/app/data/model/user_model.dart';
+import 'package:redescomunicacionais/app/data/repository/user_repository.dart';
 
 class SignInService {
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  final UserRepository _userRepository = UserRepository();
 
   SignInService();
-
-  _createUserDoc() async {
-    DocumentReference documentReference = FirebaseFirestore.instance
-        .doc('/users/${FirebaseAuth.instance.currentUser!.uid}');
-    DocumentSnapshot documentSnapshot = await documentReference.get();
-
-    if (documentSnapshot.exists) return;
-
-    documentReference.set({
-      'created_at': DateTime.now(),
-      'email': FirebaseAuth.instance.currentUser!.email,
-      'name': FirebaseAuth.instance.currentUser!.displayName,
-    });
-  }
 
   Future<UserModel?> signInGoogle() async {
     var account = await _googleSignIn.signIn();
@@ -32,10 +20,13 @@ class SignInService {
     try {
       var userCredential =
           await FirebaseAuth.instance.signInWithCredential(authCredential);
-      await _createUserDoc();
-      if (userCredential.user != null) {
-        return UserModel.fromFirebase(userCredential.user);
-      }
+
+      return await _userRepository.createUserDoc(
+        userCredential.user!.email!,
+        userCredential.user!.displayName!,
+        userCredential.user!.uid,
+        userCredential.user!.photoURL!,
+      );
     } catch (err) {
       debugPrint(err.toString());
     }
@@ -53,8 +44,12 @@ class SignInService {
     try {
       var userCredential =
           await FirebaseAuth.instance.signInWithCredential(authCredential);
-      await _createUserDoc();
-      return UserModel.fromFirebase(userCredential.user);
+      return await _userRepository.createUserDoc(
+        userCredential.user!.email!,
+        userCredential.user!.displayName!,
+        userCredential.user!.uid,
+        userCredential.user!.photoURL!,
+      );
     } catch (err) {
       debugPrint(err.toString());
     }
@@ -74,8 +69,12 @@ class SignInService {
       final user = userCredential.user;
 
       if (user != null) {
-        await _createUserDoc();
-        return UserModel.fromFirebase(user);
+        return await _userRepository.createUserDoc(
+          userCredential.user!.email!,
+          userCredential.user!.displayName!,
+          userCredential.user!.uid,
+          userCredential.user!.photoURL!,
+        );
       }
     } on FirebaseAuthException catch (e) {
       debugPrint("Erro no login com Microsoft: ${e.message}");
@@ -91,8 +90,12 @@ class SignInService {
     if (user != null) {
       try {
         debugPrint("Usuário já estava logado: ${user.email}");
-        await _createUserDoc();
-        return UserModel.fromFirebase(user);
+        return await _userRepository.createUserDoc(
+          user.email!,
+          user.displayName!,
+          user.uid,
+          user.photoURL!,
+        );
       } catch (err) {
         debugPrint("Erro ao verificar usuário silenciosamente: $err");
         return null;
