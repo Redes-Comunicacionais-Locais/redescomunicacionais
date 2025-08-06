@@ -10,30 +10,41 @@ class NewsController extends GetxController {
 
   // Adicionar notícias
   Future<void> adicionarNews(
-    String titulo,
-    String subtitulo,
-    String cidade,
-    String categoria,
-    String corpo,
-    String imgurl,
-    String autor,
+    String title,
+    String subtitle,
+    List<String> cities,
+    List<String> categories,
+    String body,
+    List<String> urlImages,
+    String author,
     String email,
-    String dataCriacao,
+    String createdAt,
     String type,
   ) async {
     try {
       isLoading(true);
       NewsModel news = NewsModel(
-        titulo: titulo,
-        subtitulo: subtitulo,
-        cidade: cidade,
-        categoria: categoria,
-        corpo: corpo,
-        imgurl: imgurl,
-        autor: autor,
-        email: email,
-        dataCriacao: dataCriacao,
+        id: DateTime.now().toIso8601String(),
+        title: title,
+        subtitle: subtitle,
+        cities: cities,
+        categories: categories,
+        body: body,
+        urlImages: urlImages,
+        author: author,
+        createdBy: email,
+        createdAt: DateTime.now(),
         type: type,
+        status: 'active',
+        validatedBy: null,
+        validatedAt: null,
+        editedBy: null,
+        editedAt: null,
+        excluedBy: null,
+        excluedAt: null,
+        editedObservation: null,
+        validatedObservation: null,
+        excludedObservation: null,
       );
 
       await _repository.adicionarNews(news);
@@ -63,8 +74,8 @@ class NewsController extends GetxController {
     try {
       isLoading(true);
       newss.value = await _repository.buscarNews();
-      newss.sort((a, b) => DateTime.parse(b.dataCriacao)
-          .compareTo(DateTime.parse(a.dataCriacao)));
+      newss.sort((a, b) => DateTime.parse(b.createdAt as String)
+          .compareTo(DateTime.parse(a.createdAt as String)));
     } catch (e) {
       Get.snackbar('Erro', 'Não foi possível carregar as notícias.',
           snackPosition: SnackPosition.BOTTOM);

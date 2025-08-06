@@ -39,14 +39,19 @@ class NewsWidget extends StatelessWidget {
                       Get.toNamed(
                         Routes.NEWS_PAGE,
                         arguments: {
-                          "titulo": news.titulo,
-                          "subtitulo": news.subtitulo,
-                          "cidade": news.cidade,
-                          "categoria": news.categoria,
-                          "corpo": news.corpo,
-                          "imgurl": news.imgurl,
-                          "autor": news.autor,
-                          "dataCriacao": news.dataCriacao,
+                          "titulo": news.title,
+                          "subtitulo": news.subtitle,
+                          "cidade":
+                              news.cities.isNotEmpty ? news.cities[0] : '',
+                          "categoria": news.categories.isNotEmpty
+                              ? news.categories[0]
+                              : '',
+                          "corpo": news.body,
+                          "imgurl": news.urlImages.isNotEmpty
+                              ? news.urlImages[0]
+                              : '',
+                          "autor": news.author,
+                          "dataCriacao": news.createdAt.toString(),
                           "type": news.type,
                         },
                       );
@@ -67,7 +72,9 @@ class NewsWidget extends StatelessWidget {
                               borderRadius: const BorderRadius.vertical(
                                   top: Radius.circular(8.0)),
                               child: Image.memory(
-                                base64Decode(news.imgurl),
+                                base64Decode(news.urlImages.isNotEmpty
+                                    ? news.urlImages[0]
+                                    : ''),
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: 70.0,
@@ -76,7 +83,7 @@ class NewsWidget extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                news.titulo,
+                                news.title,
                                 style: const TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
@@ -107,14 +114,16 @@ class NewsWidget extends StatelessWidget {
                 Get.toNamed(
                   Routes.NEWS_PAGE,
                   arguments: {
-                    "titulo": news.titulo,
-                    "subtitulo": news.subtitulo,
-                    "cidade": news.cidade,
-                    "categoria": news.categoria,
-                    "corpo": news.corpo,
-                    "imgurl": news.imgurl,
-                    "autor": news.autor,
-                    "dataCriacao": news.dataCriacao,
+                    "titulo": news.title,
+                    "subtitulo": news.subtitle,
+                    "cidade": news.cities.isNotEmpty ? news.cities[0] : '',
+                    "categoria":
+                        news.categories.isNotEmpty ? news.categories[0] : '',
+                    "corpo": news.body,
+                    "imgurl":
+                        news.urlImages.isNotEmpty ? news.urlImages[0] : '',
+                    "autor": news.author,
+                    "dataCriacao": news.createdAt.toString(),
                     "type": news.type,
                   },
                 );
@@ -135,7 +144,8 @@ class NewsWidget extends StatelessWidget {
                       borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(12.0)),
                       child: Image.memory(
-                        base64Decode(news.imgurl),
+                        base64Decode(
+                            news.urlImages.isNotEmpty ? news.urlImages[0] : ''),
                         fit: BoxFit.cover,
                         width: double.infinity,
                         height: 200.0,
@@ -148,7 +158,7 @@ class NewsWidget extends StatelessWidget {
                         children: [
                           // Título da notícia
                           Text(
-                            news.titulo,
+                            news.title,
                             style: const TextStyle(
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
@@ -160,7 +170,7 @@ class NewsWidget extends StatelessWidget {
                           const SizedBox(height: 8.0),
                           // Subtítulo ou descrição curta
                           Text(
-                            news.subtitulo,
+                            news.subtitle ?? '',
                             style: const TextStyle(
                               fontSize: 14.0,
                               color: Colors.grey,
@@ -171,7 +181,7 @@ class NewsWidget extends StatelessWidget {
                           const SizedBox(height: 8.0),
                           // Data formatada
                           Text(
-                            _getFormattedDate(news.dataCriacao),
+                            _getFormattedDate(news.createdAt.toString()),
                             style: const TextStyle(
                               fontSize: 12.0,
                               color: Colors.grey,

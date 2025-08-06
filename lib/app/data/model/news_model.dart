@@ -25,7 +25,7 @@ class NewsModel {
   List<String> urlImages;
 
   @HiveField(7)
-  String autor;
+  String author;
 
   @HiveField(8)
   String createdBy;
@@ -74,7 +74,7 @@ class NewsModel {
     required this.categories,
     required this.body,
     required this.urlImages,
-    required this.autor,
+    required this.author,
     required this.createdBy,
     required this.createdAt,
     required this.type,
@@ -99,7 +99,7 @@ class NewsModel {
       'categories': categories,
       'body': body,
       'urlImages': urlImages,
-      'autor': autor,
+      'autor': author,
       'createdBy': createdBy,
       'createdAt': createdAt.toIso8601String(),
       'type': type,
@@ -126,7 +126,7 @@ class NewsModel {
       categories: List<String>.from(data['categories'] ?? []),
       body: data['body'] ?? '',
       urlImages: List<String>.from(data['urlImages'] ?? []),
-      autor: data['autor'] ?? '',
+      author: data['autor'] ?? '',
       createdBy: data['createdBy'] ?? '',
       createdAt: data['createdAt'] != null
           ? DateTime.parse(data['createdAt'])

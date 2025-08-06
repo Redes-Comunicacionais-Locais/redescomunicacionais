@@ -26,12 +26,13 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController subtitleController = TextEditingController();
-  late QuillController bodyController; // Altere de TextEditingController para QuillController
+  late QuillController
+      bodyController; // Altere de TextEditingController para QuillController
 
   List<String> selectedCategories = [];
-  String? selectedCategory;
+  List<String> selectedCities = [];
   bool showCategoryError = false;
-  String? selectedCity;
+
   String? selectedType;
 
   void validateAndPublish() {
@@ -42,7 +43,6 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
     if (_formKey.currentState!.validate() && selectedCategories.isNotEmpty) {
       final String title = titleController.text;
       final String subtitle = subtitleController.text;
-      final String category = selectedCategories.join(", ");
       final String bodyNews = getBodyText();
       String imageUrl = imageController.base64String ?? iconBase64();
       final String autor = homeController.user.name!;
@@ -55,10 +55,10 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
       newsController.adicionarNews(
         title,
         subtitle,
-        selectedCity ?? '',
-        category,
+        selectedCities,
+        selectedCategories,
         bodyNews,
-        imageUrl,
+        imageUrl as List<String>,
         autor,
         email,
         dataCriacao,
@@ -74,7 +74,6 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
     bodyController = QuillController.basic(); // Altere esta linha
   }
 
-  
   // Formato Delta
   String getBodyText() {
     return jsonEncode(bodyController.document.toDelta().toJson());
@@ -279,14 +278,13 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                           style: const TextStyle(
                                               color: Colors.white),
                                         ),
-                                        value: selectedCity ==
-                                            city, // Apenas uma pode ser selecionada
+                                        value: selectedCities.contains(city),
                                         onChanged: (bool? isChecked) {
                                           setState(() {
                                             if (isChecked == true) {
-                                              selectedCity = city;
+                                              selectedCities.add(city);
                                             } else {
-                                              selectedCity = null;
+                                              selectedCities.remove(city);
                                             }
                                           });
                                         },
@@ -303,6 +301,15 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                               ],
                             ),
                           ),
+                          if (showCategoryError)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Selecione pelo menos uma cidade.",
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
+                              ),
+                            ),
                           if (showCategoryError)
                             const Padding(
                               padding: EdgeInsets.only(top: 8.0),
