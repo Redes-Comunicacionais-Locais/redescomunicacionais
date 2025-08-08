@@ -8,7 +8,7 @@ class NewsController extends GetxController {
   var newss = <NewsModel>[].obs;
   var isLoading = false.obs;
 
-  // Adicionar notícias
+  // Add news - save to both Hive and Firebase
   Future<void> adicionarNews(
     String title,
     String subtitle,
@@ -48,14 +48,19 @@ class NewsController extends GetxController {
         excludedObservation: null,
       );
 
-      await _repository.adicionarNews(news);
-      newss.insert(0, news); // Insere no início da lista
+      // Save to both Hive and Firebase simultaneously
+      await Future.wait([
+        _repository.saveNewsToHive(news),
+        _repository.adicionarNews(news),
+      ]);
+
+      newss.insert(0, news); // Insert at the beginning of the list
       Get.snackbar(
         'Sucesso',
         'Notícia cadastrada com sucesso!',
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
-        backgroundColor: Colors.green, // Fundo verde para sucesso
+        backgroundColor: Colors.green,
       );
     } catch (e) {
       Get.snackbar(
@@ -63,14 +68,14 @@ class NewsController extends GetxController {
         'Não foi possível cadastrar a notícia.',
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
-        backgroundColor: Colors.red, // Fundo vermelho para erro
+        backgroundColor: Colors.red,
       );
     } finally {
       isLoading(false);
     }
   }
 
-  // Buscar notícias
+  // Get news from Firebase only
   Future<void> buscarNews() async {
     try {
       isLoading(true);
@@ -79,6 +84,22 @@ class NewsController extends GetxController {
           .compareTo(DateTime.parse(a.createdAt as String)));
     } catch (e) {
       Get.snackbar('Erro', 'Não foi possível carregar as notícias.',
+          snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // Get news from Hive only
+  Future<void> getNewsFromHive() async {
+    try {
+      isLoading(true);
+      newss.value = await _repository.getNewsFromHive();
+      newss.sort((a, b) => DateTime.parse(b.createdAt as String)
+          .compareTo(DateTime.parse(a.createdAt as String)));
+    } catch (e) {
+      Get.snackbar(
+          'Erro', 'Não foi possível carregar as notícias do cache local.',
           snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading(false);
