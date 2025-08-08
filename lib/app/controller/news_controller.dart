@@ -20,6 +20,7 @@ class NewsController extends GetxController {
     String email,
     String createdAt,
     String type,
+    String status,
   ) async {
     try {
       isLoading(true);
@@ -35,7 +36,7 @@ class NewsController extends GetxController {
         createdBy: email,
         createdAt: DateTime.now(),
         type: type,
-        status: 'active',
+        status: status,
         validatedBy: null,
         validatedAt: null,
         editedBy: null,

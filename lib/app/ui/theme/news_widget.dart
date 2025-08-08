@@ -41,10 +41,11 @@ class NewsWidget extends StatelessWidget {
                         arguments: {
                           "titulo": news.title,
                           "subtitulo": news.subtitle,
-                          "cidade":
-                              news.cities.isNotEmpty ? news.cities[0] : '',
+                          "cidade": news.cities.isNotEmpty
+                              ? news.cities.join(', ')
+                              : '',
                           "categoria": news.categories.isNotEmpty
-                              ? news.categories[0]
+                              ? news.categories.join(', ')
                               : '',
                           "corpo": news.body,
                           "imgurl": news.urlImages.isNotEmpty
@@ -116,9 +117,11 @@ class NewsWidget extends StatelessWidget {
                   arguments: {
                     "titulo": news.title,
                     "subtitulo": news.subtitle,
-                    "cidade": news.cities.isNotEmpty ? news.cities[0] : '',
-                    "categoria":
-                        news.categories.isNotEmpty ? news.categories[0] : '',
+                    "cidade":
+                        news.cities.isNotEmpty ? news.cities.join(', ') : '',
+                    "categoria": news.categories.isNotEmpty
+                        ? news.categories.join(', ')
+                        : '',
                     "corpo": news.body,
                     "imgurl":
                         news.urlImages.isNotEmpty ? news.urlImages[0] : '',

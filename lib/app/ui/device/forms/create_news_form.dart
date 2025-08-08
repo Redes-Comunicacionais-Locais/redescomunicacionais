@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/ui/components/icon_base64.dart';
 import 'package:redescomunicacionais/app/ui/components/markdown_editor.dart';
@@ -31,9 +30,9 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
 
   List<String> selectedCategories = [];
   List<String> selectedCities = [];
-  bool showCategoryError = false;
+  String? type;
 
-  String? selectedType;
+  bool showCategoryError = false;
 
   void validateAndPublish() {
     setState(() {
@@ -43,11 +42,11 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
     if (_formKey.currentState!.validate() && selectedCategories.isNotEmpty) {
       final String title = titleController.text;
       final String subtitle = subtitleController.text;
-      final String bodyNews = getBodyText();
-      String imageUrl = imageController.base64String ?? iconBase64();
-      final String autor = homeController.user.name!;
-      final String email = homeController.user.email!;
-      final String dataCriacao = DateTime.now().toString();
+      final String body = getBodyText();
+      List<String> urlImages = [imageController.base64String ?? iconBase64()];
+      final String author = homeController.user.name!;
+      final String email = homeController.user.email;
+      final String createdAt = DateTime.now().toString();
 
       // ====== Adicionar notícia/FireStore ======
       titleController.clear();
@@ -57,12 +56,13 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
         subtitle,
         selectedCities,
         selectedCategories,
-        bodyNews,
-        imageUrl as List<String>,
-        autor,
+        body,
+        urlImages,
+        author,
         email,
-        dataCriacao,
-        selectedType ?? '',
+        createdAt,
+        type ?? '',
+        "Em análise",
       );
       Get.back();
     }
@@ -347,21 +347,21 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                     ...[
                                       'Notícia',
                                       'Opnião',
-                                    ].map((type) {
+                                    ].map((selectedType) {
                                       return CheckboxListTile(
                                         title: Text(
-                                          type,
+                                          selectedType,
                                           style: const TextStyle(
                                               color: Colors.white),
                                         ),
-                                        value: selectedType ==
-                                            type, // Apenas uma pode ser selecionada
+                                        value: type ==
+                                            selectedType, // Apenas uma pode ser selecionada
                                         onChanged: (bool? isChecked) {
                                           setState(() {
                                             if (isChecked == true) {
-                                              selectedType = type;
+                                              type = selectedType;
                                             } else {
-                                              selectedType = null;
+                                              type = null;
                                             }
                                           });
                                         },
