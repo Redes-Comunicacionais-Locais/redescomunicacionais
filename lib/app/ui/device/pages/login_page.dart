@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/controller/login_controller.dart';
 import 'package:redescomunicacionais/app/controller/version_controller.dart';
 import 'package:redescomunicacionais/app/services/device_detector_service.dart';
+import 'package:redescomunicacionais/app/utils/responsive_utils.dart';
 import 'package:sign_in_button/sign_in_button.dart';
 
 class LoginPage extends StatefulWidget {
@@ -23,30 +24,29 @@ class _LoginPageState extends State<LoginPage> {
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
     final double screenHeight = screenSize.height;
-    final bool isPortrait = screenHeight > screenWidth;
-    final bool isSmallScreen = screenWidth < 400 || screenHeight < 600;
-    final bool isTablet = screenWidth > 600;
-    final bool isWeb = deviceDetector.isWeb;
-    final bool isLandscape = !isPortrait;
-
-    // Determina se deve usar layout horizontal (web ou landscape)
+    final bool isPortrait =
+        ResponsiveUtils.isPortrait(screenWidth, screenHeight);
+    final bool isSmallScreen =
+        ResponsiveUtils.isSmallScreen(screenWidth, screenHeight);
+    final bool isTablet = ResponsiveUtils.isTablet(screenWidth);
     final bool useHorizontalLayout =
-        isWeb || (isLandscape && screenWidth > 700);
+        ResponsiveUtils.shouldUseHorizontalLayout(screenWidth, screenHeight);
 
-    // Calcula tamanhos responsivos
-    double titleFontSize =
-        _calculateTitleSize(screenWidth, isTablet, useHorizontalLayout);
-    double logoSize = _calculateLogoSize(
+    // Calcula tamanhos responsivos usando a classe utilitária
+    double titleFontSize = ResponsiveUtils.calculateLoginTitleSize(
+        screenWidth, isTablet, useHorizontalLayout);
+    double logoSize = ResponsiveUtils.calculateLoginLogoSize(
         screenWidth, screenHeight, isPortrait, isTablet, useHorizontalLayout);
-    double buttonWidth =
-        _calculateButtonWidth(screenWidth, isTablet, useHorizontalLayout);
-    double versionFontSize = _calculateVersionSize(screenWidth, isTablet);
+    double buttonWidth = ResponsiveUtils.calculateLoginButtonWidth(
+        screenWidth, isTablet, useHorizontalLayout);
+    double versionFontSize =
+        ResponsiveUtils.calculateVersionFontSize(screenWidth, isTablet);
 
-    // Calcula paddings responsivos
-    EdgeInsets screenPadding = _calculateScreenPadding(
+    // Calcula paddings responsivos usando a classe utilitária
+    EdgeInsets screenPadding = ResponsiveUtils.calculateLoginScreenPadding(
         screenWidth, screenHeight, isTablet, useHorizontalLayout);
-    double verticalSpacing =
-        _calculateVerticalSpacing(screenHeight, isPortrait, isSmallScreen);
+    double verticalSpacing = ResponsiveUtils.calculateLoginVerticalSpacing(
+        screenHeight, isPortrait, isSmallScreen);
 
     return Scaffold(
       body: Container(
@@ -395,84 +395,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-
-  // Métodos auxiliares para cálculos responsivos
-  double _calculateTitleSize(
-      double screenWidth, bool isTablet, bool useHorizontalLayout) {
-    if (useHorizontalLayout) {
-      if (isTablet) return 36.0;
-      return screenWidth < 800 ? 28.0 : 32.0;
-    }
-
-    if (isTablet) return 40.0;
-    if (screenWidth < 350) return 22.0;
-    if (screenWidth < 400) return 26.0;
-    return 32.0;
-  }
-
-  double _calculateLogoSize(double screenWidth, double screenHeight,
-      bool isPortrait, bool isTablet, bool useHorizontalLayout) {
-    if (useHorizontalLayout) {
-      if (isTablet) return screenHeight * 0.35;
-      return screenHeight * 0.3;
-    }
-
-    if (isTablet) return screenWidth * 0.25;
-
-    double baseSize = isPortrait ? screenWidth * 0.4 : screenHeight * 0.3;
-
-    // Limitadores para diferentes tamanhos de tela
-    if (screenWidth < 350) return baseSize.clamp(120.0, 160.0);
-    if (screenWidth < 400) return baseSize.clamp(140.0, 180.0);
-
-    return baseSize.clamp(160.0, 220.0);
-  }
-
-  double _calculateButtonWidth(
-      double screenWidth, bool isTablet, bool useHorizontalLayout) {
-    if (useHorizontalLayout) {
-      if (isTablet) return screenWidth * 0.25;
-      return screenWidth * 0.3;
-    }
-
-    if (isTablet) return screenWidth * 0.4;
-    if (screenWidth < 350) return screenWidth * 0.85;
-    if (screenWidth < 400) return screenWidth * 0.8;
-    return screenWidth * 0.75;
-  }
-
-  double _calculateVersionSize(double screenWidth, bool isTablet) {
-    if (isTablet) return 14.0;
-    if (screenWidth < 350) return 9.0;
-    return 10.0;
-  }
-
-  EdgeInsets _calculateScreenPadding(double screenWidth, double screenHeight,
-      bool isTablet, bool useHorizontalLayout) {
-    if (useHorizontalLayout) {
-      double horizontal = isTablet ? screenWidth * 0.08 : screenWidth * 0.05;
-      double vertical = isTablet ? screenHeight * 0.04 : screenHeight * 0.02;
-
-      return EdgeInsets.symmetric(
-        horizontal: horizontal.clamp(20.0, 80.0),
-        vertical: vertical.clamp(16.0, 40.0),
-      );
-    }
-
-    double horizontal = isTablet ? screenWidth * 0.1 : screenWidth * 0.05;
-    double vertical = isTablet ? screenHeight * 0.05 : screenHeight * 0.02;
-
-    return EdgeInsets.symmetric(
-      horizontal: horizontal.clamp(16.0, 60.0),
-      vertical: vertical.clamp(8.0, 30.0),
-    );
-  }
-
-  double _calculateVerticalSpacing(
-      double screenHeight, bool isPortrait, bool isSmallScreen) {
-    if (isSmallScreen) return screenHeight * 0.035;
-    if (!isPortrait) return screenHeight * 0.045;
-    return screenHeight * 0.04;
   }
 }
