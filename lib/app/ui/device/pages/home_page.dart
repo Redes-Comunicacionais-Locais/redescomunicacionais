@@ -264,10 +264,37 @@ class _HomePageState extends State<HomePage> {
             ),
             child: Column(
               children: [
+                // Título do aplicativo
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: isTablet ? 15.0 : 12.0,
+                    horizontal: isTablet ? 15.0 : 10.0,
+                  ),
+                  child: Text(
+                    "Redes Comunicacionais Locais",
+                    style: TextStyle(
+                      fontSize: isTablet ? 16.0 : 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+
+                // Divisor após o título
+                Divider(
+                  color: Colors.white.withOpacity(0.3),
+                  thickness: 1.0,
+                  indent: isTablet ? 15.0 : 10.0,
+                  endIndent: isTablet ? 15.0 : 10.0,
+                ),
+
                 // Header do sidebar com perfil do usuário
                 Container(
                   padding: EdgeInsets.symmetric(
-                    vertical: isTablet ? 20.0 : 15.0,
+                    vertical: isTablet ? 15.0 : 12.0,
                     horizontal: isTablet ? 15.0 : 10.0,
                   ),
                   child: Column(
