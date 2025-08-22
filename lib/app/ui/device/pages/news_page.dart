@@ -308,70 +308,70 @@ class _NewsPageState extends State<NewsPage> {
                                   isTablet) *
                               0.5),
                     ),
-                    child: AbsorbPointer(
-                      child: QuillEditor.basic(
-                        controller: _quillController,
-                        focusNode: FocusNode(),
-                        scrollController: ScrollController(),
-                        config: QuillEditorConfig(
-                          padding: EdgeInsets.all(isTablet ? 20 : 16),
-                          autoFocus: false,
-                          expands: true, // Para ocupar todo o espaço disponível
-                          customStyles: DefaultStyles(
-                            paragraph: DefaultTextBlockStyle(
-                              TextStyle(
-                                color: Colors.white,
-                                fontSize: isTablet ? 18 : 16,
-                              ),
-                              HorizontalSpacing.zero,
-                              const VerticalSpacing(6, 0),
-                              const VerticalSpacing(0, 0),
-                              null,
-                            ),
-                            bold: TextStyle(
+                    padding: EdgeInsets.all(isTablet ? 20 : 16),
+                    child: QuillEditor.basic(
+                      controller: _quillController,
+                      focusNode: FocusNode(),
+                      scrollController: ScrollController(),
+                      config: QuillEditorConfig(
+                        padding: EdgeInsets.zero,
+                        autoFocus: false,
+                        expands: true,
+                        enableInteractiveSelection:
+                            false, // Desabilita seleção de texto
+                        customStyles: DefaultStyles(
+                          paragraph: DefaultTextBlockStyle(
+                            TextStyle(
                               color: Colors.white,
-                              fontWeight: FontWeight.bold,
                               fontSize: isTablet ? 18 : 16,
                             ),
-                            italic: TextStyle(
-                              color: Colors.white,
-                              fontStyle: FontStyle.italic,
+                            HorizontalSpacing.zero,
+                            const VerticalSpacing(6, 0),
+                            const VerticalSpacing(0, 0),
+                            null,
+                          ),
+                          bold: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: isTablet ? 18 : 16,
+                          ),
+                          italic: TextStyle(
+                            color: Colors.white,
+                            fontStyle: FontStyle.italic,
+                            fontSize: isTablet ? 18 : 16,
+                          ),
+                          underline: TextStyle(
+                            color: Colors.white,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.white,
+                            fontSize: isTablet ? 18 : 16,
+                          ),
+                          quote: DefaultTextBlockStyle(
+                            TextStyle(
+                              color: Colors.white70,
                               fontSize: isTablet ? 18 : 16,
                             ),
-                            underline: TextStyle(
+                            HorizontalSpacing.zero,
+                            const VerticalSpacing(6, 6),
+                            const VerticalSpacing(0, 0),
+                            BoxDecoration(
+                              border: Border(
+                                left: BorderSide(color: Colors.white, width: 4),
+                              ),
+                            ),
+                          ),
+                          lists: DefaultListBlockStyle(
+                            TextStyle(
                               color: Colors.white,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Colors.white,
                               fontSize: isTablet ? 18 : 16,
                             ),
-                            quote: DefaultTextBlockStyle(
-                              TextStyle(
-                                color: Colors.white70,
-                                fontSize: isTablet ? 18 : 16,
-                              ),
-                              HorizontalSpacing.zero,
-                              const VerticalSpacing(6, 6),
-                              const VerticalSpacing(0, 0),
-                              BoxDecoration(
-                                border: Border(
-                                  left:
-                                      BorderSide(color: Colors.white, width: 4),
-                                ),
-                              ),
+                            HorizontalSpacing.zero,
+                            const VerticalSpacing(6, 0),
+                            const VerticalSpacing(0, 0),
+                            const BoxDecoration(
+                              color: Colors.transparent,
                             ),
-                            lists: DefaultListBlockStyle(
-                              TextStyle(
-                                color: Colors.white,
-                                fontSize: isTablet ? 18 : 16,
-                              ),
-                              HorizontalSpacing.zero,
-                              const VerticalSpacing(6, 0),
-                              const VerticalSpacing(0, 0),
-                              const BoxDecoration(
-                                color: Colors.transparent,
-                              ),
-                              null,
-                            ),
+                            null,
                           ),
                         ),
                       ),
