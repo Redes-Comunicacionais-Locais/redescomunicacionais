@@ -83,8 +83,8 @@ class NewsController extends GetxController {
       newss.sort((a, b) => DateTime.parse(b.createdAt as String)
           .compareTo(DateTime.parse(a.createdAt as String)));
     } catch (e) {
-      Get.snackbar('Erro', 'Não foi possível carregar as notícias.',
-          snackPosition: SnackPosition.BOTTOM);
+      /*Get.snackbar('Erro', 'Não foi possível carregar as notícias.',
+          snackPosition: SnackPosition.BOTTOM);*/
     } finally {
       isLoading(false);
     }

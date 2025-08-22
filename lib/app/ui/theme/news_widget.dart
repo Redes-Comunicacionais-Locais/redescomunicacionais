@@ -23,6 +23,27 @@ class NewsWidget extends StatelessWidget {
         return const Center(child: Text("Nenhuma notícia encontrada"));
       }
 
+      // Filtra notícias com imagens válidas
+      final validNews = newsController.newss.where((news) {
+        if (news.urlImages.isEmpty) return false;
+        try {
+          base64Decode(news.urlImages[0]);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }).toList();
+
+      if (validNews.isEmpty) {
+        return const Center(
+          child: Text(
+            "Nenhuma notícia com imagem válida encontrada",
+            style: TextStyle(color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
+        );
+      }
+
       return ListView(
         children: [
           const SizedBox(height: 16.0), // Espaço superior
@@ -33,7 +54,7 @@ class NewsWidget extends StatelessWidget {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: newsController.newss.map((news) {
+                children: validNews.map((news) {
                   return GestureDetector(
                     onTap: () {
                       Get.toNamed(
@@ -72,14 +93,7 @@ class NewsWidget extends StatelessWidget {
                             ClipRRect(
                               borderRadius: const BorderRadius.vertical(
                                   top: Radius.circular(8.0)),
-                              child: Image.memory(
-                                base64Decode(news.urlImages.isNotEmpty
-                                    ? news.urlImages[0]
-                                    : ''),
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: 70.0,
-                              ),
+                              child: _buildSafeImage(news.urlImages[0], 70.0),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -109,7 +123,7 @@ class NewsWidget extends StatelessWidget {
                   16.0), // Espaço entre os cards horizontais e a lista vertical
 
           // Lista vertical de notícias
-          ...newsController.newss.map((news) {
+          ...validNews.map((news) {
             return GestureDetector(
               onTap: () {
                 Get.toNamed(
@@ -146,13 +160,7 @@ class NewsWidget extends StatelessWidget {
                     ClipRRect(
                       borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(12.0)),
-                      child: Image.memory(
-                        base64Decode(
-                            news.urlImages.isNotEmpty ? news.urlImages[0] : ''),
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: 200.0,
-                      ),
+                      child: _buildSafeImage(news.urlImages[0], 200.0),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(12.0),
@@ -221,6 +229,41 @@ class NewsWidget extends StatelessWidget {
       }
     } catch (e) {
       return dataCriacao;
+    }
+  }
+
+  // Função para construir imagem segura com tratamento de erro
+  Widget _buildSafeImage(String base64String, double height) {
+    try {
+      return Image.memory(
+        base64Decode(base64String),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: height,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: double.infinity,
+            height: height,
+            color: Colors.grey[800],
+            child: const Icon(
+              Icons.image_not_supported,
+              color: Colors.grey,
+              size: 40,
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      return Container(
+        width: double.infinity,
+        height: height,
+        color: Colors.grey[800],
+        child: const Icon(
+          Icons.image_not_supported,
+          color: Colors.grey,
+          size: 40,
+        ),
+      );
     }
   }
 }
