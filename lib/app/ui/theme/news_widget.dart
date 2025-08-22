@@ -23,6 +23,27 @@ class NewsWidget extends StatelessWidget {
         return const Center(child: Text("Nenhuma notícia encontrada"));
       }
 
+      // Filtra notícias com imagens válidas
+      final validNews = newsController.newss.where((news) {
+        if (news.urlImages.isEmpty) return false;
+        try {
+          base64Decode(news.urlImages[0]);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }).toList();
+
+      if (validNews.isEmpty) {
+        return const Center(
+          child: Text(
+            "Nenhuma notícia com imagem válida encontrada",
+            style: TextStyle(color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
+        );
+      }
+
       return ListView(
         children: [
           const SizedBox(height: 16.0), // Espaço superior
@@ -33,20 +54,26 @@ class NewsWidget extends StatelessWidget {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: newsController.newss.map((news) {
+                children: validNews.map((news) {
                   return GestureDetector(
                     onTap: () {
                       Get.toNamed(
                         Routes.NEWS_PAGE,
                         arguments: {
-                          "titulo": news.titulo,
-                          "subtitulo": news.subtitulo,
-                          "cidade": news.cidade,
-                          "categoria": news.categoria,
-                          "corpo": news.corpo,
-                          "imgurl": news.imgurl,
-                          "autor": news.autor,
-                          "dataCriacao": news.dataCriacao,
+                          "titulo": news.title,
+                          "subtitulo": news.subtitle,
+                          "cidade": news.cities.isNotEmpty
+                              ? news.cities.join(', ')
+                              : '',
+                          "categoria": news.categories.isNotEmpty
+                              ? news.categories.join(', ')
+                              : '',
+                          "corpo": news.body,
+                          "imgurl": news.urlImages.isNotEmpty
+                              ? news.urlImages[0]
+                              : '',
+                          "autor": news.author,
+                          "dataCriacao": news.createdAt.toString(),
                           "type": news.type,
                         },
                       );
@@ -66,17 +93,12 @@ class NewsWidget extends StatelessWidget {
                             ClipRRect(
                               borderRadius: const BorderRadius.vertical(
                                   top: Radius.circular(8.0)),
-                              child: Image.memory(
-                                base64Decode(news.imgurl),
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: 70.0,
-                              ),
+                              child: _buildSafeImage(news.urlImages[0], 70.0),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                news.titulo,
+                                news.title,
                                 style: const TextStyle(
                                   fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
@@ -101,20 +123,24 @@ class NewsWidget extends StatelessWidget {
                   16.0), // Espaço entre os cards horizontais e a lista vertical
 
           // Lista vertical de notícias
-          ...newsController.newss.map((news) {
+          ...validNews.map((news) {
             return GestureDetector(
               onTap: () {
                 Get.toNamed(
                   Routes.NEWS_PAGE,
                   arguments: {
-                    "titulo": news.titulo,
-                    "subtitulo": news.subtitulo,
-                    "cidade": news.cidade,
-                    "categoria": news.categoria,
-                    "corpo": news.corpo,
-                    "imgurl": news.imgurl,
-                    "autor": news.autor,
-                    "dataCriacao": news.dataCriacao,
+                    "titulo": news.title,
+                    "subtitulo": news.subtitle,
+                    "cidade":
+                        news.cities.isNotEmpty ? news.cities.join(', ') : '',
+                    "categoria": news.categories.isNotEmpty
+                        ? news.categories.join(', ')
+                        : '',
+                    "corpo": news.body,
+                    "imgurl":
+                        news.urlImages.isNotEmpty ? news.urlImages[0] : '',
+                    "autor": news.author,
+                    "dataCriacao": news.createdAt.toString(),
                     "type": news.type,
                   },
                 );
@@ -134,12 +160,7 @@ class NewsWidget extends StatelessWidget {
                     ClipRRect(
                       borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(12.0)),
-                      child: Image.memory(
-                        base64Decode(news.imgurl),
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: 200.0,
-                      ),
+                      child: _buildSafeImage(news.urlImages[0], 200.0),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(12.0),
@@ -148,7 +169,7 @@ class NewsWidget extends StatelessWidget {
                         children: [
                           // Título da notícia
                           Text(
-                            news.titulo,
+                            news.title,
                             style: const TextStyle(
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
@@ -160,7 +181,7 @@ class NewsWidget extends StatelessWidget {
                           const SizedBox(height: 8.0),
                           // Subtítulo ou descrição curta
                           Text(
-                            news.subtitulo,
+                            news.subtitle ?? '',
                             style: const TextStyle(
                               fontSize: 14.0,
                               color: Colors.grey,
@@ -171,7 +192,7 @@ class NewsWidget extends StatelessWidget {
                           const SizedBox(height: 8.0),
                           // Data formatada
                           Text(
-                            _getFormattedDate(news.dataCriacao),
+                            _getFormattedDate(news.createdAt.toString()),
                             style: const TextStyle(
                               fontSize: 12.0,
                               color: Colors.grey,
@@ -208,6 +229,41 @@ class NewsWidget extends StatelessWidget {
       }
     } catch (e) {
       return dataCriacao;
+    }
+  }
+
+  // Função para construir imagem segura com tratamento de erro
+  Widget _buildSafeImage(String base64String, double height) {
+    try {
+      return Image.memory(
+        base64Decode(base64String),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: height,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: double.infinity,
+            height: height,
+            color: Colors.grey[800],
+            child: const Icon(
+              Icons.image_not_supported,
+              color: Colors.grey,
+              size: 40,
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      return Container(
+        width: double.infinity,
+        height: height,
+        color: Colors.grey[800],
+        child: const Icon(
+          Icons.image_not_supported,
+          color: Colors.grey,
+          size: 40,
+        ),
+      );
     }
   }
 }
