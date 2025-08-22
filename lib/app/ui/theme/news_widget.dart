@@ -5,15 +5,26 @@ import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import 'package:intl/intl.dart'; // Para formatar datas
 
-class NewsWidget extends StatelessWidget {
+class NewsWidget extends StatefulWidget {
   NewsWidget({super.key});
 
+  @override
+  State<NewsWidget> createState() => _NewsWidgetState();
+}
+
+class _NewsWidgetState extends State<NewsWidget> {
   final NewsController newsController = Get.put(NewsController());
+  int? selectedCardIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    // Busca as notícias apenas uma vez quando o widget é inicializado
+    newsController.buscarNews();
+  }
 
   @override
   Widget build(BuildContext context) {
-    newsController.buscarNews();
-
     return Obx(() {
       if (newsController.isLoading.value) {
         return const Center(child: CircularProgressIndicator());
@@ -44,19 +55,155 @@ class NewsWidget extends StatelessWidget {
         );
       }
 
-      return ListView(
-        children: [
-          const SizedBox(height: 16.0), // Espaço superior
+      return GestureDetector(
+        // Detecta toque fora dos cards para fechar o menu
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          if (selectedCardIndex != null) {
+            setState(() {
+              selectedCardIndex = null;
+            });
+          }
+        },
+        child: ListView(
+          children: [
+            const SizedBox(height: 16.0), // Espaço superior
 
-          // Cards horizontais
-          SizedBox(
-            height: 120.0, // Altura dos cards horizontais
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: validNews.map((news) {
-                  return GestureDetector(
+            // Cards horizontais
+            SizedBox(
+              height: 120.0, // Altura dos cards horizontais
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: validNews.map((news) {
+                    return GestureDetector(
+                      onTap: () {
+                        Get.toNamed(
+                          Routes.NEWS_PAGE,
+                          arguments: {
+                            "titulo": news.title,
+                            "subtitulo": news.subtitle,
+                            "cidade": news.cities.isNotEmpty
+                                ? news.cities.join(', ')
+                                : '',
+                            "categoria": news.categories.isNotEmpty
+                                ? news.categories.join(', ')
+                                : '',
+                            "corpo": news.body,
+                            "imgurl": news.urlImages.isNotEmpty
+                                ? news.urlImages[0]
+                                : '',
+                            "autor": news.author,
+                            "dataCriacao": news.createdAt.toString(),
+                            "type": news.type,
+                          },
+                        );
+                      },
+                      child: Card(
+                        color: Colors.grey[900],
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                        elevation: 4.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: SizedBox(
+                          width: 120.0, // Largura de cada card horizontal
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(8.0)),
+                                child: _buildSafeImage(news.urlImages[0], 70.0),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  news.title,
+                                  style: const TextStyle(
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+
+            const SizedBox(
+                height:
+                    16.0), // Espaço entre os cards horizontais e a lista vertical
+
+            // Lista vertical de notícias
+            ...validNews.asMap().entries.map((entry) {
+              final index = entry.key;
+              final news = entry.value;
+              final isSelected = selectedCardIndex == index;
+
+              return Column(
+                children: [
+                  // Barra de ações (aparece apenas quando o card está selecionado)
+                  if (isSelected)
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0, vertical: 8.0),
+                      decoration: const BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(12.0),
+                          topRight: Radius.circular(12.0),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Ícone de editar (lápis)
+                          GestureDetector(
+                            onTap: () {
+                              _showDevelopmentPopup("Editar");
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: const Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8.0),
+                          // Ícone de excluir (lixeira)
+                          GestureDetector(
+                            onTap: () {
+                              _showDevelopmentPopup("Excluir");
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  // Card da notícia
+                  GestureDetector(
                     onTap: () {
+                      // Sempre navega para a página da notícia
                       Get.toNamed(
                         Routes.NEWS_PAGE,
                         arguments: {
@@ -78,137 +225,152 @@ class NewsWidget extends StatelessWidget {
                         },
                       );
                     },
-                    child: Card(
-                      color: Colors.grey[900],
-                      margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                      elevation: 4.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                    onLongPress: () {
+                      // Seleciona/deseleciona o card no long press
+                      setState(() {
+                        if (selectedCardIndex == index) {
+                          selectedCardIndex = null;
+                        } else {
+                          selectedCardIndex = index;
+                        }
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: isSelected
+                              ? Radius.zero
+                              : const Radius.circular(12.0),
+                          topRight: isSelected
+                              ? Radius.zero
+                              : const Radius.circular(12.0),
+                          bottomLeft: const Radius.circular(12.0),
+                          bottomRight: const Radius.circular(12.0),
+                        ),
+                        border: isSelected
+                            ? Border.all(color: Colors.blue, width: 2.0)
+                            : null,
                       ),
-                      child: SizedBox(
-                        width: 120.0, // Largura de cada card horizontal
+                      margin: EdgeInsets.only(
+                        left: 16.0,
+                        right: 16.0,
+                        bottom: 8.0,
+                        top: isSelected ? 0.0 : 8.0,
+                      ),
+                      child: Card(
+                        color: Colors.black,
+                        margin: EdgeInsets.zero,
+                        elevation: isSelected ? 8.0 : 4.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: isSelected
+                                ? Radius.zero
+                                : const Radius.circular(12.0),
+                            topRight: isSelected
+                                ? Radius.zero
+                                : const Radius.circular(12.0),
+                            bottomLeft: const Radius.circular(12.0),
+                            bottomRight: const Radius.circular(12.0),
+                          ),
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Imagem da notícia
                             ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(8.0)),
-                              child: _buildSafeImage(news.urlImages[0], 70.0),
+                              borderRadius: BorderRadius.only(
+                                topLeft: isSelected
+                                    ? Radius.zero
+                                    : const Radius.circular(12.0),
+                                topRight: isSelected
+                                    ? Radius.zero
+                                    : const Radius.circular(12.0),
+                              ),
+                              child: _buildSafeImage(news.urlImages[0], 200.0),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                news.title,
-                                style: const TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Título da notícia
+                                  Text(
+                                    news.title,
+                                    style: const TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 8.0),
+                                  // Subtítulo ou descrição curta
+                                  Text(
+                                    news.subtitle ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 14.0,
+                                      color: Colors.grey,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 8.0),
+                                  // Data formatada
+                                  Text(
+                                    _getFormattedDate(
+                                        news.createdAt.toString()),
+                                    style: const TextStyle(
+                                      fontSize: 12.0,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-
-          const SizedBox(
-              height:
-                  16.0), // Espaço entre os cards horizontais e a lista vertical
-
-          // Lista vertical de notícias
-          ...validNews.map((news) {
-            return GestureDetector(
-              onTap: () {
-                Get.toNamed(
-                  Routes.NEWS_PAGE,
-                  arguments: {
-                    "titulo": news.title,
-                    "subtitulo": news.subtitle,
-                    "cidade":
-                        news.cities.isNotEmpty ? news.cities.join(', ') : '',
-                    "categoria": news.categories.isNotEmpty
-                        ? news.categories.join(', ')
-                        : '',
-                    "corpo": news.body,
-                    "imgurl":
-                        news.urlImages.isNotEmpty ? news.urlImages[0] : '',
-                    "autor": news.author,
-                    "dataCriacao": news.createdAt.toString(),
-                    "type": news.type,
-                  },
-                );
-              },
-              child: Card(
-                color: Colors.black,
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Imagem da notícia
-                    ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(12.0)),
-                      child: _buildSafeImage(news.urlImages[0], 200.0),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Título da notícia
-                          Text(
-                            news.title,
-                            style: const TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 8.0),
-                          // Subtítulo ou descrição curta
-                          Text(
-                            news.subtitle ?? '',
-                            style: const TextStyle(
-                              fontSize: 14.0,
-                              color: Colors.grey,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 8.0),
-                          // Data formatada
-                          Text(
-                            _getFormattedDate(news.createdAt.toString()),
-                            style: const TextStyle(
-                              fontSize: 12.0,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        ],
+                  ),
+                ],
+              );
+            }).toList(),
+          ],
+        ),
       );
     });
+  }
+
+  // Método para mostrar popup de função em desenvolvimento
+  void _showDevelopmentPopup(String action) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: Text(
+            action,
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: const Text(
+            "Função em desenvolvimento",
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                "OK",
+                style: TextStyle(color: Colors.blue),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Função para calcular e formatar a data
