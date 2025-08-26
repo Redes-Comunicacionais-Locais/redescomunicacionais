@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:redescomunicacionais/app/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/ui/components/icon_base64.dart';
-import 'package:redescomunicacionais/app/ui/components/markdown_styles.dart';
+import 'package:redescomunicacionais/app/ui/components/markdown_editor.dart';
 import '../../../controller/home_controller.dart';
 import 'package:redescomunicacionais/app/controller/image_controller.dart';
 import 'package:get/get.dart';
-//import 'package:image_picker/image_picker.dart';
-//import 'dart:typed_data';
+import 'package:flutter_quill/flutter_quill.dart'; // Adicione este import
 import 'dart:convert';
 
 class CreateNewsPage extends StatefulWidget {
@@ -27,28 +25,14 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController subtitleController = TextEditingController();
-  final TextEditingController bodyController = TextEditingController();
+  late QuillController
+      bodyController; // Altere de TextEditingController para QuillController
 
   List<String> selectedCategories = [];
-  String? selectedCategory;
+  List<String> selectedCities = [];
+  String? type;
+
   bool showCategoryError = false;
-  String? selectedCity;
-  String? selectedType;
-
-  String textoExemploMarkdown = """
-  ### Este é um exemplo de texto em Markdown
-  
-  **O que é o Markdown?** É uma linguagem de marcação leve usada para formatar texto de forma simples e intuitiva.
-
-  Este é um parágrafo de exemplo que contém um pouco de **negrito** e *itálico* para destacar algumas palavras.
-  
-  ### Lista de Itens:
-   - **Item 1**: Explicação sobre o primeiro item.
-   - *Item 2*: Explicação sobre o segundo item.
-   - *Item 3*: Um trecho de código destacado.
-   
-  > Esta é uma citação para dar mais ênfase a uma ideia.
-  """;
 
   void validateAndPublish() {
     setState(() {
@@ -58,12 +42,11 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
     if (_formKey.currentState!.validate() && selectedCategories.isNotEmpty) {
       final String title = titleController.text;
       final String subtitle = subtitleController.text;
-      final String category = selectedCategories.join(", ");
-      final String bodyNews = bodyController.text;
-      String imageUrl = imageController.base64String ?? iconBase64();
-      final String autor = homeController.user.name!;
-      final String email = homeController.user.email!;
-      final String dataCriacao = DateTime.now().toString();
+      final String body = getBodyText();
+      List<String> urlImages = [imageController.base64String ?? iconBase64()];
+      final String author = homeController.user.name!;
+      final String email = homeController.user.email;
+      final String createdAt = DateTime.now().toString();
 
       // ====== Adicionar notícia/FireStore ======
       titleController.clear();
@@ -71,17 +54,35 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
       newsController.adicionarNews(
         title,
         subtitle,
-        selectedCity ?? '',
-        category,
-        bodyNews,
-        imageUrl,
-        autor,
+        selectedCities,
+        selectedCategories,
+        body,
+        urlImages,
+        author,
         email,
-        dataCriacao,
-        selectedType ?? '',
+        createdAt,
+        type ?? '',
+        "Em análise",
       );
       Get.back();
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    bodyController = QuillController.basic(); // Altere esta linha
+  }
+
+  // Formato Delta
+  String getBodyText() {
+    return jsonEncode(bodyController.document.toDelta().toJson());
+  }
+
+  @override
+  void dispose() {
+    bodyController.dispose(); // Mantenha o dispose
+    super.dispose();
   }
 
   @override
@@ -180,9 +181,20 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                   children: [
                                     ...[
                                       'Política',
-                                      'Esporte',
+                                      'Segurança',
+                                      'Educação',
+                                      'Saúde',
+                                      'Transporte público e trânsito',
                                       'Economia',
+                                      'Emprego e oportunidades',
+                                      'Cultura',
+                                      'Turismo e lazer',
+                                      'Esportes',
+                                      'Meio Ambiente',
+                                      'Infraestrutura da cidade',
+                                      'Habitação',
                                       'Tecnologia',
+                                      'Ação comunitária'
                                     ].map((category) {
                                       return CheckboxListTile(
                                         title: Text(
@@ -266,14 +278,13 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                           style: const TextStyle(
                                               color: Colors.white),
                                         ),
-                                        value: selectedCity ==
-                                            city, // Apenas uma pode ser selecionada
+                                        value: selectedCities.contains(city),
                                         onChanged: (bool? isChecked) {
                                           setState(() {
                                             if (isChecked == true) {
-                                              selectedCity = city;
+                                              selectedCities.add(city);
                                             } else {
-                                              selectedCity = null;
+                                              selectedCities.remove(city);
                                             }
                                           });
                                         },
@@ -290,6 +301,15 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                               ],
                             ),
                           ),
+                          if (showCategoryError)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Selecione pelo menos uma cidade.",
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 12),
+                              ),
+                            ),
                           if (showCategoryError)
                             const Padding(
                               padding: EdgeInsets.only(top: 8.0),
@@ -327,21 +347,21 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                                     ...[
                                       'Notícia',
                                       'Opnião',
-                                    ].map((type) {
+                                    ].map((selectedType) {
                                       return CheckboxListTile(
                                         title: Text(
-                                          type,
+                                          selectedType,
                                           style: const TextStyle(
                                               color: Colors.white),
                                         ),
-                                        value: selectedType ==
-                                            type, // Apenas uma pode ser selecionada
+                                        value: type ==
+                                            selectedType, // Apenas uma pode ser selecionada
                                         onChanged: (bool? isChecked) {
                                           setState(() {
                                             if (isChecked == true) {
-                                              selectedType = type;
+                                              type = selectedType;
                                             } else {
-                                              selectedType = null;
+                                              type = null;
                                             }
                                           });
                                         },
@@ -373,57 +393,10 @@ class _CreateNewsPageState extends State<CreateNewsPage> {
                       const SizedBox(height: 16),
 
                       // Texto em markdown
-                      Column(children: [
-                        TextFormField(
-                          controller: bodyController
-                            ..text = bodyController.text.isEmpty
-                                ? textoExemploMarkdown
-                                : bodyController
-                                    .text, // Texto padrão quando vazio
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            labelText: "Corpo da Notícia",
-                            labelStyle: const TextStyle(color: Colors.white),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.white),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Colors.white, width: 2),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          maxLines: 6,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "O corpo da notícia é obrigatório.";
-                            }
-                            return null;
-                          },
-                        ),
+                      Expanded(
+                        child: MarkdownEditor(controller: bodyController),
+                      ),
 
-                        // Convertendo texto para markdown
-                        const SizedBox(height: 16),
-
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white),
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.black,
-                          ),
-                          child: ValueListenableBuilder<TextEditingValue>(
-                            valueListenable: bodyController,
-                            builder: (context, value, child) {
-                              return MarkdownBody(
-                                data: value.text, // Atualiza o Markdown em tempo real
-                                styleSheet: customMarkdownStyle
-                              );
-                            },
-                          ),
-                        ),
-                      ]),
                       const SizedBox(height: 16),
                       // >>>>> Buscando imagem na galeria e convertendo para base 64 <<<<<
 

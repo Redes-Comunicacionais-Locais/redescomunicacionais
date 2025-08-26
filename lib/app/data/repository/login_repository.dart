@@ -4,14 +4,27 @@ import 'package:redescomunicacionais/app/data/provider/sign_in.dart';
 class LoginRepository {
   final SignInService signInService = SignInService();
 
-  Future<UserModel?> signInGoogle(){
+  Future<UserModel?> signInGoogle() {
     return signInService.signInGoogle();
   }
 
-  Future<UserModel?> trySignInGoogle(){
+  Future<UserModel?> trySignInGoogle() {
     return signInService.trySignInGoogle();
   }
-  logoutGoogle(){
+
+  logoutGoogle() {
     signInService.logoutGoogle();
+  }
+
+  Future<UserModel?> signInMicrosoft() async {
+    return signInService.signInMicrosoft();
+  }
+
+  Future<UserModel?> trySignInMicrosoft() {
+    return signInService.trySignInMicrosoft();
+  }
+
+  logoutMicrosoft() {
+    signInService.logoutMicrosoft();
   }
 }

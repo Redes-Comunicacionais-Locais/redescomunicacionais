@@ -38,9 +38,8 @@ class HomeController extends GetxController {
 
   void goUserGuide() {
     Get.toNamed(Routes.WEB_VIEW, arguments: {
-      'url':
-          'https://github.com/Redes-Comunicacionais-Locais/redescomunicacionais/wiki/Guia-do-Usu%C3%A1rio',
-      'title': 'RCL'
+      'url': 'https://redescomunicacionaislocais.uff.br/guia-do-usuario/',
+      'title': 'Guia do Usuário'
     });
   }
 
@@ -56,7 +55,7 @@ class HomeController extends GetxController {
     Get.toNamed(Routes.WEB_VIEW, arguments: {
       'url':
           'https://github.com/Redes-Comunicacionais-Locais/redescomunicacionais/wiki/Perguntas-Frequentes',
-      'title': 'RCL'
+      'title': 'Perguntas Frequentes'
     });
   }
 
@@ -65,6 +64,13 @@ class HomeController extends GetxController {
       'url':
           'https://redescomunicacionaislocais.uff.br/politica-de-privacidade/',
       'title': 'RCL'
+    });
+  }
+
+  void goAboutUs() {
+    Get.toNamed(Routes.WEB_VIEW, arguments: {
+      'url': 'https://redescomunicacionaislocais.uff.br/',
+      'title': 'Sobre Nós',
     });
   }
 }
