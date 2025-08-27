@@ -24,10 +24,21 @@ class ImageController extends GetxController {
     _base64String.value = null;
     _message.value = "Processando sua imagem... Isso pode levar alguns segundos.";
 
-    if (!imageFile.path.toLowerCase().endsWith('.jpg') && 
-        !imageFile.path.toLowerCase().endsWith('.jpeg')) {
-      _message.value = "A imagem deve ser no formato JPG ou JPEG.";
-      return;
+    // MUDANÇA: Verificar tipo MIME em vez da extensão do arquivo
+    String? mimeType = imageFile.mimeType;
+    if (mimeType != null) {
+      // Verificar pelo tipo MIME
+      if (mimeType != 'image/jpeg' && mimeType != 'image/jpg') {
+        _message.value = "A imagem deve ser no formato JPG ou JPEG.";
+        return;
+      }
+    } else {
+      // Fallback: verificar extensão (para compatibilidade)
+      String fileName = imageFile.name.toLowerCase();
+      if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg')) {
+        _message.value = "A imagem deve ser no formato JPG ou JPEG.";
+        return;
+      }
     }
 
     Uint8List imageBytes = await imageFile.readAsBytes();
