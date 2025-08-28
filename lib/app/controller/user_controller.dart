@@ -8,6 +8,8 @@ class UserController extends GetxController {
   var isEditor = false.obs;
   var isLoading = false.obs;
 
+  final RxList<Map<String, dynamic>> allUsers = <Map<String, dynamic>>[].obs;
+
   Future<void> addProfile(String email, String profile) async {
     try {
       isLoading(true);
@@ -39,6 +41,17 @@ class UserController extends GetxController {
     } else if (role == UserRole.editor) {
       isEditor.value = true;
     }
-    
+  }
+
+  Future<void> loadAllUsers() async {
+    try {
+      isLoading.value = true;
+      List<Map<String, dynamic>> users = await _repository.getAllUsers();
+      allUsers.value = users;
+    } catch (e) {
+      Get.snackbar("Erro", "Erro ao carregar usuários: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

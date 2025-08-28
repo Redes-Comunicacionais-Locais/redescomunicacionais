@@ -120,4 +120,18 @@ class UserRepository {
       return UserRole.user; // Retorna user como padrão em caso de erro
     }
   }
+
+  Future<List<Map<String, dynamic>>> getAllUsers() async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore.collection('users').get();
+      
+      return querySnapshot.docs.map((doc) {
+        Map<String, dynamic> userData = doc.data() as Map<String, dynamic>;
+        userData['id'] = doc.id; // Adiciona o ID do documento
+        return userData;
+      }).toList();
+    } catch (e) {
+      throw Exception("Erro ao buscar usuários: $e");
+    }
+  }
 }
