@@ -67,12 +67,38 @@ class UserRepository {
   }
 
   Future<UserRole> getUserRole(String email) async {
-    final isEditor = await _firestore.collection('editor').doc(email).get();
-    if (isEditor.exists) return UserRole.editor;
+    try {
+      // Busca na coleção 'users' pelo campo 'email'
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1) // Pega apenas o primeiro resultado
+          .get();
 
-    final isAdmin = await _firestore.collection('admin').doc(email).get();
-    if (isAdmin.exists) return UserRole.admin;
-
-    return UserRole.user;
+      if (querySnapshot.docs.isNotEmpty) {
+        // Pega o primeiro documento encontrado
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+        
+        // Verifica o campo 'role'
+        String role = userData['role'] ?? 'user';
+        
+        switch (role.toLowerCase()) {
+          case 'admin':
+            return UserRole.admin;
+          case 'editor':
+            return UserRole.editor;
+          default:
+            return UserRole.user;
+        }
+      }
+      
+      // Se não encontrou nenhum usuário com esse email
+      return UserRole.user;
+      
+    } catch (e) {
+      //print("Erro ao buscar role do usuário: $e");
+      return UserRole.user; // Retorna user como padrão em caso de erro
+    }
   }
 }
