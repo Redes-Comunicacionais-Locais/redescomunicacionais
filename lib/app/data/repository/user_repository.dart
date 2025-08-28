@@ -56,23 +56,82 @@ class UserRepository {
 
   Future<void> addProfile(String email, String profile) async {
     try {
-      if (profile == 'admin') {
-        await _firestore.collection('admin').doc(email).set({});
-      } else if (profile == 'editor') {
-        await _firestore.collection('editor').doc(email).set({});
+      // Busca na coleção 'users' pelo campo 'email'
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Pega o primeiro documento encontrado
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+        String userId = userDoc.id;
+        
+        // Atualiza apenas o campo 'role' do usuário existente
+        await _firestore.collection('users').doc(userId).update({
+          'role': profile,
+          'roleUpdatedAt': DateTime.now(),
+          // Opcional: adicionar quem fez a alteração
+          // 'roleUpdatedBy': 'admin_email_or_id',
+        });
+       
+      } else {
+        throw Exception("Usuário não encontrado");
       }
+      
     } catch (e) {
-      throw Exception("Erro ao criar admin vazio: $e");
+      throw Exception("Erro ao atualizar role do usuário: $e");
     }
   }
 
   Future<UserRole> getUserRole(String email) async {
-    final isEditor = await _firestore.collection('editor').doc(email).get();
-    if (isEditor.exists) return UserRole.editor;
+    try {
+      // Busca na coleção 'users' pelo campo 'email'
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1) // Pega apenas o primeiro resultado
+          .get();
 
-    final isAdmin = await _firestore.collection('admin').doc(email).get();
-    if (isAdmin.exists) return UserRole.admin;
+      if (querySnapshot.docs.isNotEmpty) {
+        // Pega o primeiro documento encontrado
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+        Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+        
+        // Verifica o campo 'role'
+        String role = userData['role'] ?? 'user';
+        
+        switch (role.toLowerCase()) {
+          case 'admin':
+            return UserRole.admin;
+          case 'editor':
+            return UserRole.editor;
+          default:
+            return UserRole.user;
+        }
+      }
+      
+      // Se não encontrou nenhum usuário com esse email
+      return UserRole.user;
+      
+    } catch (e) {
+      //print("Erro ao buscar role do usuário: $e");
+      return UserRole.user; // Retorna user como padrão em caso de erro
+    }
+  }
 
-    return UserRole.user;
+  Future<List<Map<String, dynamic>>> getAllUsers() async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore.collection('users').get();
+      
+      return querySnapshot.docs.map((doc) {
+        Map<String, dynamic> userData = doc.data() as Map<String, dynamic>;
+        userData['id'] = doc.id; // Adiciona o ID do documento
+        return userData;
+      }).toList();
+    } catch (e) {
+      throw Exception("Erro ao buscar usuários: $e");
+    }
   }
 }
