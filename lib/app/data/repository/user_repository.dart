@@ -56,13 +56,32 @@ class UserRepository {
 
   Future<void> addProfile(String email, String profile) async {
     try {
-      if (profile == 'admin') {
-        await _firestore.collection('admin').doc(email).set({});
-      } else if (profile == 'editor') {
-        await _firestore.collection('editor').doc(email).set({});
+      // Busca na coleção 'users' pelo campo 'email'
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Pega o primeiro documento encontrado
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+        String userId = userDoc.id;
+        
+        // Atualiza apenas o campo 'role' do usuário existente
+        await _firestore.collection('users').doc(userId).update({
+          'role': profile,
+          'roleUpdatedAt': DateTime.now(),
+          // Opcional: adicionar quem fez a alteração
+          // 'roleUpdatedBy': 'admin_email_or_id',
+        });
+       
+      } else {
+        throw Exception("Usuário não encontrado");
       }
+      
     } catch (e) {
-      throw Exception("Erro ao criar admin vazio: $e");
+      throw Exception("Erro ao atualizar role do usuário: $e");
     }
   }
 
