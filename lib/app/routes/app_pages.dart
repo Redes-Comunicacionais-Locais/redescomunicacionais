@@ -1,18 +1,18 @@
 import 'package:get/get.dart';
-import 'package:redescomunicacionais/app/bindings/home_bindings.dart';
+import 'package:redescomunicacionais/app/modules/dashboard/bindings/home_bindings.dart';
 import 'package:redescomunicacionais/app/bindings/image_bindings.dart';
-import 'package:redescomunicacionais/app/bindings/login_bindings.dart';
-import 'package:redescomunicacionais/app/bindings/news_bindings.dart';
-import 'package:redescomunicacionais/app/bindings/user_bindings.dart';
+import 'package:redescomunicacionais/app/modules/login/bindings/login_bindings.dart';
+import 'package:redescomunicacionais/app/modules/news/bindings/news_bindings.dart';
+import 'package:redescomunicacionais/app/modules/user/bindings/user_bindings.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
-import 'package:redescomunicacionais/app/ui/device/forms/create_news_form.dart';
-import 'package:redescomunicacionais/app/ui/device/pages/admin_page.dart';
-import 'package:redescomunicacionais/app/ui/device/pages/home_page.dart';
-import 'package:redescomunicacionais/app/ui/device/pages/initial_page.dart';
-import 'package:redescomunicacionais/app/ui/device/pages/login_page.dart';
-import 'package:redescomunicacionais/app/ui/theme/news_widget.dart';
-import 'package:redescomunicacionais/app/ui/device/pages/news_page.dart';
-import 'package:redescomunicacionais/app/web_view/webview_page.dart';
+import 'package:redescomunicacionais/app/modules/news/ui/create_news_form.dart';
+import 'package:redescomunicacionais/app/modules/admin/ui/admin_page.dart';
+import 'package:redescomunicacionais/app/modules/dashboard/ui/home_page.dart';
+import 'package:redescomunicacionais/app/modules/inital/ui/initial_page.dart';
+import 'package:redescomunicacionais/app/modules/login/ui/login_page.dart';
+import 'package:redescomunicacionais/app/utils/theme/news_widget.dart';
+import 'package:redescomunicacionais/app/modules/news/ui/news_page.dart';
+import 'package:redescomunicacionais/app/modules/web/ui/webview_page.dart';
 
 class AppPages {
   static final routes = [
