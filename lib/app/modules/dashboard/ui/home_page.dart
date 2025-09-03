@@ -9,7 +9,7 @@ import 'package:redescomunicacionais/app/modules/user/controller/user_controller
 import 'package:redescomunicacionais/app/controller/version_controller.dart';
 import 'package:redescomunicacionais/app/services/device_detector_service.dart';
 import 'package:redescomunicacionais/app/utils/responsive_utils.dart';
-import 'package:redescomunicacionais/app/utils/theme/news_widget.dart';
+import 'package:redescomunicacionais/app/modules/news/utils/news_widget.dart';
 import 'package:redescomunicacionais/app/utils/theme/menu_drawer.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 
@@ -159,7 +159,7 @@ class _HomePageState extends State<HomePage> {
 
       try {
         final newsController = Get.find<NewsController>();
-        await newsController.buscarNews();
+        await newsController.getNewsFromFirebase();
       } catch (e) {
         // NewsController ainda não foi inicializado, ignore
       }
@@ -194,7 +194,7 @@ class _HomePageState extends State<HomePage> {
       // Recarrega as notícias se o controller existir
       try {
         final newsController = Get.find<NewsController>();
-        await newsController.buscarNews();
+        await newsController.getNewsFromFirebase();
       } catch (e) {
         // NewsController ainda não foi inicializado, ignore
       }

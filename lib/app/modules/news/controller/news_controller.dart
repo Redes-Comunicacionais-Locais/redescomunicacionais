@@ -4,12 +4,13 @@ import 'package:redescomunicacionais/app/modules/news/data/model/news_model.dart
 import 'package:redescomunicacionais/app/modules/news/data/repository/news_repository.dart';
 
 class NewsController extends GetxController {
-  final NewsRepository _repository = NewsRepository();
+  final NewsRepository _repository;
+  NewsController(this._repository);
   var newss = <NewsModel>[].obs;
   var isLoading = false.obs;
 
   // Add news - save to both Hive and Firebase
-  Future<void> adicionarNews(
+  Future<void> addNews(
     String title,
     String subtitle,
     List<String> cities,
@@ -51,7 +52,7 @@ class NewsController extends GetxController {
       // Save to both Hive and Firebase simultaneously
       await Future.wait([
         _repository.saveNewsToHive(news),
-        _repository.adicionarNews(news),
+        _repository.saveNewsToFirebase(news),
       ]);
 
       newss.insert(0, news); // Insert at the beginning of the list
@@ -76,10 +77,10 @@ class NewsController extends GetxController {
   }
 
   // Get news from Firebase only
-  Future<void> buscarNews() async {
+  Future<void> getNewsFromFirebase() async {
     try {
       isLoading(true);
-      newss.value = await _repository.buscarNews();
+      newss.value = await _repository.getNewsFromFirebase();
       newss.sort((a, b) => DateTime.parse(b.createdAt as String)
           .compareTo(DateTime.parse(a.createdAt as String)));
     } catch (e) {

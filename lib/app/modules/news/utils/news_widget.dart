@@ -13,14 +13,14 @@ class NewsWidget extends StatefulWidget {
 }
 
 class _NewsWidgetState extends State<NewsWidget> {
-  final NewsController newsController = Get.put(NewsController());
+  final NewsController newsController = Get.find<NewsController>();
   int? selectedCardIndex;
 
   @override
   void initState() {
     super.initState();
     // Busca as notícias apenas uma vez quando o widget é inicializado
-    newsController.buscarNews();
+    newsController.getNewsFromFirebase();
   }
 
   @override
