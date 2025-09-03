@@ -51,4 +51,16 @@ class NewsProvider  {
     }
   }
 
+Future<String> hideNews(String newsId, String status, String userEmail) async {
+  try {
+    await _firestore.collection(collectionPath).doc(newsId).update({
+      'status': status,
+      'excluedAt': DateTime.now().toIso8601String(),
+      'excluedBy': userEmail,
+    });
+    return "success";
+  } catch (e) {
+    return "Error hiding news status: $e";
+  }
+}
 }

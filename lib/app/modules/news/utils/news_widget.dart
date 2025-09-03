@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:redescomunicacionais/app/modules/news/utils/news_states.dart';
+import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/modules/news/controller/news_controller.dart';
 import 'package:intl/intl.dart'; // Para formatar datas
@@ -14,7 +16,9 @@ class NewsWidget extends StatefulWidget {
 
 class _NewsWidgetState extends State<NewsWidget> {
   final NewsController newsController = Get.find<NewsController>();
+  final UserModel user = Get.arguments;
   int? selectedCardIndex;
+  late String userEmail = user.email;
 
   @override
   void initState() {
@@ -31,12 +35,18 @@ class _NewsWidgetState extends State<NewsWidget> {
       }
 
       if (newsController.newss.isEmpty) {
-        return const Center(child: Text("Nenhuma notícia encontrada"));
+        return const Center(child: Text("Nenhuma notícia encontrada", selectionColor: Colors.white,));
       }
 
-      // Filtra notícias com imagens válidas
+      // Filtra notícias com imagens válidas e status "publicado"
       final validNews = newsController.newss.where((news) {
+        // Verifica se o status é "publicado"
+        if (news.status != "publicado") return false;
+        
+        // Verifica se tem imagens
         if (news.urlImages.isEmpty) return false;
+        
+        // Verifica se a imagem base64 é válida
         try {
           base64Decode(news.urlImages[0]);
           return true;
@@ -185,7 +195,7 @@ class _NewsWidgetState extends State<NewsWidget> {
                           // Ícone de excluir (lixeira)
                           GestureDetector(
                             onTap: () {
-                              _showDevelopmentPopup("Excluir");
+                              hideNewsPopup(news.id, NewsStates.deletado, userEmail, news.createdBy);
                             },
                             child: Container(
                               padding: const EdgeInsets.all(8.0),
@@ -340,6 +350,76 @@ class _NewsWidgetState extends State<NewsWidget> {
         ),
       );
     });
+  }
+
+  void hideNewsPopup(String newsId, String status, String userEmail, String authorEmail) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: const Text(
+            "Excluir Notícia",
+            style: TextStyle(color: Colors.white),
+          ),
+          content: const Text(
+            "Tem certeza que deseja excluir esta notícia?",
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                "Cancelar",
+                style: TextStyle(color: Colors.blue),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // Fecha o dialog primeiro
+                
+                try {
+                  String result = await newsController.hideNews(newsId, status, userEmail, authorEmail);
+                  
+                  // Mostra SnackBar com o resultado
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        result == "sucess" 
+                          ? "Notícia excluída com sucesso" 
+                          : result,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: result == "sucess" 
+                        ? Colors.green 
+                        : Colors.red,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                  
+                  // Se foi sucesso, atualiza a lista
+                  if (result == "sucess") {
+                    setState(() {
+                      selectedCardIndex = null; // Remove seleção
+                    });
+                    newsController.getNewsFromFirebase(); // Recarrega as notícias
+                  }
+                  
+                // ignore: empty_catches
+                } catch (e) {
+                }
+              },
+              child: const Text(
+                "Excluir",
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Método para mostrar popup de função em desenvolvimento

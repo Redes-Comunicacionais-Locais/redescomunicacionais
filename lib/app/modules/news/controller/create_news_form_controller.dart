@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:redescomunicacionais/app/modules/news/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/controller/home_controller.dart';
 import 'package:redescomunicacionais/app/controller/image_controller.dart';
+import 'package:redescomunicacionais/app/modules/news/utils/news_states.dart';
 import 'package:redescomunicacionais/app/utils/components/icon_base64.dart';
 
 class CreateNewsFormController extends GetxController {
@@ -155,7 +156,7 @@ class CreateNewsFormController extends GetxController {
       email,
       createdAt,
       _type.value ?? '',
-      "Em análise",
+      NewsStates.publicado,
     );
 
     // Limpar formulário

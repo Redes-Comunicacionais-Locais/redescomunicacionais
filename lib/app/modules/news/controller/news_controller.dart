@@ -106,4 +106,40 @@ class NewsController extends GetxController {
       isLoading(false);
     }
   }
+
+Future<String> hideNews(String newsId, String status, String userEmail, String authorEmail) async {
+  
+  if (userEmail == authorEmail) {
+    String result = "";
+    try {
+      isLoading(true);
+
+      result = await _repository.hideNews(newsId, status, userEmail);
+
+      if (result == "success") {
+        newss.removeWhere((news) => news.id == newsId); // Remove da lista local (interface)
+        Get.snackbar(
+          'Sucesso',
+          'Notícia excluída com sucesso!',
+          snackPosition: SnackPosition.BOTTOM,
+          colorText: Colors.white,
+          backgroundColor: Colors.green,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Erro',
+        'Não foi possível excluir a notícia.',
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
+      );
+    } finally {
+      isLoading(false);
+    }
+    return result;
+  } else {
+    return "Você não tem permissão para excluir esta notícia.";
+  }
+}
 }
