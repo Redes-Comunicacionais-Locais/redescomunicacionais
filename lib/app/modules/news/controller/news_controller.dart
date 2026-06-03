@@ -124,7 +124,6 @@ class NewsController extends GetxController {
 
     try {
       NewsModel news = NewsModel(
-        id: DateTime.now().toIso8601String(),
         title: title,
         subtitle: subtitle,
         cities: cities,

@@ -8,7 +8,7 @@ import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
 
 class NewsProvider {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String collectionPath = "news";
+  final String collectionPath = "news_test";
 
   Future<void> _saveNewsToFirebase(NewsModel news) async {
     try {
