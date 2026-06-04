@@ -8,7 +8,7 @@ import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
 
 class NewsProvider {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String collectionPath = "news";
+  final String collectionPath = "news_test";
 
   Future<void> _saveNewsToFirebase(NewsModel news) async {
     try {
@@ -262,7 +262,6 @@ class NewsProvider {
             DateTime? hiveDate = hiveNews.lastUpdated;
 
             if (fbDate != null && hiveDate != null) {
-
               final fbClean = DateTime.fromMillisecondsSinceEpoch(
                   fbDate.millisecondsSinceEpoch);
               final hiveClean = DateTime.fromMillisecondsSinceEpoch(

@@ -13,7 +13,7 @@ class UserProvider {
   final String hiveUserKey = 'current_user';
   final String userCollection = 'users';
 
-  Future<UserModel> createUserDoc(
+  Future<void> createUserDoc(
       String email, String name, String uid, String urlImage) async {
     UserModel userHive = UserModel.empty();
     UserModel userFirebase = UserModel.empty();
@@ -59,8 +59,6 @@ class UserProvider {
     } catch (e) {
       throw Exception("Erro ao atualizar informações básicas do usuário: $e");
     }
-
-    return selectedUser;
   }
 
   Future<void> _createUserDocInFirebase(

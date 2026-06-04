@@ -47,28 +47,15 @@ class HomePage extends GetView<HomeController> {
                             : controller.isDeletedMode.value
                                 ? 'Matérias excluídas'.tr
                                 : 'app_short_name'.tr;
-                return Row(
-                  children: [
-                    SizedBox(width: isTablet ? 10.0 : 8.0),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            titleText,
-                            style: TextStyle(
-                              fontSize: appBarTitleSize,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                return Text(
+                  titleText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: appBarTitleSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 );
               }),
               shape: const RoundedRectangleBorder(

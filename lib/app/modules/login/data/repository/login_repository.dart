@@ -8,31 +8,31 @@ class LoginRepository {
   final SignInApple signInApple = SignInApple();
   final UserProvider userProvider = UserProvider();
 
-  Future<UserModel> signInGoogle() {
+  Future<void> signInGoogle() {
     return signInService.signInGoogle();
   }
 
-  Future<UserModel> trySignInGoogle() {
+  Future<void> trySignInGoogle() {
     return signInService.trySignInGoogle();
   }
 
-  logoutGoogle() {
-    signInService.logoutGoogle();
+  Future<void> logoutGoogle() {
+    return signInService.logoutGoogle();
   }
 
-  Future<UserModel> signInMicrosoft() async {
+  Future<void> signInMicrosoft() async {
     return signInService.signInMicrosoft();
   }
 
-  Future<UserModel> trySignInMicrosoft() {
+  Future<void> trySignInMicrosoft() {
     return signInService.trySignInMicrosoft();
   }
 
-  logoutMicrosoft() {
-    signInService.logoutMicrosoft();
+  Future<void> logoutMicrosoft() {
+    return signInService.logoutMicrosoft();
   }
 
-  Future<UserModel> signInAppleAuth() async {
+  Future<void> signInAppleAuth() async {
     return await signInApple.signInWithApple();
   }
 

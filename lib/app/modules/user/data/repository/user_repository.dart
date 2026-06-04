@@ -5,7 +5,7 @@ class UserRepository {
   UserRepository();
   final UserProvider _userProvider = UserProvider();
 
-  Future<UserModel> createUserDoc(
+  Future<void> createUserDoc(
       String email, String name, String uid, String urlImage) {
     return _userProvider.createUserDoc(email, name, uid, urlImage);
   }

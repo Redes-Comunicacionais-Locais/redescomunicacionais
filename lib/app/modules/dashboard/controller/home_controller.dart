@@ -42,10 +42,8 @@ class HomeController extends GetxController {
   @override
   Future<void> onInit() async {
     connectionsController = Get.find<ConnectionsController>();
-    _loadPackageInfo();
-
     user = await _userRepository.getCurrentUser();
-
+    _loadPackageInfo();
     super.onInit();
   }
 

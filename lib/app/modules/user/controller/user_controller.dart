@@ -15,28 +15,24 @@ class UserController extends GetxController {
   RxBool isSavingData = false.obs;
   RxBool isDeletingAccount = false.obs;
 
-  final TextEditingController nameController = TextEditingController();
-
-  Rxn<UserModel> currentUser = Rxn<UserModel>();
+  UserModel currentUser = UserModel.empty();
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
+    await loadCurrentUserData();
     super.onInit();
-    loadCurrentUserData();
-  }
-
-  @override
-  void onClose() {
-    nameController.dispose();
-    super.onClose();
   }
 
   Future<void> loadCurrentUserData() async {
     try {
       isDataLoading.value = true;
       UserModel user = await _repository.getCurrentUser();
-      currentUser.value = user;
-      nameController.text = user.name ?? '';
+
+      if (isClosed) {
+        return;
+      }
+
+      currentUser = user;
     } catch (e) {
       PopUps.snackbar(
         texto: 'Não foi possível carregar seus dados.',
@@ -48,31 +44,35 @@ class UserController extends GetxController {
   }
 
   Future<void> saveCurrentUserName() async {
-    final name = nameController.text.trim();
-
-    if (name.isEmpty) {
+    if (currentUser.name == null || currentUser.name!.trim().isEmpty) {
       PopUps.snackbar(
         texto: 'Informe um nome válido.',
         cor: Colors.orange,
       );
-    } else {
-      try {
-        isSavingData.value = true;
-        await _repository.updateUserName(currentUser.value!.id, name);
-        currentUser.value = await _repository.getCurrentUser();
+      return;
+    }
 
-        PopUps.snackbar(
-          texto: 'Nome atualizado com sucesso.',
-          cor: Colors.green,
-        );
-      } catch (e) {
-        PopUps.snackbar(
-          texto: 'Não foi possível atualizar o nome: $e',
-          cor: Colors.red,
-        );
-      } finally {
-        isSavingData.value = false;
+    try {
+      isSavingData.value = true;
+      await _repository.updateUserName(
+          currentUser.id, currentUser.name!.trim());
+      currentUser = await _repository.getCurrentUser();
+
+      if (isClosed) {
+        return;
       }
+
+      PopUps.snackbar(
+        texto: 'Nome atualizado com sucesso.',
+        cor: Colors.green,
+      );
+    } catch (e) {
+      PopUps.snackbar(
+        texto: 'Não foi possível atualizar o nome: $e',
+        cor: Colors.red,
+      );
+    } finally {
+      isSavingData.value = false;
     }
   }
 

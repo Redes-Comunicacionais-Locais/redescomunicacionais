@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:redescomunicacionais/app/config/secrets.dart';
-import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/modules/user/data/repository/user_repository.dart';
 
 class SignInService {
@@ -18,7 +17,7 @@ class SignInService {
 
   SignInService();
 
-  Future<UserModel> signInGoogle() async {
+  Future<void> signInGoogle() async {
     try {
       await _init;
       var account = await _googleSignIn.authenticate();
@@ -29,7 +28,7 @@ class SignInService {
     }
   }
 
-  Future<UserModel> _signIn(GoogleSignInAccount account) async {
+  Future<void> _signIn(GoogleSignInAccount account) async {
     try {
       final GoogleSignInAuthentication googleAuth = account.authentication;
       final authCredential = fb.GoogleAuthProvider.credential(
@@ -45,7 +44,7 @@ class SignInService {
     }
   }
 
-  Future<UserModel> _createUserDoc(
+  Future<void> _createUserDoc(
     fb.UserCredential userCredential,
     String? displayName,
     String? photoUrl,
@@ -63,7 +62,7 @@ class SignInService {
     }
   }
 
-  Future<UserModel> trySignInGoogle() async {
+  Future<void> trySignInGoogle() async {
     final User? firebaseUser = FirebaseAuth.instance.currentUser;
 
     if (firebaseUser != null) {
@@ -81,7 +80,6 @@ class SignInService {
             userDoc.get('id') ?? firebaseUser.uid,
             userDoc.get('urlImage') ?? firebaseUser.photoURL ?? '',
           );
-
         }
       } catch (err) {
         debugPrint("Erro ao buscar dados do usuário: $err");
@@ -91,7 +89,7 @@ class SignInService {
     return await _trySignSilentlyInGoogle();
   }
 
-  Future<UserModel> _trySignSilentlyInGoogle() async {
+  Future<void> _trySignSilentlyInGoogle() async {
     try {
       final Future<GoogleSignInAccount?>? account =
           _googleSignIn.attemptLightweightAuthentication();
@@ -102,12 +100,12 @@ class SignInService {
 
       final googleUser = await account;
 
-      if(googleUser == null) {
+      if (googleUser == null) {
         debugPrint("Nenhum usuário encontrado durante login silencioso.");
         throw Exception("Nenhum usuário encontrado durante login silencioso");
-      }
-      else{
-        debugPrint("Usuário encontrado durante login silencioso: ${googleUser.email}");
+      } else {
+        debugPrint(
+            "Usuário encontrado durante login silencioso: ${googleUser.email}");
 
         return await _signIn(googleUser);
       }
@@ -122,7 +120,7 @@ class SignInService {
     await FirebaseAuth.instance.signOut();
   }
 
-  Future<UserModel> signInMicrosoft() async {
+  Future<void> signInMicrosoft() async {
     final microsoftProvider = OAuthProvider("microsoft.com");
     try {
       final UserCredential userCredential =
@@ -145,7 +143,7 @@ class SignInService {
     throw Exception("Erro ao fazer login com Microsoft");
   }
 
-  Future<UserModel> trySignInMicrosoft() async {
+  Future<void> trySignInMicrosoft() async {
     final User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {

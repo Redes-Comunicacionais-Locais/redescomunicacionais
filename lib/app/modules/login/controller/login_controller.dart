@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:redescomunicacionais/app/modules/user/controller/user_controller.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/modules/user/data/repository/user_repository.dart';
 import 'package:redescomunicacionais/app/modules/login/data/repository/login_repository.dart';
@@ -29,24 +28,14 @@ class LoginController extends GetxController {
     }
   }
 
-  void _clearUserState() {
-    if (Get.isRegistered<UserController>()) {
-      final userController = Get.find<UserController>();
-      userController.currentUser.value = null;
-      userController.nameController.clear();
-    }
-  }
-
   void loginGoogle() async {
     try {
-      _repository.logoutGoogle();
+      await _repository.logoutGoogle();
       await _repository.signInGoogle();
-      Get.offNamed(Routes.HOME);
+      Get.offAllNamed(Routes.HOME);
     } catch (e) {
-      // Use debugPrint ao invés de snackbar para erros de inicialização
       debugPrint("Erro de Login: $e");
 
-      // Só mostre snackbar se o contexto estiver disponível
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (Get.context != null) {
           PopUps.snackbar(
@@ -60,8 +49,9 @@ class LoginController extends GetxController {
 
   void loginMicrosoft() async {
     try {
-      _repository.logoutGoogle();
-      Get.offNamed(Routes.HOME);
+      await _repository.logoutGoogle();
+      await _repository.logoutMicrosoft();
+      Get.offAllNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro de Login Microsoft: $e");
 
@@ -82,7 +72,7 @@ class LoginController extends GetxController {
           onTimeout: () =>
               throw Exception("Tempo esgotado para login silencioso"));
 
-      Get.offNamed(Routes.HOME);
+      Get.offAllNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro no tryLogin: $e");
       loginAnonymous();
@@ -92,7 +82,7 @@ class LoginController extends GetxController {
   Future<void> tryLoginMicrosoft() async {
     try {
       await _repository.trySignInMicrosoft();
-      Get.offNamed(Routes.HOME);
+      Get.offAllNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro no tryLoginMicrosoft: $e");
       loginAnonymous();
@@ -103,14 +93,15 @@ class LoginController extends GetxController {
     await _repository.logoutMicrosoft();
     await _repository.logoutGoogle();
     await _userRepository.deleteCurrentUserFromHive();
-    _clearUserState();
     Get.offAllNamed(Routes.LOGIN);
   }
 
   void loginApple() async {
     try {
+      await _repository.logoutGoogle();
+      await _repository.logoutMicrosoft();
       await _repository.signInAppleAuth();
-      Get.offNamed(Routes.HOME);
+      Get.offAllNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro de Login Apple: $e");
 
@@ -126,8 +117,10 @@ class LoginController extends GetxController {
   }
 
   void loginAnonymous() async {
+    await _repository.logoutGoogle();
+    await _repository.logoutMicrosoft();
     final anonymousUser = UserModel.empty();
     await _repository.createUserDocInHive(anonymousUser);
-    Get.offNamed(Routes.HOME);
+    Get.offAllNamed(Routes.HOME);
   }
 }
