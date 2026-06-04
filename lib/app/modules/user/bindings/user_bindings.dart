@@ -4,6 +4,6 @@ import 'package:redescomunicacionais/app/modules/user/controller/user_controller
 class UserBinding implements Bindings {
   @override
   void dependencies() {
-    Get.put<UserController>(UserController(), permanent: true);
+    Get.lazyPut<UserController>(() => UserController());
   }
 }

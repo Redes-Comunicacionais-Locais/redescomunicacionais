@@ -5,25 +5,16 @@ class UserRepository {
   UserRepository();
   final UserProvider _userProvider = UserProvider();
 
-  Future<UserModel> createUserDoc(
+  Future<void> createUserDoc(
       String email, String name, String uid, String urlImage) {
     return _userProvider.createUserDoc(email, name, uid, urlImage);
   }
 
-  Future<void> addProfile(String email, String profile, String adminEmail) {
-    return _userProvider.addProfile(email, profile, adminEmail);
+  Future<void> updateRole(String userId, String role, String adminEmail) {
+    return _userProvider.updateUserRole(userId, role, adminEmail);
   }
 
-  Future<void> updateRoleDocument(
-      String userId, String role, String updatedBy) {
-    return _userProvider.updateRoleDocument(userId, role, updatedBy);
-  }
-
-  Future<UserRole> getUserRole(String uid) {
-    return _userProvider.getUserRole(uid);
-  }
-
-  Future<List<Map<String, dynamic>>> getAllUsers() {
+  Future<List<UserModel>> getAllUsers() {
     return _userProvider.getAllUsers();
   }
 
@@ -31,11 +22,7 @@ class UserRepository {
     return _userProvider.getCurrentUserFromHive();
   }
 
-  updateUserInFirebase(UserModel user) {
-    return _userProvider.updateUserInFirebase(user);
-  }
-
-  updateUserInHive(UserModel user) {
+  Future<void> updateUserInHive(UserModel user) {
     return _userProvider.updateUserInHive(user);
   }
 
@@ -43,11 +30,11 @@ class UserRepository {
     return _userProvider.deleteCurrentUserFromHive();
   }
 
-  Future<UserModel> updateCurrentUserName(String name) {
-    return _userProvider.updateCurrentUserName(name);
-  }
-
   Future<void> deleteCurrentUserAccount() {
     return _userProvider.deleteCurrentUserAccount();
+  }
+
+  Future<void> updateUserName(String userId, String name) {
+    return _userProvider.updateUserName(userId, name);
   }
 }
