@@ -36,7 +36,7 @@ class LoginRepository {
     return await signInApple.signInWithApple();
   }
 
-  Future<String> createUserDocInHive(UserModel user) async {
+  Future<void> createUserDocInHive(UserModel user) async {
     return await userProvider.createUserDocInHive(user);
   }
 }

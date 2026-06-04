@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/controller/home_controller.dart';
-import 'package:redescomunicacionais/app/modules/connections/controller/connections_controller.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/modules/news/ui/news_windows.page.dart';
 import 'package:redescomunicacionais/app/utils/responsive_utils.dart';
@@ -111,7 +110,9 @@ class HomePage extends GetView<HomeController> {
                       onPressed: () => Get.toNamed(Routes.CONNECTIONS),
                       icon: Icon(
                         Icons.wifi,
-                        color: conn.isInternetConnected.value ? Colors.green : Colors.red,
+                        color: conn.isInternetConnected.value
+                            ? Colors.green
+                            : Colors.red,
                         size: iconSize,
                       ),
                     ),
@@ -155,7 +156,6 @@ class HomePage extends GetView<HomeController> {
                     );
                   },
                 ),
-          
                 IconButton(
                   iconSize: iconSize,
                   icon: const Icon(Icons.help_outline),
@@ -210,18 +210,17 @@ class HomePage extends GetView<HomeController> {
               ),
               child: Center(
                 child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Obx(() => Text(
-                        controller.locationService.city.value,
-                        style: TextStyle(
-                          fontSize: bottomBarFontSize,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )),
-                ),
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '',
+                      style: TextStyle(
+                        fontSize: bottomBarFontSize,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
               ),
             ),
     );
@@ -279,17 +278,17 @@ class HomePage extends GetView<HomeController> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Obx(() => Text(
-                              controller.locationService.city.value,
-                              style: TextStyle(
-                                fontSize: isTablet ? 12.0 : 10.0,
-                                color: Colors.white.withOpacity(0.8),
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ))
+                        Text(
+                          '',
+                          style: TextStyle(
+                            fontSize: isTablet ? 12.0 : 10.0,
+                            color: Colors.white.withOpacity(0.8),
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        )
                       ],
                     ),
                   ),
@@ -332,9 +331,4 @@ class HomePage extends GetView<HomeController> {
       ),
     );
   }
-
- 
-
- 
 }
-

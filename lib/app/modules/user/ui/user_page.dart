@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/user/controller/user_controller.dart';
-import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
 
@@ -172,12 +171,10 @@ class UserPage extends GetView<UserController> {
                           onPressed: controller.isSavingData.value
                               ? null
                               : () async {
-                                  final UserModel? updatedUser =
-                                      await controller.saveCurrentUserName();
-                                  if (updatedUser != null) {
+                                  await controller.saveCurrentUserName();
+                                  {
                                     Get.offAllNamed(
                                       Routes.HOME,
-                                      arguments: updatedUser,
                                     );
                                   }
                                 },

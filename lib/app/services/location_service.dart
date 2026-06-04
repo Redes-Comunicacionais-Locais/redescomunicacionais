@@ -29,8 +29,6 @@ class LocationService extends GetxService {
   }
 
   Future<void> requestLocation(UserModel user) async {
-    
-
     final completer = Completer<void>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -118,21 +116,8 @@ class LocationService extends GetxService {
       );
 
       if (placemarks.isNotEmpty) {
-        city.value = placemarks.first.subAdministrativeArea ?? 'city_not_found'.tr;
-
-        try {
-          await userController.updateUserInFirebase(user);
-          debugPrint("Firebase atualizado com sucesso");
-        } catch (e) {
-          debugPrint("Erro ao atualizar Firebase: $e");
-        }
-
-        try {
-          await userController.updateUserInHive(user);
-          debugPrint("Hive atualizado com sucesso");
-        } catch (e) {
-          debugPrint("Erro ao atualizar Hive: $e");
-        }
+        city.value =
+            placemarks.first.subAdministrativeArea ?? 'city_not_found'.tr;
       }
     } on TimeoutException {
       city.value = 'error_updating_location'.tr;

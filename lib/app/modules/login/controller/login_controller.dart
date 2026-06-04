@@ -40,8 +40,8 @@ class LoginController extends GetxController {
   void loginGoogle() async {
     try {
       _repository.logoutGoogle();
-      UserModel user = await _repository.signInGoogle();
-      Get.offNamed(Routes.HOME, arguments: user);
+      await _repository.signInGoogle();
+      Get.offNamed(Routes.HOME);
     } catch (e) {
       // Use debugPrint ao invés de snackbar para erros de inicialização
       debugPrint("Erro de Login: $e");
@@ -61,9 +61,7 @@ class LoginController extends GetxController {
   void loginMicrosoft() async {
     try {
       _repository.logoutGoogle();
-      UserModel user = await _repository.signInMicrosoft();
-        Get.offNamed(Routes.HOME, arguments: user);
-      
+      Get.offNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro de Login Microsoft: $e");
 
@@ -80,11 +78,11 @@ class LoginController extends GetxController {
 
   Future<void> tryLogin() async {
     try {
-      UserModel user = await _repository
-          .trySignInGoogle()
-          .timeout(const Duration(seconds: 10), onTimeout: () => throw Exception("Tempo esgotado para login silencioso"));
+      await _repository.trySignInGoogle().timeout(const Duration(seconds: 10),
+          onTimeout: () =>
+              throw Exception("Tempo esgotado para login silencioso"));
 
-        Get.offNamed(Routes.HOME, arguments: user);
+      Get.offNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro no tryLogin: $e");
       loginAnonymous();
@@ -92,15 +90,13 @@ class LoginController extends GetxController {
   }
 
   Future<void> tryLoginMicrosoft() async {
-    try{
-       UserModel hasLogged = await _repository.trySignInMicrosoft();
-      Get.offNamed(Routes.HOME, arguments: hasLogged);
-    }
-    catch(e){
+    try {
+      await _repository.trySignInMicrosoft();
+      Get.offNamed(Routes.HOME);
+    } catch (e) {
       debugPrint("Erro no tryLoginMicrosoft: $e");
       loginAnonymous();
     }
-   
   }
 
   void logout() async {
@@ -113,8 +109,8 @@ class LoginController extends GetxController {
 
   void loginApple() async {
     try {
-      UserModel user = await _repository.signInAppleAuth();
-        Get.offNamed(Routes.HOME, arguments: user);
+      await _repository.signInAppleAuth();
+      Get.offNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro de Login Apple: $e");
 
@@ -131,7 +127,7 @@ class LoginController extends GetxController {
 
   void loginAnonymous() async {
     final anonymousUser = UserModel.empty();
-     await _repository.createUserDocInHive(anonymousUser);
-    Get.offNamed(Routes.HOME, arguments: anonymousUser);
+    await _repository.createUserDocInHive(anonymousUser);
+    Get.offNamed(Routes.HOME);
   }
 }
