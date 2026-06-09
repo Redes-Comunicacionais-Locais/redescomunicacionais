@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/user/controller/user_controller.dart';
-import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
 
-class UserPage extends GetView<UserController> {
+class UserPage extends StatefulWidget {
   const UserPage({super.key});
+
+  @override
+  State<UserPage> createState() => _UserPageState();
+}
+
+class _UserPageState extends State<UserPage> {
+  final TextEditingController _nameController = TextEditingController();
+  bool _isNameInitialized = false;
+
+  UserController get controller => Get.find<UserController>();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
 
   Future<void> _confirmDeleteAccount(BuildContext context) async {
     final bool? confirm = await showDialog<bool>(
@@ -72,11 +87,20 @@ class UserPage extends GetView<UserController> {
       body: Obx(
         () {
           if (controller.isDataLoading.value) {
+            _isNameInitialized = false;
             return const Center(
               child: BlinkingLoadingIcon(
                 size: 36,
               ),
             );
+          }
+
+          if (!_isNameInitialized) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              _nameController.text = controller.currentUser.name ?? '';
+              _isNameInitialized = true;
+            });
           }
 
           return SafeArea(
@@ -125,7 +149,10 @@ class UserPage extends GetView<UserController> {
                         ),
                         const SizedBox(height: 20),
                         TextField(
-                          controller: controller.nameController,
+                          controller: _nameController,
+                          onChanged: (value) {
+                            controller.currentUser.name = value;
+                          },
                           textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
                             labelText: 'name'.tr,
@@ -159,7 +186,7 @@ class UserPage extends GetView<UserController> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  controller.currentUser.value?.email ?? '',
+                                  controller.currentUser.email,
                                   style: theme.textTheme.bodyMedium,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -172,12 +199,12 @@ class UserPage extends GetView<UserController> {
                           onPressed: controller.isSavingData.value
                               ? null
                               : () async {
-                                  final UserModel? updatedUser =
-                                      await controller.saveCurrentUserName();
-                                  if (updatedUser != null) {
+                                  controller.currentUser.name =
+                                      _nameController.text;
+                                  await controller.saveCurrentUserName();
+                                  {
                                     Get.offAllNamed(
                                       Routes.HOME,
-                                      arguments: updatedUser,
                                     );
                                   }
                                 },

@@ -1,22 +1,19 @@
-import 'dart:convert';
 import 'package:flutter/material.dart' show Colors, debugPrint;
 import 'package:get/get.dart';
-import 'package:redescomunicacionais/app/modules/dashboard/controller/home_controller.dart';
 import 'package:redescomunicacionais/app/modules/news/data/model/news_model.dart';
 import 'package:redescomunicacionais/app/modules/news/data/repository/news_repository.dart';
 import 'package:redescomunicacionais/app/modules/news/utils/news_states.dart';
-import 'package:redescomunicacionais/app/modules/user/controller/user_controller.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
+import 'package:redescomunicacionais/app/modules/user/data/repository/user_repository.dart';
 import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/utils/components/popups.dart';
 
 class NewsController extends GetxController {
   final NewsRepository _repository = NewsRepository();
-  late UserController userController;
-  late UserModel user;
+  final UserRepository _userRepository = UserRepository();
 
-  HomeController get homeController => Get.find<HomeController>();
+  UserModel user = UserModel.empty();
 
   var inAnalysisNewsList = <NewsModel>[].obs;
   var myDraftsList = <NewsModel>[].obs;
@@ -30,8 +27,7 @@ class NewsController extends GetxController {
   @override
   onInit() async {
     super.onInit();
-    userController = Get.find<UserController>();
-    user = await userController.getCurrentUser();
+    user = await _userRepository.getCurrentUser();
     await _repository.syncNewsHiveAndFirebase(user);
     await getAllNewsFromHive();
   }
@@ -142,8 +138,8 @@ class NewsController extends GetxController {
       //  Tentar salvar no Hive
       try {
         await _repository.saveNewsToHive(news);
-        _repository
-            .syncNewsHiveAndFirebase(user); // Sincroniza os dados após atualização
+        _repository.syncNewsHiveAndFirebase(
+            user); // Sincroniza os dados após atualização
         getAllNewsFromHive(); // Atualiza as listas no controller
       } catch (e) {
         debugPrint("Hive falhou: $e.");
@@ -167,8 +163,8 @@ class NewsController extends GetxController {
 
     try {
       await _repository.hideNews(newsId, status, userEmail);
-      _repository
-          .syncNewsHiveAndFirebase(user); // Sincroniza os dados após atualização
+      _repository.syncNewsHiveAndFirebase(
+          user); // Sincroniza os dados após atualização
       getAllNewsFromHive(); // Atualiza as listas no controller
       PopUps.snackbar(
         texto: '$type excluída com sucesso!',
@@ -214,8 +210,8 @@ class NewsController extends GetxController {
         validatorName,
         newsType,
       );
-      _repository
-          .syncNewsHiveAndFirebase(user); // Sincroniza os dados após atualização
+      _repository.syncNewsHiveAndFirebase(
+          user); // Sincroniza os dados após atualização
       getAllNewsFromHive(); // Atualiza as listas no controller
       PopUps.snackbar(
         texto: isApproved
@@ -244,7 +240,8 @@ class NewsController extends GetxController {
   }
 
   bool canReReview(NewsModel news) {
-    bool isEditorOrAdmin = user.role == UserRoles.editor || user.role == UserRoles.admin;
+    bool isEditorOrAdmin =
+        user.role == UserRoles.editor || user.role == UserRoles.admin;
     bool isNotAuthor = user.email != news.createdBy;
     bool isRevisableStatus = news.status == NewsStates.publicado ||
         news.status == NewsStates.emAnalise;

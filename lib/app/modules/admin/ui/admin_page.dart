@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/admin/controller/admin_controller.dart';
 import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
+import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
 
@@ -69,37 +70,40 @@ class AdminPage extends GetView<AdminController> {
 
             // Lista de usuários
             Expanded(
-              child: GetBuilder<AdminController>(
-                builder: (adminController) {
-                  if (controller.isLoadingUserController().value) {
-                    return const Center(
-                      child: BlinkingLoadingIcon(
-                        size: 36,
-                        color: Colors.white,
-                      ),
-                    );
-                  }
-
-                  final filteredUsers = controller.getFilteredAndSortedUsers();
-                  if (filteredUsers.isEmpty) {
-                    return Center(
-                      child: Text(
-                        'no_user_found'.tr,
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: filteredUsers.length,
-                    itemBuilder: (context, index) {
-                      final user = filteredUsers[index];
-                      return _buildUserCard(user);
-                    },
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(
+                    child: BlinkingLoadingIcon(
+                      size: 36,
+                      color: Colors.white,
+                    ),
                   );
-                },
-              ),
+                }
+
+                String filter = controller.selectedRoleFilter.value;
+                List<UserModel> filteredUsers = controller.users
+                    .where((u) => filter == 'todos' ? true : u.role == filter)
+                    .toList()
+                  ..sort((a, b) => a.email.compareTo(b.email));
+
+                if (filteredUsers.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'no_user_found'.tr,
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: filteredUsers.length,
+                  itemBuilder: (context, index) {
+                    UserModel user = filteredUsers[index];
+                    return _buildUserCard(user);
+                  },
+                );
+              }),
             ),
           ],
         ),
@@ -107,10 +111,10 @@ class AdminPage extends GetView<AdminController> {
     );
   }
 
-  Widget _buildUserCard(Map<String, dynamic> user) {
-    String email = user['email'] ?? '';
-    String userId = user['id'] ?? '';
-    String currentRole = user['role'] ?? 'user';
+  Widget _buildUserCard(UserModel user) {
+    String email = user.email;
+    String userId = user.id;
+    String currentRole = user.role;
 
     // Gera iniciais do email
     String initials = email.isNotEmpty ? email[0].toUpperCase() : 'U';
@@ -198,7 +202,8 @@ class AdminPage extends GetView<AdminController> {
                   DropdownMenuItem(value: 'user', child: Text('role_user'.tr)),
                   DropdownMenuItem(
                       value: 'editor', child: Text('role_editor'.tr)),
-                  DropdownMenuItem(value: 'admin', child: Text('role_admin'.tr)),
+                  DropdownMenuItem(
+                      value: 'admin', child: Text('role_admin'.tr)),
                 ],
                 onChanged: (newRole) async {
                   if (newRole != null) {
@@ -206,15 +211,12 @@ class AdminPage extends GetView<AdminController> {
                     bool? confirm =
                         await _showConfirmDialog(email, currentRole, newRole);
                     if (confirm == true) {
-                      controller.addProfile(
-                          email, newRole, controller.user?.email ?? '');
-                      // Atualiza documento de role
                       if (userId.isNotEmpty) {
-                        await controller.updateRoleDocument(
-                            userId, newRole, controller.user?.email ?? '');
+                        await controller.userRepository
+                            .updateRole(userId, newRole, controller.user.email);
                       }
                       // Recarrega a lista
-                      controller.loadAllUsers();
+                      await controller.loadAllUsers();
                     }
                   }
                 },
@@ -250,7 +252,7 @@ class AdminPage extends GetView<AdminController> {
         ),
         selected: isSelected,
         onSelected: (selected) {
-          controller.setRoleFilter(filterValue);
+          controller.selectedRoleFilter.value = filterValue;
         },
         backgroundColor:
             isSelected ? Colors.blue : Colors.black.withOpacity(0.4),
@@ -291,8 +293,8 @@ class AdminPage extends GetView<AdminController> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child:
-                Text('cancel'.tr, style: const TextStyle(color: Colors.white70)),
+            child: Text('cancel'.tr,
+                style: const TextStyle(color: Colors.white70)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),

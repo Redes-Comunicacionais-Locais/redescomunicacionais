@@ -262,7 +262,6 @@ class NewsProvider {
             DateTime? hiveDate = hiveNews.lastUpdated;
 
             if (fbDate != null && hiveDate != null) {
-
               final fbClean = DateTime.fromMillisecondsSinceEpoch(
                   fbDate.millisecondsSinceEpoch);
               final hiveClean = DateTime.fromMillisecondsSinceEpoch(
