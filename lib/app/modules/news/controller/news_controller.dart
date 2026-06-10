@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart' show Colors, debugPrint;
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/news/data/model/news_model.dart';
@@ -15,11 +16,13 @@ class NewsController extends GetxController {
 
   UserModel user = UserModel.empty();
 
-  var inAnalysisNewsList = <NewsModel>[].obs;
-  var myDraftsList = <NewsModel>[].obs;
-  var rejectedNewsList = <NewsModel>[].obs;
-  var deletedNewsList = <NewsModel>[].obs;
-  var publishedNewsList = <NewsModel>[].obs;
+  QueryDocumentSnapshot<Map<String, dynamic>>? lastDocument;
+
+  RxList<NewsModel> inAnalysisNewsList = <NewsModel>[].obs;
+  RxList<NewsModel> myDraftsList = <NewsModel>[].obs;
+  RxList<NewsModel> rejectedNewsList = <NewsModel>[].obs;
+  RxList<NewsModel> deletedNewsList = <NewsModel>[].obs;
+  RxList<NewsModel> publishedNewsList = <NewsModel>[].obs;
 
   RxBool isLoading = false.obs;
   RxnInt selectedCardIndex = RxnInt();
@@ -28,8 +31,9 @@ class NewsController extends GetxController {
   onInit() async {
     super.onInit();
     user = await _userRepository.getCurrentUser();
+    await getPublicNewsFromHive(null);
+    await getOuthersNewsFromHive();
     await _repository.syncNewsHiveAndFirebase(user);
-    await getAllNewsFromHive();
   }
 
   // Abre a página de detalhe
@@ -37,6 +41,12 @@ class NewsController extends GetxController {
     Get.toNamed(Routes.NEWS_PAGE, arguments: toNewsArguments(news));
   }
 
+  Future<void> getMoreNews() async {
+    if (lastDocument == null) {
+      return; // Não há mais notícias para carregar
+    }
+    await getPublicNewsFromHive(lastDocument);
+  }
   // Prepara o map de argumentos usado nas rotas de detalhe
   Map<String, dynamic> toNewsArguments(NewsModel news) {
     return {
@@ -72,29 +82,55 @@ class NewsController extends GetxController {
     });
   }
 
-  Future<void> getAllNewsFromHive() async {
+  Future<void> getOuthersNewsFromHive() async {
     try {
       isLoading(true);
-
-      List<NewsModel> allNews = await _repository.getNewsFromHive();
+      await _repository
+          .getOuthersNews(user); // Atualiza o Hive com os dados do Firebase
+      List<NewsModel> outhersNews = await _repository.getOuthersNewsFromHive();
 
       // So admin e editor veem as listas de análise, rascunho, rejeitado e deletado
       if (user.role == UserRoles.admin || user.role == UserRoles.editor) {
         inAnalysisNewsList.assignAll(
-          allNews.where((news) => news.status == NewsStates.emAnalise).toList(),
+          outhersNews
+              .where((news) => news.status == NewsStates.emAnalise)
+              .toList(),
         );
         myDraftsList.assignAll(
-          allNews.where((news) => news.status == NewsStates.rascunho).toList(),
+          outhersNews
+              .where((news) => news.status == NewsStates.rascunho)
+              .toList(),
         );
         rejectedNewsList.assignAll(
-          allNews.where((news) => news.status == NewsStates.rejeitado).toList(),
+          outhersNews
+              .where((news) => news.status == NewsStates.rejeitado)
+              .toList(),
         );
         deletedNewsList.assignAll(
-          allNews.where((news) => news.status == NewsStates.deletado).toList(),
+          outhersNews
+              .where((news) => news.status == NewsStates.deletado)
+              .toList(),
         );
       }
+    } catch (e) {
+      debugPrint("Erro no Controller (Hive): $e");
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> getPublicNewsFromHive(
+      QueryDocumentSnapshot<Map<String, dynamic>>? ld) async {
+    try {
+      isLoading(true);
+      lastDocument = await _repository.getPublicNewsPaginated(
+          ld); // Atualiza o Hive com os dados do Firebase e obtém o próximo ponteiro de paginação
+      List<NewsModel> publicNews = await _repository.getPublicNewsFromHive();
+
       publishedNewsList.assignAll(
-        allNews.where((news) => news.status == NewsStates.publicado).toList(),
+        publicNews
+            .where((news) => news.status == NewsStates.publicado)
+            .toList(),
       );
     } catch (e) {
       debugPrint("Erro no Controller (Hive): $e");
@@ -140,7 +176,8 @@ class NewsController extends GetxController {
         await _repository.saveNewsToHive(news);
         _repository.syncNewsHiveAndFirebase(
             user); // Sincroniza os dados após atualização
-        getAllNewsFromHive(); // Atualiza as listas no controller
+        getPublicNewsFromHive(null); 
+        getOuthersNewsFromHive();
       } catch (e) {
         debugPrint("Hive falhou: $e.");
         throw Exception("Erro ao salvar notícia: $e");
@@ -165,7 +202,8 @@ class NewsController extends GetxController {
       await _repository.hideNews(newsId, status, userEmail);
       _repository.syncNewsHiveAndFirebase(
           user); // Sincroniza os dados após atualização
-      getAllNewsFromHive(); // Atualiza as listas no controller
+      getPublicNewsFromHive(null); 
+      getOuthersNewsFromHive();
       PopUps.snackbar(
         texto: '$type excluída com sucesso!',
         cor: Colors.green,
@@ -212,7 +250,8 @@ class NewsController extends GetxController {
       );
       _repository.syncNewsHiveAndFirebase(
           user); // Sincroniza os dados após atualização
-      getAllNewsFromHive(); // Atualiza as listas no controller
+      getPublicNewsFromHive(null); 
+      getOuthersNewsFromHive();
       PopUps.snackbar(
         texto: isApproved
             ? 'Matéria aprovada com sucesso!'

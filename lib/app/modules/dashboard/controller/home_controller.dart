@@ -65,7 +65,8 @@ class HomeController extends GetxController {
   Future<void> refreshDashboardData() async {
     try {
       await _newsRepository.syncNewsHiveAndFirebase(user);
-      await newsController.getAllNewsFromHive();
+      await newsController.getPublicNewsFromHive(null);
+      await newsController.getOuthersNewsFromHive();
       forceRecreate();
     } catch (e) {
       Get.snackbar(

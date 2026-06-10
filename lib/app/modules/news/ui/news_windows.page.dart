@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart'; // Para formatar datas
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
 
-class NewsWindowsPage extends GetView<NewsController> {
+class NewsWindowsPage extends StatefulWidget {
   NewsWindowsPage({
     super.key,
     RxBool? isRevisionMode,
@@ -26,6 +26,27 @@ class NewsWindowsPage extends GetView<NewsController> {
   final RxBool isDeletedMode;
 
   @override
+  State<NewsWindowsPage> createState() => _NewsWindowsPageState();
+}
+
+class _NewsWindowsPageState extends State<NewsWindowsPage> {
+  late ScrollController _scrollController;
+  late NewsController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _controller = Get.find<NewsController>();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -34,13 +55,13 @@ class NewsWindowsPage extends GetView<NewsController> {
         ),
         child: Obx(
           () {
-            final bool allListsEmpty = controller.publishedNewsList.isEmpty &&
-                controller.inAnalysisNewsList.isEmpty &&
-                controller.myDraftsList.isEmpty &&
-                controller.rejectedNewsList.isEmpty &&
-                controller.deletedNewsList.isEmpty;
+            final bool allListsEmpty = _controller.publishedNewsList.isEmpty &&
+                _controller.inAnalysisNewsList.isEmpty &&
+                _controller.myDraftsList.isEmpty &&
+                _controller.rejectedNewsList.isEmpty &&
+                _controller.deletedNewsList.isEmpty;
 
-            if (controller.isLoading.value || allListsEmpty) {
+            if (_controller.isLoading.value || allListsEmpty) {
               return const Center(
                 child: BlinkingLoadingIcon(
                   size: 36,
@@ -51,6 +72,10 @@ class NewsWindowsPage extends GetView<NewsController> {
 
             final List<NewsModel> validNews = _getNewsForCurrentMode();
             final List<NewsModel> sortedNews = _sortByCreatedAt(validNews);
+            final bool isPublishedMode = !widget.isDeletedMode.value &&
+              !widget.isRejectedMode.value &&
+              !widget.isRevisionMode.value &&
+              !widget.isDraftMode.value;
 
             if (sortedNews.isEmpty) {
               return Center(
@@ -66,9 +91,10 @@ class NewsWindowsPage extends GetView<NewsController> {
               // Detecta toque fora dos cards para fechar o menu
               behavior: HitTestBehavior.translucent,
               onTap: () {
-                controller.selectedCardIndex.value = null;
+                _controller.selectedCardIndex.value = null;
               },
               child: ListView(
+                controller: _scrollController,
                 children: [
                   //const SizedBox(height: 16.0), // Espaço superior
 
@@ -79,6 +105,8 @@ class NewsWindowsPage extends GetView<NewsController> {
 
                   // Lista vertical de notícias
                   ..._buildNewsList(sortedNews),
+                  if (isPublishedMode && sortedNews.isNotEmpty)
+                    _buildCreateMoreItem(),
                 ],
               ),
             );
@@ -89,23 +117,23 @@ class NewsWindowsPage extends GetView<NewsController> {
   }
 
   List<NewsModel> _getNewsForCurrentMode() {
-    if (isDeletedMode.value) {
-      return controller.deletedNewsList;
+    if (widget.isDeletedMode.value) {
+      return _controller.deletedNewsList;
     }
 
-    if (isRejectedMode.value) {
-      return controller.rejectedNewsList;
+    if (widget.isRejectedMode.value) {
+      return _controller.rejectedNewsList;
     }
 
-    if (isRevisionMode.value) {
-      return controller.inAnalysisNewsList;
+    if (widget.isRevisionMode.value) {
+      return _controller.inAnalysisNewsList;
     }
 
-    if (isDraftMode.value) {
-      return controller.myDraftsList;
+    if (widget.isDraftMode.value) {
+      return _controller.myDraftsList;
     }
 
-    return controller.publishedNewsList;
+    return _controller.publishedNewsList;
   }
 
   List<NewsModel> _sortByCreatedAt(List<NewsModel> newsList) {
@@ -114,6 +142,7 @@ class NewsWindowsPage extends GetView<NewsController> {
     return sortedList;
   }
 
+  // ignore: unused_element
   Widget _buildHorizontalCards(List<NewsModel> validNews) {
     return SizedBox(
       height: 120.0,
@@ -122,7 +151,7 @@ class NewsWindowsPage extends GetView<NewsController> {
         child: Row(
           children: validNews.map<Widget>((n) {
             return GestureDetector(
-              onTap: () => controller.openNews(n),
+              onTap: () => _controller.openNews(n),
               child: Card(
                 color: Colors.grey[900],
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -142,7 +171,7 @@ class NewsWindowsPage extends GetView<NewsController> {
                                 n.urlImages[0].isNotEmpty
                             ? _buildSafeImage(n.urlImages[0], 70.0)
                             : Image.asset(
-                                controller.getCityImageAsset(n.cities.isNotEmpty
+                                  _controller.getCityImageAsset(n.cities.isNotEmpty
                                     ? n.cities[0]
                                     : 'default'),
                                 fit: BoxFit.cover,
@@ -181,7 +210,7 @@ class NewsWindowsPage extends GetView<NewsController> {
         final news = entry.value;
 
         return Obx(() {
-          final isSelected = controller.isSelected(index);
+          final isSelected = _controller.isSelected(index);
 
           return Column(
             children: [
@@ -206,8 +235,8 @@ class NewsWindowsPage extends GetView<NewsController> {
                       // Ícone de editar (lápis)
                       GestureDetector(
                         onTap: () {
-                          if (controller.canEdit(news)) {
-                            controller.openEditNews(news);
+                          if (_controller.canEdit(news)) {
+                            _controller.openEditNews(news);
                           } else {
                             _showAccessDeniedDialog(Get.context!);
                           }
@@ -235,13 +264,13 @@ class NewsWindowsPage extends GetView<NewsController> {
                           ),
                         ),
                       ),
-                      if (controller.canDelete(news))
+                      if (_controller.canDelete(news))
                         GestureDetector(
                           onTap: () {
                             hideNewsPopup(
                                 news.id,
                                 NewsStates.deletado,
-                                controller.user.email,
+                                _controller.user.email,
                                 news.createdBy,
                                 news.type);
                           },
@@ -269,7 +298,7 @@ class NewsWindowsPage extends GetView<NewsController> {
                           ),
                         ),
 
-                      if (isRevisionMode.value || controller.canReReview(news))
+                      if (widget.isRevisionMode.value || _controller.canReReview(news))
                         GestureDetector(
                           onTap: () => _showReviewDialog(news),
                           child: Container(
@@ -296,7 +325,7 @@ class NewsWindowsPage extends GetView<NewsController> {
                           ),
                         ),
 
-                      if (isDeletedMode.value)
+                      if (widget.isDeletedMode.value)
                         GestureDetector(
                           onTap: () => _showObservationDialog(
                             news.excludedObservation,
@@ -325,7 +354,7 @@ class NewsWindowsPage extends GetView<NewsController> {
                           ),
                         ),
 
-                      if (isRejectedMode.value)
+                      if (widget.isRejectedMode.value)
                         GestureDetector(
                           onTap: () => _showObservationDialog(
                             news.rejectedObservation,
@@ -359,8 +388,8 @@ class NewsWindowsPage extends GetView<NewsController> {
               
               // Card da notícia
               GestureDetector(
-                onTap: () => controller.openNews(news),
-                onLongPress: () => controller.toggleSelected(index),
+                onTap: () => _controller.openNews(news),
+                onLongPress: () => _controller.toggleSelected(index),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
@@ -417,7 +446,7 @@ class NewsWindowsPage extends GetView<NewsController> {
                               ? _buildSafeImage(news.urlImages[0], 200.0)
                               : // se não houver base64, usa asset local por city
                               Image.asset(
-                                  controller.getCityImageAsset(
+                                  _controller.getCityImageAsset(
                                       news.cities.isNotEmpty
                                           ? news.cities[0]
                                           : 'default'),
@@ -477,6 +506,33 @@ class NewsWindowsPage extends GetView<NewsController> {
     ).toList();
   }
 
+  Widget _buildCreateMoreItem() {
+    return GestureDetector(
+      onTap: () {
+        _controller.getMoreNews();
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 16.0),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(color: Colors.white24, width: 1.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 34,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> hideNewsPopup(String newsId, String status, String userEmail,
       String authorEmail, String type) async {
     await Get.dialog(
@@ -499,7 +555,7 @@ class NewsWindowsPage extends GetView<NewsController> {
           TextButton(
             onPressed: () async {
               Get.back();
-              await controller.hideNews(
+              await _controller.hideNews(
                 newsId: newsId,
                 status: status,
                 userEmail: userEmail,
@@ -697,13 +753,13 @@ class NewsWindowsPage extends GetView<NewsController> {
             onPressed: () async {
               final reason = _reasonController.text.trim();
               Get.back();
-              await controller.reviewNews(
+              await _controller.reviewNews(
                 newsId: news.id,
                 isApproved: accepted,
                 reason: reason,
-                validator: controller.user.email,
+                validator: _controller.user.email,
                 creator: news.createdBy,
-                validatorName: controller.user.name ?? '',
+                validatorName: _controller.user.name ?? '',
                 newsType: news.type,
               );
             },
