@@ -29,7 +29,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       statusUpdatedAt: fields[9] as DateTime?,
       statusUpdatedBy: fields[10] as String?,
       statusObservation: fields[11] as String?,
-      lastUpdated: fields[12] as DateTime?,
+      lastUpdated: fields[12] as DateTime,
     );
   }
 

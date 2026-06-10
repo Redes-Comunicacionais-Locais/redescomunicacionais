@@ -17,7 +17,7 @@ class NewsModelAdapter extends TypeAdapter<NewsModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return NewsModel(
-      id: fields[0] as String,
+      id: fields[0] as String?,
       title: fields[1] as String,
       subtitle: fields[2] as String?,
       body: fields[5] as String,
@@ -27,7 +27,7 @@ class NewsModelAdapter extends TypeAdapter<NewsModel> {
       videoUrl: fields[21] as String?,
       type: fields[10] as String,
       status: fields[11] as String,
-      lastUpdated: fields[26] as DateTime?,
+      lastUpdated: fields[26] as DateTime,
       author: fields[7] as String,
       createdBy: fields[8] as String,
       createdAt: fields[9] as DateTime,

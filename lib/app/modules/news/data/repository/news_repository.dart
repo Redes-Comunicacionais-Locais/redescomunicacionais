@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:redescomunicacionais/app/modules/news/data/model/news_model.dart';
 import 'package:redescomunicacionais/app/modules/news/data/provider/news_provider.dart';
+import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 
 class NewsRepository {
   NewsRepository();
@@ -9,12 +11,26 @@ class NewsRepository {
     await newsProvider.saveNewsToHive(news);
   }
 
-  Future<void> syncNewsHiveAndFirebase() async {
-    await newsProvider.syncNewsHiveAndFirebase();
+  Future<void> syncNewsHiveAndFirebase(UserModel user) async {
+    await newsProvider.syncNewsHiveAndFirebase(user);
   }
 
-  Future<List<NewsModel>> getNewsFromHive() {
-    return newsProvider.getNewsFromHive();
+  Future<List<NewsModel>> getPublicNewsFromHive() {
+    return newsProvider.getPublicNewsFromHive();
+  }
+
+  Future<List<NewsModel>> getOuthersNewsFromHive() {
+    return newsProvider.getOuthersNewsFromHive();
+  }
+
+  Future<QueryDocumentSnapshot<Map<String, dynamic>>?> getPublicNewsPaginated(
+      QueryDocumentSnapshot<Map<String, dynamic>>? lastDocument) async {
+    return await newsProvider.getPublicNewsPaginated(
+        lastDocument: lastDocument);
+  }
+
+  Future<void> getOuthersNews(UserModel user) async {
+    await newsProvider.getOuthersNews(user);
   }
 
   Future<void> hideNews(String newsId, String status, String userEmail) async {
