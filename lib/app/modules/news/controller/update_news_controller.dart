@@ -20,7 +20,8 @@ class UpdateNewsController extends GetxController {
       String result = await newsRepository.updateNews(newsId, updatedData);
       newsRepository
           .syncNewsHiveAndFirebase(newsController.user); // Sincroniza os dados após atualização
-      newsController.getAllNewsFromHive(); // Atualiza as listas no controller
+      newsController.getPublicNewsFromHive(null); 
+      newsController.getOuthersNewsFromHive();
       return result;
     } catch (e) {
       return "Erro ao atualizar notícia: $e";
