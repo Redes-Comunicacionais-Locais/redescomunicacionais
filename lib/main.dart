@@ -26,6 +26,7 @@ Future<void> main() async {
       getPages: AppPages.routes,
       initialRoute: Routes.INITIAL,
 
+
       theme: appThemeData,
       darkTheme: appThemeDataDark,
       themeMode: ThemeMode.system,
