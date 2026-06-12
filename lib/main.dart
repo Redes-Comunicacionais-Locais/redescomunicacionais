@@ -17,8 +17,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await HiveInitializer
-      .initialize(); // Inicializa o Hive e registra os adapters
+  await HiveInitializer.initialize();
 
   runApp(
     GetMaterialApp(
@@ -26,7 +25,11 @@ Future<void> main() async {
       debugShowCheckedModeBanner: false,
       getPages: AppPages.routes,
       initialRoute: Routes.INITIAL,
+
       theme: appThemeData,
+      darkTheme: appThemeDataDark,
+      themeMode: ThemeMode.system,
+
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
