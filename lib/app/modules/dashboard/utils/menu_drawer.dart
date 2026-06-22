@@ -11,7 +11,7 @@ class MenuPage extends GetView<HomeController> {
   final double? iconSize;
   final bool? isTablet;
 
-  MenuPage({
+  const MenuPage({
     super.key,
     this.isHorizontal = false,
     this.iconSize,
@@ -48,7 +48,6 @@ class MenuPage extends GetView<HomeController> {
 
   Widget _buildDrawerMenu(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.black,
       child: Container(
         decoration: BoxDecoration(
           gradient: AppColors.darkBlueToBlackGradient(),
@@ -57,9 +56,6 @@ class MenuPage extends GetView<HomeController> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(
-                gradient: AppColors.appBarTopGradient(),
-              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -104,20 +100,26 @@ class MenuPage extends GetView<HomeController> {
                 ],
               ),
             ),
-            _buildCreateNewsItem(context, isDrawer: true),
             _buildAdminItem(context, isDrawer: true),
             _buildRestrictedMenuItem(
               context,
               icon: Icons.newspaper,
-              title: 'Central da notícia'.tr,
+              title: 'central_da_materia'.tr,
               onTap: () => Get.toNamed(Routes.NEWSCENTER),
             ),
-            _buildRestrictedMenuItem(
-              context,
-              icon: Icons.chat_bubble_outline,
-              title: 'Central de Comnunicação'.tr,
-              onTap: () => Get.toNamed(Routes.CENTRAL_DE_COMUNICACAO),
-            ),
+            if (!controller.isAnonymousUser)
+              ListTile(
+                leading:
+                    const Icon(Icons.chat_bubble_outline, color: Colors.white),
+                title: Text(
+                  'central_de_comunicacao'.tr,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Get.back();
+                  Get.toNamed(Routes.CENTRAL_DE_COMUNICACAO);
+                },
+              ),
             if (!controller.isAnonymousUser)
               ListTile(
                 leading: const Icon(Icons.person_outline, color: Colors.white),
@@ -133,7 +135,7 @@ class MenuPage extends GetView<HomeController> {
             ListTile(
               leading: const Icon(Icons.wifi, color: Colors.white),
               title: Text(
-                'Conexões',
+                'Conexões'.tr,
                 style: const TextStyle(color: Colors.white),
               ),
               onTap: () {
@@ -290,7 +292,6 @@ class MenuPage extends GetView<HomeController> {
                 SizedBox(height: isTablet! ? 15.0 : 10.0),
                 Divider(color: Colors.white.withOpacity(0.2), thickness: 0.5),
                 SizedBox(height: isTablet! ? 15.0 : 10.0),
-                _buildCreateNewsItem(context, isDrawer: false),
                 _buildAdminItem(context, isDrawer: false),
                 SizedBox(height: isTablet! ? 15.0 : 10.0),
                 Divider(color: Colors.white.withOpacity(0.2), thickness: 0.5),
@@ -300,11 +301,12 @@ class MenuPage extends GetView<HomeController> {
                   title: 'Central da notícia'.tr,
                   onTap: () => Get.toNamed(Routes.NEWSCENTER),
                 ),
-                _buildRestrictedHorizontalMenuTile(
-                  icon: Icons.chat_bubble_outline,
-                  title: 'Central de Comnunicação'.tr,
-                  onTap: () => Get.toNamed(Routes.CENTRAL_DE_COMUNICACAO),
-                ),
+                if (!controller.isAnonymousUser)
+                  _buildHorizontalMenuTile(
+                    icon: Icons.chat_bubble_outline,
+                    title: 'Central de Comnunicação'.tr,
+                    onTap: () => Get.toNamed(Routes.CENTRAL_DE_COMUNICACAO),
+                  ),
                 _buildHorizontalMenuTile(
                   icon: Icons.info_outline,
                   title: 'Sobre'.tr,
@@ -341,34 +343,6 @@ class MenuPage extends GetView<HomeController> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildCreateNewsItem(BuildContext context, {required bool isDrawer}) {
-    if (controller.user.role != UserRoles.admin &&
-        controller.user.role != UserRoles.editor) {
-      return const SizedBox.shrink();
-    }
-
-    if (isDrawer) {
-      return ListTile(
-        leading: const Icon(Icons.article_outlined, color: Colors.white),
-        title: Text(
-          'Criar Matéria'.tr,
-          style: const TextStyle(color: Colors.white),
-        ),
-        onTap: () {
-          Get.back();
-          Get.toNamed(Routes.CREATE_NEWS);
-        },
-      );
-    }
-
-    return _buildHorizontalMenuTile(
-      icon: Icons.article_outlined,
-      title: 'Criar Matéria'.tr,
-      onTap: () => Get.toNamed(Routes.CREATE_NEWS),
-      iconColor: Colors.white,
     );
   }
 
