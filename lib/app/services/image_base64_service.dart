@@ -61,7 +61,7 @@ class ImageBase64Service extends GetxController {
     Uint8List? webpBytes = await FlutterImageCompress.compressWithFile(
       croppedFile.path,
       format: CompressFormat.webp,
-      quality: 100, 
+      quality: 100,
     );
 
     if (webpBytes == null) {
@@ -88,10 +88,12 @@ class ImageBase64Service extends GetxController {
     } else {
       _base64String.value = base64Encode(webpBytes);
       var tamanho = (_base64String.value!.length) / 1024;
-      print('Tamanho original: ${File(imageFile.path).lengthSync() / 1024} KB');
-      print('Tamanho após crop: ${File(croppedFile.path).lengthSync() / 1024} KB');
-      print('Tamanho em WebP: ${  webpBytes.lengthInBytes / 1024} KB');
-      print('Tamanho em base 64: $tamanho KB'); 
+      debugPrint(
+          'Tamanho original: ${File(imageFile.path).lengthSync() / 1024} KB');
+      debugPrint(
+          'Tamanho após crop: ${File(croppedFile.path).lengthSync() / 1024} KB');
+      debugPrint('Tamanho em WebP: ${webpBytes.lengthInBytes / 1024} KB');
+      debugPrint('Tamanho em base 64: $tamanho KB');
       _message.value = 'image_selected_success'.tr;
     }
   }
