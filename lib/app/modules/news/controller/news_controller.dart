@@ -47,6 +47,7 @@ class NewsController extends GetxController {
     }
     await getPublicNewsFromHive(lastDocument);
   }
+
   // Prepara o map de argumentos usado nas rotas de detalhe
   Map<String, dynamic> toNewsArguments(NewsModel news) {
     return {
@@ -176,7 +177,7 @@ class NewsController extends GetxController {
         await _repository.saveNewsToHive(news);
         _repository.syncNewsHiveAndFirebase(
             user); // Sincroniza os dados após atualização
-        getPublicNewsFromHive(null); 
+        getPublicNewsFromHive(null);
         getOuthersNewsFromHive();
       } catch (e) {
         debugPrint("Hive falhou: $e.");
@@ -195,14 +196,22 @@ class NewsController extends GetxController {
     required String status,
     required String userEmail,
     required String type,
+    required String creator,
   }) async {
+    if (creator != userEmail) {
+      PopUps.snackbar(
+        texto: 'Você não pode revisar sua própria matéria.',
+        cor: Colors.red,
+      );
+      return;
+    }
     isLoading(true);
 
     try {
       await _repository.hideNews(newsId, status, userEmail);
       _repository.syncNewsHiveAndFirebase(
           user); // Sincroniza os dados após atualização
-      getPublicNewsFromHive(null); 
+      getPublicNewsFromHive(null);
       getOuthersNewsFromHive();
       PopUps.snackbar(
         texto: '$type excluída com sucesso!',
@@ -250,7 +259,7 @@ class NewsController extends GetxController {
       );
       _repository.syncNewsHiveAndFirebase(
           user); // Sincroniza os dados após atualização
-      getPublicNewsFromHive(null); 
+      getPublicNewsFromHive(null);
       getOuthersNewsFromHive();
       PopUps.snackbar(
         texto: isApproved

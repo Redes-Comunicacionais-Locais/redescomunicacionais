@@ -73,9 +73,9 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
             final List<NewsModel> validNews = _getNewsForCurrentMode();
             final List<NewsModel> sortedNews = _sortByCreatedAt(validNews);
             final bool isPublishedMode = !widget.isDeletedMode.value &&
-              !widget.isRejectedMode.value &&
-              !widget.isRevisionMode.value &&
-              !widget.isDraftMode.value;
+                !widget.isRejectedMode.value &&
+                !widget.isRevisionMode.value &&
+                !widget.isDraftMode.value;
 
             if (sortedNews.isEmpty) {
               return Center(
@@ -167,17 +167,18 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
                       ClipRRect(
                         borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(8.0)),
-                        child: n.urlImages.isNotEmpty &&
-                                n.urlImages[0].isNotEmpty
-                            ? _buildSafeImage(n.urlImages[0], 70.0)
-                            : Image.asset(
-                                  _controller.getCityImageAsset(n.cities.isNotEmpty
-                                    ? n.cities[0]
-                                    : 'default'),
-                                fit: BoxFit.cover,
-                                width: 120.0,
-                                height: 70.0,
-                              ),
+                        child:
+                            n.urlImages.isNotEmpty && n.urlImages[0].isNotEmpty
+                                ? _buildSafeImage(n.urlImages[0], 70.0)
+                                : Image.asset(
+                                    _controller.getCityImageAsset(
+                                        n.cities.isNotEmpty
+                                            ? n.cities[0]
+                                            : 'default'),
+                                    fit: BoxFit.cover,
+                                    width: 120.0,
+                                    height: 70.0,
+                                  ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -298,7 +299,8 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
                           ),
                         ),
 
-                      if (widget.isRevisionMode.value || _controller.canReReview(news))
+                      if (widget.isRevisionMode.value ||
+                          _controller.canReReview(news))
                         GestureDetector(
                           onTap: () => _showReviewDialog(news),
                           child: Container(
@@ -385,7 +387,7 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
                     ],
                   ),
                 ),
-              
+
               // Card da notícia
               GestureDetector(
                 onTap: () => _controller.openNews(news),
@@ -560,6 +562,7 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
                 status: status,
                 userEmail: userEmail,
                 type: type,
+                creator: authorEmail,
               );
             },
             child: Text('delete'.tr, style: const TextStyle(color: Colors.red)),
@@ -655,27 +658,40 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
         backgroundColor: Colors.grey[900],
         title: Text(
           'news_review'.tr,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         content: Text(
           'choose_action_for_news'.tr,
-          style: TextStyle(color: Colors.white70),
+          style: const TextStyle(color: Colors.white70),
         ),
         actions: [
+          // Botão de voltar adicionado para manter a consistência do fluxo
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'cancel'.tr, // Usa o "Cancelar" mapeado nas suas traduções
+              style: TextStyle(color: Colors.grey[400]),
+            ),
+          ),
           TextButton(
             onPressed: () async {
               Get.back();
               await _showReasonDialog(news, true);
             },
-            child:
-                Text('accept'.tr, style: const TextStyle(color: Colors.green)),
+            child: Text(
+              'accept'.tr,
+              style: const TextStyle(color: Colors.green),
+            ),
           ),
           TextButton(
             onPressed: () async {
               Get.back();
               await _showReasonDialog(news, false);
             },
-            child: Text('reject'.tr, style: const TextStyle(color: Colors.red)),
+            child: Text(
+              'reject'.tr,
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -723,7 +739,7 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
           children: [
             Text(
               'write_reason'.tr,
-              style: TextStyle(color: Colors.white70),
+              style: const TextStyle(color: Colors.white70),
             ),
             const SizedBox(height: 8.0),
             TextField(
@@ -732,7 +748,7 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'write_reason_here'.tr,
-                hintStyle: TextStyle(color: Colors.white38),
+                hintStyle: const TextStyle(color: Colors.white38),
                 filled: true,
                 fillColor: Colors.grey[850],
                 border: OutlineInputBorder(
@@ -744,10 +760,13 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
           ],
         ),
         actions: [
+          // Novo botão de voltar adicionado à esquerda
           TextButton(
             onPressed: () => Get.back(),
-            child:
-                Text('cancel'.tr, style: const TextStyle(color: Colors.blue)),
+            child: Text(
+              'cancel'.tr, // Mapeado no arquivo de idiomas como "Cancelar"
+              style: TextStyle(color: Colors.grey[400]),
+            ),
           ),
           TextButton(
             onPressed: () async {
