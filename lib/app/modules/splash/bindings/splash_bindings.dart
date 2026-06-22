@@ -3,9 +3,9 @@ import 'package:redescomunicacionais/app/modules/splash/controller/splash_contro
 
 class SplashBindings implements Bindings {
   @override
-  void dependencies() async {
-    Get.lazyPut<SplashController>(
-      () => SplashController(),
+  void dependencies() {
+    Get.put<SplashController>(
+      SplashController(),
     );
   }
 }
