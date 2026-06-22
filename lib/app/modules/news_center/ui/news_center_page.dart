@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/news_center/controller/news_center_controller.dart';
+import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 
 class NewsCenterPage extends GetView<NewsCenterController> {
@@ -59,6 +60,13 @@ class NewsCenterPage extends GetView<NewsCenterController> {
                         mainAxisSpacing: 14,
                         childAspectRatio: 1,
                         children: [
+                          _ActionCard(
+                            title: 'Criar nova matéria',
+                            subtitle: 'Comece a criar uma nova matéria',
+                            icon: Icons.create_rounded,
+                            accentColor: Colors.greenAccent,
+                            onTap: () => Get.toNamed(Routes.CREATE_NEWS),
+                          ),
                           _ActionCard(
                             title: 'Revisar Matérias',
                             subtitle: 'Fila de avaliação e aprovação editorial',
@@ -193,7 +201,8 @@ class _ActionCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(22),
         child: Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(
+              16), // Reduzido levemente de 18 para dar mais margem interna em telas pequenas
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(22),
             gradient: LinearGradient(
@@ -221,38 +230,51 @@ class _ActionCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10), // Ajustado de 12 para 10
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
                   icon,
-                  size: 34,
+                  size:
+                      30, // Ajustado de 34 para 30 para equilibrar o espaço do card
                   color: accentColor,
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+              const SizedBox(
+                  height: 8), // Pequeno espaçador fixo entre o ícone e o texto
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment:
+                      MainAxisAlignment.end, // Alinha o texto na base do card
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize:
+                            15, // Ajustado de 18 para 15 (melhor para GridView 2x2 em celulares)
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.78),
-                      fontSize: 13,
-                      height: 1.3,
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      maxLines:
+                          2, // Limita o subtítulo em até 2 linhas caso falte espaço
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.78),
+                        fontSize: 12, // Ajustado de 13 para 12
+                        height: 1.2,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

@@ -50,8 +50,8 @@ class _NewsPageState extends State<NewsPage> {
     final String cidade = Get.arguments["cidade"] ?? "";
     final String corpo = Get.arguments["corpo"] ?? "";
     final String type = Get.arguments["type"] ?? "";
-    final String videoUrl = Get.arguments["videoUrl"] ??
-        "https://www.youtube.com/shorts/vCeCb-evJOc";
+    final String videoUrl = Get.arguments["videoUrl"] ?? "";
+
     final String validatedByName = Get.arguments["validatedByName"] ?? "-";
 
     // Carrega o conteúdo Delta no controller
