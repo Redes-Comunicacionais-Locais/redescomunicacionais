@@ -1,12 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:redescomunicacionais/app/services/device_detector_service.dart';
 
 /// Classe utilitária para cálculos de responsividade
 /// Centraliza todas as funções de responsividade para manter o código limpo
 class ResponsiveUtils {
-  static final DeviceDetectorService _deviceDetector =
-      DeviceDetectorService.instance;
-
   // ===== MÉTODOS DE DETECÇÃO DE DISPOSITIVO =====
 
   /// Verifica se deve usar layout horizontal baseado no dispositivo e orientação
@@ -14,7 +11,7 @@ class ResponsiveUtils {
       double screenWidth, double screenHeight) {
     final bool isPortrait = screenHeight > screenWidth;
     final bool isLandscape = !isPortrait;
-    final bool isWeb = _deviceDetector.isWeb;
+    final bool isWeb = kIsWeb;
 
     return isWeb || (isLandscape && screenWidth > 700);
   }

@@ -60,6 +60,10 @@
 				</array>
 			</dict>
 		</array>
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+ 			<string>https</string>
+		</array>
 		<key>GIDClientID</key>
 		<string>792922518433-2eueup5n0tiqvbc3jonpn71iciga2glo.apps.googleusercontent.com</string>
 		<key>NSPhotoLibraryUsageDescription</key>

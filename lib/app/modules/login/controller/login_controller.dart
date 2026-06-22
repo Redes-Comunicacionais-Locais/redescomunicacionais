@@ -9,9 +9,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 class LoginController extends GetxController {
   final LoginRepository _repository = LoginRepository();
-  final RxString appVersion = 'Carregando...'.obs;
-
   final UserRepository _userRepository = UserRepository();
+
+  final RxString appVersion = 'Carregando...'.obs;
 
   @override
   void onInit() {
@@ -119,7 +119,7 @@ class LoginController extends GetxController {
   void loginAnonymous() async {
     await _repository.logoutGoogle();
     await _repository.logoutMicrosoft();
-    final anonymousUser = UserModel.empty();
+    UserModel anonymousUser = UserModel.empty();
     await _repository.createUserDocInHive(anonymousUser);
     Get.offAllNamed(Routes.HOME);
   }
