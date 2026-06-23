@@ -24,12 +24,6 @@ class SplashController extends GetxController {
     if (Get.context != null) {
       await _updateService.checkForUpdates(Get.context!);
     }
-
-    final status = await _updateService.checkFirebaseVersionStatus();
-
-    // Se NÃO for uma atualização obrigatória, o usuário pode continuar para o login
-    if (status != UpdateStatus.forceUpdate) {
-      _loginController.tryLogin();
-    }
+    _loginController.tryLogin();
   }
 }

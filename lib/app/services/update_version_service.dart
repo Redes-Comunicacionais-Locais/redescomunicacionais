@@ -37,7 +37,7 @@ class UpdateVersionService {
 
       if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
         //Firebase para saber se deve ser obrigatório ou opcional
-        final UpdateStatus status = await checkFirebaseVersionStatus();
+        final UpdateStatus status = await _checkFirebaseVersionStatus();
 
         if (status == UpdateStatus.forceUpdate &&
             updateInfo.immediateUpdateAllowed) {
@@ -62,18 +62,18 @@ class UpdateVersionService {
   }
 
   Future<void> _handleIOSUpdate(BuildContext context) async {
-    final UpdateStatus status = await checkFirebaseVersionStatus();
+    final UpdateStatus status = await _checkFirebaseVersionStatus();
 
     if (status == UpdateStatus.upToDate) return;
 
     final bool isForceUpdate = status == UpdateStatus.forceUpdate;
 
     if (context.mounted) {
-      _showIOSUpdateDialog(context, isForceUpdate);
+      await _showIOSUpdateDialog(context, isForceUpdate);
     }
   }
 
-  Future<UpdateStatus> checkFirebaseVersionStatus() async {
+  Future<UpdateStatus> _checkFirebaseVersionStatus() async {
     try {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       String currentVersion = packageInfo.version;
@@ -120,8 +120,9 @@ class UpdateVersionService {
     );
   }
 
-  void _showIOSUpdateDialog(BuildContext context, bool isForceUpdate) {
-    showDialog(
+  Future<void> _showIOSUpdateDialog(
+      BuildContext context, bool isForceUpdate) async {
+    await showDialog(
       context: context,
       barrierDismissible: !isForceUpdate,
       builder: (context) {
