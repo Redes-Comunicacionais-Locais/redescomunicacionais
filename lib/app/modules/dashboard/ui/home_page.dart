@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/controller/home_controller.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
-import 'package:redescomunicacionais/app/modules/news/ui/news_windows.page.dart';
+import 'package:redescomunicacionais/app/modules/news/ui/news_widgets.dart';
 import 'package:redescomunicacionais/app/utils/responsive_utils.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/utils/menu_drawer.dart';
@@ -24,10 +24,8 @@ class HomePage extends GetView<HomeController> {
     double appBarTitleSize = ResponsiveUtils.calculateAppBarTitleSize(
         screenWidth, isTablet, useHorizontalLayout);
     double iconSize = ResponsiveUtils.calculateIconSize(screenWidth, isTablet);
-    double bottomBarHeight =
-        ResponsiveUtils.calculateBottomBarHeight(screenHeight, isTablet);
-    double bottomBarFontSize =
-        ResponsiveUtils.calculateBottomBarFontSize(screenWidth, isTablet);
+    ResponsiveUtils.calculateBottomBarHeight(screenHeight, isTablet);
+    ResponsiveUtils.calculateBottomBarFontSize(screenWidth, isTablet);
 
     return Scaffold(
       appBar: useHorizontalLayout
@@ -83,7 +81,6 @@ class HomePage extends GetView<HomeController> {
                           controller.isDraftMode.value = false;
                           controller.isRejectedMode.value = false;
                           controller.isDeletedMode.value = false;
-                          controller.isMyDraftsMode.value = false;
                         },
                         icon:
                             const Icon(Icons.arrow_back, color: Colors.orange),
@@ -158,7 +155,7 @@ class HomePage extends GetView<HomeController> {
           await controller.refreshDashboardData();
         },
         child: Obx(
-          () => controller.isLoadingLocation.value
+          () => false
               ? Container(
                   decoration: BoxDecoration(
                     gradient: AppColors.darkBlueToBlackGradient(),
@@ -179,37 +176,9 @@ class HomePage extends GetView<HomeController> {
                       appBarTitleSize,
                       iconSize,
                     )
-                  : _buildVerticalLayout(
-                      context,
-                      screenHeight,
-                      isTablet,
-                    ),
+                  : _buildVerticalLayout(),
         ),
       ),
-      bottomNavigationBar: useHorizontalLayout
-          ? null
-          : Container(
-              color: Colors.black,
-              height: bottomBarHeight,
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * (isTablet ? 0.05 : 0.02),
-                vertical: isTablet ? 8.0 : 4.0,
-              ),
-              child: Center(
-                child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      '',
-                      style: TextStyle(
-                        fontSize: bottomBarFontSize,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )),
-              ),
-            ),
     );
   }
 
@@ -286,12 +255,8 @@ class HomePage extends GetView<HomeController> {
 
           // Lado direito - Conteúdo principal
           Expanded(
-            child: NewsWindowsPage(
+            child: NewsWidgets(
               key: ValueKey(controller.recreateKey),
-              isRevisionMode: controller.isRevisionMode,
-              isDraftMode: controller.isDraftMode,
-              isRejectedMode: controller.isRejectedMode,
-              isDeletedMode: controller.isDeletedMode,
             ),
           ),
         ],
@@ -300,21 +265,13 @@ class HomePage extends GetView<HomeController> {
   }
 
   // Layout vertical para mobile portrait
-  Widget _buildVerticalLayout(
-    BuildContext context,
-    double screenHeight,
-    bool isTablet,
-  ) {
+  Widget _buildVerticalLayout() {
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.darkBlueToBlackGradient(),
       ),
-      child: NewsWindowsPage(
+      child: NewsWidgets(
         key: ValueKey(controller.recreateKey),
-        isRevisionMode: controller.isRevisionMode,
-        isDraftMode: controller.isDraftMode,
-        isRejectedMode: controller.isRejectedMode,
-        isDeletedMode: controller.isDeletedMode,
       ),
     );
   }

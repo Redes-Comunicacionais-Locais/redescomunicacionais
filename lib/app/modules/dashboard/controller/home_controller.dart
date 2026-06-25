@@ -21,18 +21,16 @@ class HomeController extends GetxController {
 
   UserModel user = UserModel.empty();
 
-  bool get isAnonymousUser => user.id.isEmpty && user.email.isEmpty;
-
   final RxString appVersion = 'Carregando...'.obs;
   final RxString connectionTypeLabel = 'Sem conexão'.obs;
 
-  RxBool isLoadingLocation = false.obs;
   RxBool isRevisionMode = false.obs;
   RxBool isDraftMode = false.obs;
-  RxBool isMyDraftsMode = false.obs;
   RxBool isRejectedMode = false.obs;
   RxBool isDeletedMode = false.obs;
-  final RxBool isOnline = false.obs;
+  RxBool isPublishedMode = true.obs;
+
+  bool isAnonymousUser = true;
 
   /// chave usada para forçar recriação de widgets
   final RxInt _recreateKey = 0.obs;
@@ -43,6 +41,11 @@ class HomeController extends GetxController {
   Future<void> onInit() async {
     connectionsController = Get.find<ConnectionsController>();
     user = await _userRepository.getCurrentUser();
+    if (user.status == 'anonymous') {
+      isAnonymousUser = true;
+    } else {
+      isAnonymousUser = false;
+    }
     _loadPackageInfo();
     super.onInit();
   }
@@ -51,7 +54,7 @@ class HomeController extends GetxController {
     try {
       final packageInfo = await PackageInfo.fromPlatform();
       appVersion.value = packageInfo.version;
-    } catch (_) {
+    } catch (e) {
       appVersion.value = '--';
     }
   }
