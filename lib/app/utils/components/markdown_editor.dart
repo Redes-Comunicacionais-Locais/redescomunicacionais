@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 class MarkdownEditor extends StatefulWidget {
   final QuillController? controller;
@@ -92,7 +93,7 @@ class _MarkdownEditorState extends State<MarkdownEditor> {
               scrollController: ScrollController(),
               config: QuillEditorConfig(
                 padding: const EdgeInsets.all(12),
-                placeholder: 'Digite o corpo da matéria...',
+                placeholder: 'Digite o corpo da matéria...'.tr,
                 autoFocus: false,
                 expands: false,
                 customStyles: DefaultStyles(

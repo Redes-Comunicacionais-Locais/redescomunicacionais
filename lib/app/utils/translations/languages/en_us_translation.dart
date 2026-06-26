@@ -36,7 +36,8 @@ final Map<String, String> enUsTranslation = {
   'login_with_apple': 'Sign in with Apple',
   'login_anonymously': 'Sign in anonymously',
   'confirm_deletion': 'Confirm deletion',
-  'confirm_delete_account_message': 'Are you sure you want to delete your account? This action cannot be undone and all data will be lost.',
+  'confirm_delete_account_message':
+      'Are you sure you want to delete your account? This action cannot be undone and all data will be lost.',
   'delete_account': 'Delete account',
   'your_data': 'Your data',
   'update_display_name': 'Update your display name',
@@ -44,10 +45,11 @@ final Map<String, String> enUsTranslation = {
   'enter_your_name': 'Enter your name',
   'save_changes': 'Save changes',
   'danger_zone': 'Danger zone',
-  'delete_account_warning': 'Deleting the account removes access and linked data.',
+  'delete_account_warning':
+      'Deleting the account removes access and linked data.',
   'news_revision': 'News review',
   'news_revision_controller': 'News revision controller',
-  'add_news': 'Add news',
+  'add_news': 'Add News',
   'edit_news': 'Edit news',
   'title': 'Title',
   'title_required': 'Title is required.',
@@ -62,7 +64,8 @@ final Map<String, String> enUsTranslation = {
   'paste_youtube_link_here': 'Paste a YouTube video link here',
   'add_image': 'Add image',
   'change_image': 'Change image',
-  'image_requirements': 'The image must be in JPG or JPEG format and preferably have a maximum size of 500 KB. Larger images will be compressed, which can reduce quality and slow loading. For best visualization, landscape-oriented images are recommended.',
+  'image_requirements':
+      'Larger images will be compressed, which can reduce quality and slow loading. For best visualization, landscape-oriented images are recommended.',
   'publish_news': 'Publish news',
   'save_draft_news': 'Save draft',
   'update_news': 'Update news',
@@ -86,9 +89,10 @@ final Map<String, String> enUsTranslation = {
   'network_type': 'Network type',
   'last_check': 'Last check',
   'ranges': 'Ranges:',
-  'real_connection_checked_every_5_min': 'The real connection is checked automatically every 5 minutes.',
+  'real_connection_checked_every_5_min':
+      'The real connection is checked automatically every 5 minutes.',
   'close': 'Close',
-  'full_type': 'Full',
+  'full_type': '',
   'info_of': 'Information of',
   'content_of': 'Content of',
   'author': 'Author',
@@ -109,7 +113,8 @@ final Map<String, String> enUsTranslation = {
   'error': 'Error',
   'ok': 'OK',
   'access_denied': 'Access denied',
-  'only_author_can_edit': 'You cannot edit this news because you are not the author. Only the original author can make changes.',
+  'only_author_can_edit':
+      'You cannot edit this news because you are not the author. Only the original author can make changes.',
   'seconds_ago': 'seconds ago',
   'minutes_ago': 'minutes ago',
   'hours_ago': 'hours ago',
@@ -137,11 +142,13 @@ final Map<String, String> enUsTranslation = {
   '> 15 min: vermelho': '> 15 min: red',
   'obtaining_location': 'Obtaining location...',
   'location_request_title': 'Location Request',
-  'location_permission_description_android': 'The app would like to access your location to provide better information about your area. If you agree, select \'Confirm\'. Otherwise, select \'Continue without location\'.',
+  'location_permission_description_android':
+      'The app would like to access your location to provide better information about your area. If you agree, select \'Confirm\'. Otherwise, select \'Continue without location\'.',
   'location_not_provided': 'Location not provided',
   'continue_without_location': 'Continue without location',
   'allow_location': 'Allow location',
-  'location_permission_description_ios': 'We use your location to show you news closer to you.',
+  'location_permission_description_ios':
+      'We use your location to show you news closer to you.',
   'continue': 'Continue',
   'city_not_found': 'City not found',
   'error_updating_location': 'Error updating location',
@@ -151,10 +158,45 @@ final Map<String, String> enUsTranslation = {
   'image_selected_success': 'Image selected successfully!',
   'error_processing_image': 'Error processing image.',
   'image_too_large': 'The image is still too large!',
-  'image_compressed': 'The image exceeded the 500KB limit and was compressed. This process may result in loss of image quality.',
+  'image_compressed':
+      'The image exceeded the 500KB limit and was compressed. This process may result in loss of image quality.',
   'watch_on_youtube': 'Watch on YouTube',
   'youtube_url_placeholder': 'https://www.youtube.com/watch?v=...',
-  'processing_image_message': 'Processing your image... This may take a few seconds.',
+  'processing_image_message':
+      'Processing your image... This may take a few seconds.',
   'invalid_youtube_url': 'Invalid YouTube URL',
   'crop_image_title': 'Edit image',
+  'central_da_materia': 'News center',
+  'central_de_comunicacao': 'Communication center',
+  'Conexões': 'Connections',
+  'Cargo atualizado com sucesso': 'Role updated successfully',
+  'Ocorreu um erro ao atualizar o cargo':
+      'An error occurred while updating the role',
+  'Ocorreu um erro ao tentar fazer login com o Google. Por favor, tente novamente':
+      'An error occurred while trying to log in with Google. Please try again',
+  'Ocorreu um erro ao tentar fazer login com o Microsoft. Por favor, tente novamente.':
+      'An error occurred while trying to log in with Microsoft. Please try again.',
+  'Ocorreu um erro ao tentar fazer login com o Apple. Por favor, tente novamente.':
+      'An error occurred while trying to log in with Apple. Please try again.',
+  'Por favor, preencha todos os campos obrigatórios.':
+      'Please fill in all required fields.',
+  'Rascunho salvo com sucesso!': 'Draft saved successfully!',
+  'Erro ao salvar rascunho': 'Error saving draft',
+  'Erro ao publicar matéria': 'Error publishing news',
+  'Digite o corpo da matéria...': 'Type the body of the news...',
+  'Criar nova matéria': 'Create new news',
+  'Comece a criar uma nova matéria': 'Start creating a new news',
+  'Revisar Matérias': 'Review News',
+  'Fila de avaliação e aprovação editorial':
+      'Editorial review and approval queue',
+  'Ver seus rascunhos': 'View your drafts',
+  'Acesse suas matérias salvas como rascunhos': 'Access your saved drafts',
+  'Ver suas matérias rejeitadas': 'View your rejected news',
+  'Acompanhe o que voltou para ajustes':
+      'Track what has been sent back for adjustments',
+  'Ver suas matérias excluídas': 'View your deleted news',
+  'Confira o histórico de exclusões': 'Check the deletion history',
+  'Painel editorial': 'Editorial panel',
+  'Crie e organize as matérias em um único lugar.':
+      'Create and organize news in one place.',
 };

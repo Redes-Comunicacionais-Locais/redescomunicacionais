@@ -6,9 +6,6 @@ import 'package:redescomunicacionais/app/modules/news/utils/news_states.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
 
-
-
-
 class NewsProvider {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String collectionPath = "news";
@@ -27,90 +24,89 @@ class NewsProvider {
   }
 
   Future<QueryDocumentSnapshot<Map<String, dynamic>>?> getPublicNewsPaginated({
-  QueryDocumentSnapshot<Map<String, dynamic>>? lastDocument,
-}) async {
-  try {
-    QueryDocumentSnapshot<Map<String, dynamic>>? nextLastDocument;
+    QueryDocumentSnapshot<Map<String, dynamic>>? lastDocument,
+  }) async {
+    try {
+      QueryDocumentSnapshot<Map<String, dynamic>>? nextLastDocument;
 
-    Query<Map<String, dynamic>> query = _firestore
-        .collection(collectionPath)
-        .where('status', whereIn: [NewsStates.publicado])
-        .orderBy('createdAt', descending: true)
-        .limit(10);
-
-    if (lastDocument != null) {
-      query = query.startAfterDocument(lastDocument);
-    }
-
-    QuerySnapshot<Map<String, dynamic>> snapshot = await query.get();
-
-    if (snapshot.docs.isNotEmpty) {
-      nextLastDocument = snapshot.docs.last;
-    }
-
-    List<NewsModel> newsList = snapshot.docs.map((doc) {
-      Map<String, dynamic> data = doc.data();
-      data['id'] = doc.id;
-      return NewsModel.fromMap(data);
-    }).toList();
-
-    await saveNewsListToHive(newsList);
-
-    return nextLastDocument;
-    
-  } catch (e) {
-    throw Exception("Erro ao buscar notícias públicas paginadas: $e");
-  }
-}
-
- Future<void> getOuthersNews(UserModel user) async {
-  try {
-    if (user.role != UserRoles.admin && user.role != UserRoles.editor) {
-      throw Exception("Acesso negado: Usuário não é admin ou editor.");
-    }
-
-    Map<String, QueryDocumentSnapshot<Map<String, dynamic>>> docs = {};
-
-    List<Future<QuerySnapshot<Map<String, dynamic>>>> futures = [
-      // Suas próprias privadas (Rascunho, Rejeitado, Deletado)
-      _firestore
+      Query<Map<String, dynamic>> query = _firestore
           .collection(collectionPath)
-          .where('status', whereIn: [
-            NewsStates.rascunho,
-            NewsStates.rejeitado,
-            NewsStates.deletado,
-          ])
-          .where('createdBy', isEqualTo: user.email)
-          .get(),
+          .where('status', whereIn: [NewsStates.publicado])
+          .orderBy('createdAt', descending: true)
+          .limit(10);
 
-      // Todas as matérias que aguardam análise no sistema
-      _firestore
-          .collection(collectionPath)
-          .where('status', whereIn: [NewsStates.emAnalise]).get(),
-    ];
-
-    List<QuerySnapshot<Map<String, dynamic>>> snapshots =
-        await Future.wait(futures);
-
-    // Agrupa os resultados removendo duplicatas por ID
-    for (var snapshot in snapshots) {
-      for (var doc in snapshot.docs) {
-        docs[doc.id] = doc;
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
       }
+
+      QuerySnapshot<Map<String, dynamic>> snapshot = await query.get();
+
+      if (snapshot.docs.isNotEmpty) {
+        nextLastDocument = snapshot.docs.last;
+      }
+
+      List<NewsModel> newsList = snapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data();
+        data['id'] = doc.id;
+        return NewsModel.fromMap(data);
+      }).toList();
+
+      await saveNewsListToHive(newsList);
+
+      return nextLastDocument;
+    } catch (e) {
+      throw Exception("Erro ao buscar notícias públicas paginadas: $e");
     }
-
-    // Mapeia o resultado final unificado
-    List<NewsModel> othersNewsList = docs.values.map((doc) {
-      final data = doc.data();
-      data['id'] = doc.id;
-      return NewsModel.fromMap(data);
-    }).toList();
-
-    await saveNewsListToHive(othersNewsList);
-  } catch (e) {
-    throw Exception("Erro ao buscar matérias de administração: $e");
   }
-}
+
+  Future<void> getOuthersNews(UserModel user) async {
+    try {
+      if (user.role != UserRoles.admin && user.role != UserRoles.editor) {
+        throw Exception("Acesso negado: Usuário não é admin ou editor.");
+      }
+
+      Map<String, QueryDocumentSnapshot<Map<String, dynamic>>> docs = {};
+
+      List<Future<QuerySnapshot<Map<String, dynamic>>>> futures = [
+        // Suas próprias privadas (Rascunho, Rejeitado, Deletado)
+        _firestore
+            .collection(collectionPath)
+            .where('status', whereIn: [
+              NewsStates.rascunho,
+              NewsStates.rejeitado,
+              NewsStates.deletado,
+            ])
+            .where('createdBy', isEqualTo: user.email)
+            .get(),
+
+        // Todas as matérias que aguardam análise no sistema
+        _firestore
+            .collection(collectionPath)
+            .where('status', whereIn: [NewsStates.emAnalise]).get(),
+      ];
+
+      List<QuerySnapshot<Map<String, dynamic>>> snapshots =
+          await Future.wait(futures);
+
+      // Agrupa os resultados removendo duplicatas por ID
+      for (var snapshot in snapshots) {
+        for (var doc in snapshot.docs) {
+          docs[doc.id] = doc;
+        }
+      }
+
+      // Mapeia o resultado final unificado
+      List<NewsModel> othersNewsList = docs.values.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return NewsModel.fromMap(data);
+      }).toList();
+
+      await saveNewsListToHive(othersNewsList);
+    } catch (e) {
+      throw Exception("Erro ao buscar matérias de administração: $e");
+    }
+  }
 
   Future<void> saveNewsToHive(NewsModel news) async {
     try {
@@ -145,43 +141,42 @@ class NewsProvider {
   }
 
   Future<List<NewsModel>> getPublicNewsFromHive() async {
-  try {
-    final box = Hive.isBoxOpen(collectionPath)
-        ? Hive.box<NewsModel>(collectionPath)
-        : await Hive.openBox<NewsModel>(collectionPath);
+    try {
+      final box = Hive.isBoxOpen(collectionPath)
+          ? Hive.box<NewsModel>(collectionPath)
+          : await Hive.openBox<NewsModel>(collectionPath);
 
-    List<NewsModel> allList = box.values.toList().cast<NewsModel>();
+      List<NewsModel> allList = box.values.toList().cast<NewsModel>();
 
-    List<NewsModel> publicList = allList
-        .where((news) => news.status == NewsStates.publicado)
-        .toList();
+      List<NewsModel> publicList =
+          allList.where((news) => news.status == NewsStates.publicado).toList();
 
-    return publicList;
-  } catch (e) {
-    throw Exception("Erro ao buscar notícias públicas no Hive: $e");
+      return publicList;
+    } catch (e) {
+      throw Exception("Erro ao buscar notícias públicas no Hive: $e");
+    }
   }
-}
 
-Future<List<NewsModel>> getOuthersNewsFromHive() async {
-  try {
-    final box = Hive.isBoxOpen(collectionPath)
-        ? Hive.box<NewsModel>(collectionPath)
-        : await Hive.openBox<NewsModel>(collectionPath);
+  Future<List<NewsModel>> getOuthersNewsFromHive() async {
+    try {
+      final box = Hive.isBoxOpen(collectionPath)
+          ? Hive.box<NewsModel>(collectionPath)
+          : await Hive.openBox<NewsModel>(collectionPath);
 
-    List<NewsModel> allList = box.values.toList().cast<NewsModel>();
+      List<NewsModel> allList = box.values.toList().cast<NewsModel>();
 
-    List<NewsModel> internalList = allList.where((news) {
-      return news.status == NewsStates.rascunho ||
-             news.status == NewsStates.rejeitado ||
-             news.status == NewsStates.deletado ||
-             news.status == NewsStates.emAnalise;
-    }).toList();
+      List<NewsModel> internalList = allList.where((news) {
+        return news.status == NewsStates.rascunho ||
+            news.status == NewsStates.rejeitado ||
+            news.status == NewsStates.deletado ||
+            news.status == NewsStates.emAnalise;
+      }).toList();
 
-    return internalList;
-  } catch (e) {
-    throw Exception("Erro ao buscar notícias internas no Hive: $e");
+      return internalList;
+    } catch (e) {
+      throw Exception("Erro ao buscar notícias internas no Hive: $e");
+    }
   }
-}
 
   Future<void> _deleteNewsFromHive(String newsId) async {
     try {

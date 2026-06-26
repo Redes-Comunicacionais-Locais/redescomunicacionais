@@ -36,7 +36,8 @@ final Map<String, String> itItTranslation = {
   'login_with_apple': 'Accedi con Apple',
   'login_anonymously': 'Accedi anonimamente',
   'confirm_deletion': 'Conferma eliminazione',
-  'confirm_delete_account_message': 'Sei sicuro di voler eliminare il tuo account? Questa azione non puo essere annullata e tutti i dati andranno persi.',
+  'confirm_delete_account_message':
+      'Sei sicuro di voler eliminare il tuo account? Questa azione non puo essere annullata e tutti i dati andranno persi.',
   'delete_account': 'Elimina account',
   'your_data': 'I tuoi dati',
   'update_display_name': 'Aggiorna il tuo nome visualizzato',
@@ -44,10 +45,11 @@ final Map<String, String> itItTranslation = {
   'enter_your_name': 'Inserisci il tuo nome',
   'save_changes': 'Salva modifiche',
   'danger_zone': 'Zona di pericolo',
-  'delete_account_warning': 'Eliminare l account rimuove accesso e dati collegati.',
+  'delete_account_warning':
+      'Eliminare l account rimuove accesso e dati collegati.',
   'news_revision': 'Revisione notizie',
   'news_revision_controller': 'Controller revisione notizie',
-  'add_news': 'Aggiungi notizia',
+  'add_news': 'Aggiungi Notizia',
   'edit_news': 'Modifica notizia',
   'title': 'Titolo',
   'title_required': 'Il titolo e obbligatorio.',
@@ -62,7 +64,8 @@ final Map<String, String> itItTranslation = {
   'paste_youtube_link_here': 'Incolla qui un link YouTube',
   'add_image': 'Aggiungi immagine',
   'change_image': 'Cambia immagine',
-  'image_requirements': 'L immagine deve essere in formato JPG o JPEG e preferibilmente avere una dimensione massima di 500 KB. Immagini piu grandi saranno compresse, con possibile perdita di qualita e rallentamento del caricamento. Per una migliore visualizzazione, si consiglia l uso di immagini in orientamento orizzontale.',
+  'image_requirements':
+      'Immagini piu grandi saranno compresse, con possibile perdita di qualita e rallentamento del caricamento. Per una migliore visualizzazione, si consiglia l uso di immagini in orientamento orizzontale.',
   'publish_news': 'Pubblica notizia',
   'save_draft_news': 'Salva bozza',
   'update_news': 'Aggiorna notizia',
@@ -86,9 +89,10 @@ final Map<String, String> itItTranslation = {
   'network_type': 'Tipo di rete',
   'last_check': 'Ultimo controllo',
   'ranges': 'Intervalli:',
-  'real_connection_checked_every_5_min': 'La connessione reale viene verificata automaticamente ogni 5 minuti.',
+  'real_connection_checked_every_5_min':
+      'La connessione reale viene verificata automaticamente ogni 5 minuti.',
   'close': 'Chiudi',
-  'full_type': 'Completo',
+  'full_type': '',
   'info_of': 'Informazioni su',
   'content_of': 'Contenuto di',
   'author': 'Autore',
@@ -109,7 +113,8 @@ final Map<String, String> itItTranslation = {
   'error': 'Errore',
   'ok': 'OK',
   'access_denied': 'Accesso negato',
-  'only_author_can_edit': 'Non puoi modificare questa notizia perche non sei l autore. Solo l autore originale puo apportare modifiche.',
+  'only_author_can_edit':
+      'Non puoi modificare questa notizia perche non sei l autore. Solo l autore originale puo apportare modifiche.',
   'seconds_ago': 'secondi fa',
   'minutes_ago': 'minuti fa',
   'hours_ago': 'ore fa',
@@ -137,11 +142,13 @@ final Map<String, String> itItTranslation = {
   '> 15 min: vermelho': '> 15 min: rosso',
   'obtaining_location': 'Ottenimento della posizione...',
   'location_request_title': 'Richiesta di Posizione',
-  'location_permission_description_android': 'L app vorrebbe accedere alla tua posizione per fornire informazioni migliori sulla tua area. Se sei d accordo, seleziona \'Conferma\'. Altrimenti, seleziona \'Continua senza posizione\'.',
+  'location_permission_description_android':
+      'L app vorrebbe accedere alla tua posizione per fornire informazioni migliori sulla tua area. Se sei d accordo, seleziona \'Conferma\'. Altrimenti, seleziona \'Continua senza posizione\'.',
   'location_not_provided': 'Posizione non fornita',
   'continue_without_location': 'Continua senza posizione',
   'allow_location': 'Consenti posizione',
-  'location_permission_description_ios': 'Usiamo la tua posizione per mostrarti notizie piu vicino a te.',
+  'location_permission_description_ios':
+      'Usiamo la tua posizione per mostrarti notizie piu vicino a te.',
   'continue': 'Continua',
   'city_not_found': 'Citta non trovata',
   'error_updating_location': 'Errore nell aggiornamento della posizione',
@@ -151,10 +158,47 @@ final Map<String, String> itItTranslation = {
   'image_selected_success': 'Immagine selezionata con successo!',
   'error_processing_image': 'Errore nell elaborazione dell immagine.',
   'image_too_large': 'L immagine e ancora troppo grande!',
-  'image_compressed': 'L immagine ha superato il limite di 500KB ed e stata compressa. Questo processo potrebbe comportare una perdita di qualita dell immagine.',
+  'image_compressed':
+      'L immagine ha superato il limite di 500KB ed e stata compressa. Questo processo potrebbe comportare una perdita di qualita dell immagine.',
   'watch_on_youtube': 'Guarda su YouTube',
   'youtube_url_placeholder': 'https://www.youtube.com/watch?v=...',
-  'processing_image_message': 'Elaborazione della tua immagine... Questo puo richiedere alcuni secondi.',
+  'processing_image_message':
+      'Elaborazione della tua immagine... Questo puo richiedere alcuni secondi.',
   'invalid_youtube_url': 'URL YouTube non valido',
   'crop_image_title': 'Modifica immagine',
+  'central_da_materia': 'Centro notizie',
+  'central_de_comunicacao': 'Centro comunicazione',
+  'Conexões': 'Connessioni',
+  'Cargo atualizado com sucesso': 'Ruolo aggiornato con successo',
+  'Ocorreu um erro ao atualizar o cargo':
+      'Si e verificato un errore durante l aggiornamento del ruolo',
+  'Ocorreu um erro ao tentar fazer login com o Google. Por favor, tente novamente':
+      'Si e verificato un errore durante il tentativo di accesso con Google. Per favore, riprova',
+  'Ocorreu um erro ao tentar fazer login com o Microsoft. Por favor, tente novamente.':
+      'Si e verificato un errore durante il tentativo di accesso con Microsoft. Per favore, riprova.',
+  'Ocorreu um erro ao tentar fazer login com o Apple. Por favor, tente novamente.':
+      'Si e verificato un errore durante il tentativo di accesso con Apple.',
+  'Por favor, preencha todos os campos obrigatórios.':
+      'Per favore, compila tutti i campi obbligatori.',
+  'Rascunho salvo com sucesso!': 'Bozza salvata con successo!',
+  'Erro ao salvar rascunho': 'Errore durante il salvataggio della bozza',
+  'Erro ao publicar matéria': 'Errore durante la pubblicazione della notizia',
+  'Digite o corpo da matéria...': 'Digita il corpo della notizia...',
+  'Criar nova matéria': 'Crea nuova notizia',
+  'Comece a criar uma nova matéria': 'Inizia a creare una nuova notizia',
+  'Revisar Matérias': 'Revisionare notizie',
+  'Fila de avaliação e aprovação editorial':
+      'Coda di revisione e approvazione editoriale',
+  'Ver seus rascunhos': 'Visualizza le tue bozze',
+  'Acesse suas matérias salvas como rascunhos':
+      'Accedi alle tue notizie salvate come bozze',
+  'Ver suas matérias rejeitadas': 'Visualizza le tue notizie rifiutate',
+  'Acompanhe o que voltou para ajustes':
+      'Segui quello che e tornato per le modifiche',
+  'Ver suas matérias excluídas': 'Visualizza le tue notizie eliminate',
+  'Confira o histórico de exclusões':
+      'Controlla la cronologia delle eliminazioni',
+  'Painel editorial': 'Pannello editoriale',
+  'Crie e organize as matérias em um único lugar.':
+      'Crea e organizza le notizie in un unico posto.',
 };

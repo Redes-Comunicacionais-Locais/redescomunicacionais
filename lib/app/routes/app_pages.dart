@@ -18,7 +18,7 @@ import 'package:redescomunicacionais/app/modules/admin/ui/admin_page.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/ui/home_page.dart';
 import 'package:redescomunicacionais/app/modules/splash/ui/splash_page.dart';
 import 'package:redescomunicacionais/app/modules/login/ui/login_page.dart';
-import 'package:redescomunicacionais/app/modules/news/ui/news_windows.page.dart';
+import 'package:redescomunicacionais/app/modules/news/ui/news_widgets.dart';
 import 'package:redescomunicacionais/app/modules/news/ui/news_page.dart';
 import 'package:redescomunicacionais/app/modules/user/ui/user_page.dart';
 import 'package:redescomunicacionais/app/modules/web/ui/webview_page.dart';
@@ -43,12 +43,12 @@ class AppPages {
     GetPage(
       name: Routes.HOME,
       page: () => HomePage(),
-      bindings: [UserBinding(), HomeBinding(), NewsBinding(), ConnectionsBindings()],
-    ),
-    GetPage(
-      name: Routes.NEWS,
-      page: () => NewsWindowsPage(),
-      binding: NewsBinding(),
+      bindings: [
+        UserBinding(),
+        HomeBinding(),
+        NewsBinding(),
+        ConnectionsBindings()
+      ],
     ),
     GetPage(
       name: Routes.NEWS_PAGE,

@@ -1,36 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_quill/flutter_quill.dart'; // Adicione este import
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:intl/intl.dart';
 import 'package:redescomunicacionais/app/services/youtube_service.dart';
 import 'package:redescomunicacionais/app/utils/responsive_utils.dart';
 import 'package:redescomunicacionais/app/modules/news/controller/news_controller.dart';
+import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 
-class NewsPage extends StatefulWidget {
+class NewsPage extends GetView<NewsController> {
   const NewsPage({super.key});
-
-  @override
-  State<NewsPage> createState() => _NewsPageState();
-}
-
-class _NewsPageState extends State<NewsPage> {
-  late QuillController _quillController;
-  late final NewsController _newsController;
-
-  @override
-  void initState() {
-    super.initState();
-    // Inicializa com documento vazio - será carregado no build
-    _quillController = QuillController.basic();
-    _newsController = Get.find<NewsController>();
-  }
-
-  @override
-  void dispose() {
-    _quillController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,110 +20,77 @@ class _NewsPageState extends State<NewsPage> {
     final bool isTablet = ResponsiveUtils.isTablet(screenWidth);
     final bool isWideScreen = screenWidth > 900; // Para modo horizontal/web
 
-    final String titulo = Get.arguments["titulo"] ?? "";
-    final String subtitulo = Get.arguments["subtitulo"] ?? "";
-    final String imgurl = Get.arguments["imgurl"] ?? "";
-    final String autor = Get.arguments["autor"] ?? "";
-    final String dataCriacao = Get.arguments["dataCriacao"] ?? "";
-    final String categoria = Get.arguments["categoria"] ?? "";
-    final String cidade = Get.arguments["cidade"] ?? "";
-    final String corpo = Get.arguments["corpo"] ?? "";
-    final String type = Get.arguments["type"] ?? "";
-    final String videoUrl = Get.arguments["videoUrl"] ??
-        "https://www.youtube.com/shorts/vCeCb-evJOc";
-    final String validatedByName = Get.arguments["validatedByName"] ?? "-";
+    bool hasMoreThanTwoCategories =
+        controller.selectedNews.categories.length > 2;
+    List<String> visibleCategories = hasMoreThanTwoCategories
+        ? controller.selectedNews.categories.take(2).toList()
+        : controller.selectedNews.categories;
 
-    // Carrega o conteúdo Delta no controller
-    try {
-      if (corpo.isNotEmpty) {
-        final deltaJson = jsonDecode(corpo);
-        final document = Document.fromJson(deltaJson);
-        _quillController = QuillController(
-          document: document,
-          selection: const TextSelection.collapsed(offset: 0),
-        );
-      }
-    } catch (e) {
-      // Se falhar ao decodificar, usa texto simples
-      _quillController = QuillController.basic();
-      _quillController.document.insert(0, corpo);
-    }
+    return GetBuilder<NewsController>(
+      init: controller,
+      initState: (_) {
+        try {
+          controller.quillController?.dispose();
+        } catch (_) {}
 
-    // Formata a data
-    String formatData(String data) {
-      try {
-        final DateTime parsedDate = DateTime.parse(data);
-        return DateFormat('dd/MM/yyyy HH:mm').format(parsedDate);
-      } catch (e) {
-        return data;
-      }
-    }
-
-    // Processa categorias para responsividade
-    List<String> categorias =
-        categoria.split(',').map((e) => e.trim()).toList();
-    bool hasMoreThanTwoCategories = categorias.length > 2;
-    List<String> visibleCategories =
-        hasMoreThanTwoCategories ? categorias.take(2).toList() : categorias;
-
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text(
-          '${'full_type'.tr} $type',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: ResponsiveUtils.calculateAppBarTitleSize(
-                screenWidth, isTablet, false),
-          ),
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.white,
-          size: ResponsiveUtils.calculateIconSize(screenWidth, isTablet),
-        ),
-        centerTitle: true,
-        toolbarHeight: isTablet ? 70.0 : 56.0,
-      ),
-      body: isWideScreen
-          ? _buildWideScreenLayout(
-              screenWidth,
-              screenHeight,
-              isTablet,
-              titulo,
-              subtitulo,
-              imgurl,
-              autor,
-              dataCriacao,
-              cidade,
-              categorias,
-              visibleCategories,
-              hasMoreThanTwoCategories,
-              type,
-              context,
-              videoUrl,
-              formatData,
-              validatedByName,
-            )
-          : _buildMobileLayout(
-              screenWidth,
-              screenHeight,
-              isTablet,
-              titulo,
-              subtitulo,
-              imgurl,
-              autor,
-              dataCriacao,
-              cidade,
-              categorias,
-              visibleCategories,
-              hasMoreThanTwoCategories,
-              type,
-              context,
-              videoUrl,
-              formatData,
-              validatedByName,
+        controller.startQuillController();
+      },
+      dispose: (_) {
+        try {
+          controller.quillController?.dispose();
+        } catch (_) {}
+      },
+      builder: (_) {
+        if (controller.quillController == null) {
+          return const Scaffold(
+            backgroundColor: Colors.black,
+            body: Center(
+              child: CircularProgressIndicator(color: Colors.white),
             ),
+          );
+        }
+        return Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.appBarBottomGradient(),
+              ),
+            ),
+            title: Text(
+              '${'full_type'.tr} ${controller.selectedNews.type}',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: ResponsiveUtils.calculateAppBarTitleSize(
+                    screenWidth, isTablet, false),
+              ),
+            ),
+            iconTheme: IconThemeData(
+              color: Colors.white,
+              size: ResponsiveUtils.calculateIconSize(screenWidth, isTablet),
+            ),
+            centerTitle: true,
+            toolbarHeight: isTablet ? 70.0 : 56.0,
+          ),
+          body: isWideScreen
+              ? _buildWideScreenLayout(
+                  screenWidth,
+                  screenHeight,
+                  isTablet,
+                  visibleCategories,
+                  hasMoreThanTwoCategories,
+                  context,
+                )
+              : _buildMobileLayout(
+                  screenWidth,
+                  screenHeight,
+                  isTablet,
+                  visibleCategories,
+                  hasMoreThanTwoCategories,
+                  context,
+                ),
+        );
+      },
     );
   }
 
@@ -153,21 +99,12 @@ class _NewsPageState extends State<NewsPage> {
     double screenWidth,
     double screenHeight,
     bool isTablet,
-    String titulo,
-    String subtitulo,
-    String imgurl,
-    String autor,
-    String dataCriacao,
-    String cidade,
-    List<String> categorias,
     List<String> visibleCategories,
     bool hasMoreThanTwoCategories,
-    String type,
     BuildContext context,
-    String videoUrl,
-    String Function(String) formatData,
-    String validatedBy,
   ) {
+    String urlImages = controller.selectedNews.urlImages[0];
+    List<String> cities = controller.selectedNews.cities;
     return Row(
       children: [
         // Lado esquerdo - Informações da notícia
@@ -185,26 +122,36 @@ class _NewsPageState extends State<NewsPage> {
                       ResponsiveUtils.calculateResponsiveBorderRadius(
                               isTablet) *
                           0.8),
-                  child: imgurl.isNotEmpty
+                  child: urlImages
+                          .isNotEmpty // Garanta que a condição inicial está aqui
                       ? Image.memory(
-                          base64Decode(imgurl),
+                          base64Decode(urlImages),
                           fit: BoxFit.cover,
                           width: double.infinity,
-                          height: isTablet ? 300 : 250,
+                          height: isTablet ? 250 : 200,
                         )
-                      : Image.asset(
-                          _newsController.getCityImageAsset(
-                              cidade.isNotEmpty ? cidade : 'default'),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: isTablet ? 300 : 250,
-                        ),
+                      : (cities.isNotEmpty &&
+                              cities[0]
+                                  .isNotEmpty) // Proteção para não quebrar o app se a lista sumir
+                          ? Image.asset(
+                              controller.getCityImageAsset(cities[0]),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: isTablet ? 250 : 200,
+                            )
+                          : Image.asset(
+                              // Um "fallback" caso não tenha imagem em base64 E nem cidade válida
+                              controller.getCityImageAsset('default'),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: isTablet ? 250 : 200,
+                            ),
                 ),
                 SizedBox(height: isTablet ? 25 : 20),
 
                 // Container do título
                 Text(
-                  titulo,
+                  controller.selectedNews.title,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -216,7 +163,7 @@ class _NewsPageState extends State<NewsPage> {
 
                 // Container do subtítulo
                 Text(
-                  subtitulo,
+                  controller.selectedNews.subtitle ?? '',
                   style: TextStyle(
                     color: Colors.white70,
                     fontWeight: FontWeight.w500,
@@ -250,7 +197,7 @@ class _NewsPageState extends State<NewsPage> {
                           ),
                           SizedBox(width: isTablet ? 8 : 6),
                           Text(
-                            '${'info_of'.tr} $type',
+                            '${'info_of'.tr} ${controller.selectedNews.type}',
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: isTablet ? 16 : 14,
@@ -278,16 +225,11 @@ class _NewsPageState extends State<NewsPage> {
 
                       // Informações organizadas
                       _buildInfoRowWideScreen(
-                          isTablet,
-                          autor,
-                          dataCriacao,
-                          cidade,
-                          categorias,
-                          visibleCategories,
-                          hasMoreThanTwoCategories,
-                          type,
-                          context,
-                          formatData),
+                        isTablet,
+                        visibleCategories,
+                        hasMoreThanTwoCategories,
+                        context,
+                      ),
                     ],
                   ),
                 ),
@@ -317,7 +259,7 @@ class _NewsPageState extends State<NewsPage> {
                   // Título da seção do conteúdo
                   Container(
                     child: Text(
-                      '${'content_of'.tr} $type',
+                      '${'content_of'.tr} ${controller.selectedNews.type}',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: isTablet ? 24 : 20,
@@ -327,12 +269,13 @@ class _NewsPageState extends State<NewsPage> {
                   ),
                   SizedBox(height: isTablet ? 20 : 16),
 
-                  if (videoUrl.isNotEmpty)
+                  if (controller.selectedNews.videoUrl != '' &&
+                      controller.selectedNews.videoUrl != null)
                     // Mini player do YouTube
                     Container(
                       margin: EdgeInsets.only(bottom: isTablet ? 20 : 16),
                       child: YouTubeMiniPlayer(
-                        videoUrl: videoUrl,
+                        videoUrl: controller.selectedNews.videoUrl!,
                         width: double.infinity,
                         height: isTablet ? 200 : 160,
                         autoPlay: false,
@@ -355,7 +298,7 @@ class _NewsPageState extends State<NewsPage> {
                     ),
                     child: AbsorbPointer(
                       child: QuillEditor.basic(
-                        controller: _quillController,
+                        controller: controller.quillController,
                         focusNode: FocusNode(),
                         scrollController: ScrollController(),
                         config: QuillEditorConfig(
@@ -437,21 +380,12 @@ class _NewsPageState extends State<NewsPage> {
     double screenWidth,
     double screenHeight,
     bool isTablet,
-    String titulo,
-    String subtitulo,
-    String imgurl,
-    String autor,
-    String dataCriacao,
-    String cidade,
-    List<String> categorias,
     List<String> visibleCategories,
     bool hasMoreThanTwoCategories,
-    String type,
     BuildContext context,
-    String videoUrl,
-    String Function(String) formatData,
-    String validatedBy,
   ) {
+    String urlImages = controller.selectedNews.urlImages[0];
+    List<String> cities = controller.selectedNews.cities;
     return ListView(
       padding: ResponsiveUtils.calculateResponsivePadding(
           screenWidth, screenHeight, isTablet),
@@ -462,27 +396,37 @@ class _NewsPageState extends State<NewsPage> {
               borderRadius: BorderRadius.circular(
                   ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) *
                       0.8),
-              child: imgurl.isNotEmpty
+              child: urlImages
+                      .isNotEmpty // Garanta que a condição inicial está aqui
                   ? Image.memory(
-                      base64Decode(imgurl),
+                      base64Decode(urlImages),
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: isTablet ? 250 : 200,
                     )
-                  : Image.asset(
-                      _newsController.getCityImageAsset(
-                          cidade.isNotEmpty ? cidade : 'default'),
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: isTablet ? 250 : 200,
-                    ),
+                  : (cities.isNotEmpty &&
+                          cities[0]
+                              .isNotEmpty) // Proteção para não quebrar o app se a lista sumir
+                      ? Image.asset(
+                          controller.getCityImageAsset(cities[0]),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: isTablet ? 250 : 200,
+                        )
+                      : Image.asset(
+                          // Um "fallback" caso não tenha imagem em base64 E nem cidade válida
+                          controller.getCityImageAsset('default'),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: isTablet ? 250 : 200,
+                        ),
             ),
           ],
         ),
         SizedBox(height: isTablet ? 25 : 20),
         //Título
         Text(
-          titulo,
+          controller.selectedNews.title,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -493,7 +437,7 @@ class _NewsPageState extends State<NewsPage> {
         SizedBox(height: isTablet ? 12 : 10),
         //Subtítulo
         Text(
-          subtitulo,
+          controller.selectedNews.subtitle ?? '',
           style: TextStyle(
             color: Colors.white70,
             fontWeight: FontWeight.w500,
@@ -526,7 +470,7 @@ class _NewsPageState extends State<NewsPage> {
                   ),
                   SizedBox(width: isTablet ? 8 : 6),
                   Text(
-                    '${'info_of'.tr} $type',
+                    '${'info_of'.tr} ${controller.selectedNews.type}',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: isTablet ? 16 : 14,
@@ -555,28 +499,22 @@ class _NewsPageState extends State<NewsPage> {
               // Informações organizadas
               _buildInfoRow(
                 isTablet,
-                autor,
-                dataCriacao,
-                cidade,
-                categorias,
                 visibleCategories,
                 hasMoreThanTwoCategories,
-                type,
                 context,
-                formatData,
-                validatedBy,
               ),
             ],
           ),
         ),
         SizedBox(height: isTablet ? 25 : 20),
 
-        if (videoUrl.isNotEmpty)
+        if (controller.selectedNews.videoUrl != '' &&
+            controller.selectedNews.videoUrl != null)
           // Mini player do YouTube
           Container(
             padding: EdgeInsets.all(isTablet ? 16 : 12),
             child: YouTubeMiniPlayer(
-              videoUrl: videoUrl,
+              videoUrl: controller.selectedNews.videoUrl!,
               width: screenWidth * 0.9, // 90% da largura da tela
               height: isTablet ? 220 : 180,
               autoPlay: false,
@@ -598,7 +536,7 @@ class _NewsPageState extends State<NewsPage> {
           child: AbsorbPointer(
             // ← BLOQUEIA TODA INTERAÇÃO
             child: QuillEditor.basic(
-              controller: _quillController,
+              controller: controller.quillController,
               focusNode: FocusNode(),
               scrollController: ScrollController(),
               config: QuillEditorConfig(
@@ -670,23 +608,18 @@ class _NewsPageState extends State<NewsPage> {
 
   // Widget para construir a linha de informações com categorias responsivas (layout wide screen)
   Widget _buildInfoRowWideScreen(
-      bool isTablet,
-      String autor,
-      String dataCriacao,
-      String cidade,
-      List<String> categorias,
-      List<String> visibleCategories,
-      bool hasMoreThanTwoCategories,
-      String type,
-      BuildContext context,
-      String Function(String) formatData) {
+    bool isTablet,
+    List<String> visibleCategories,
+    bool hasMoreThanTwoCategories,
+    BuildContext context,
+  ) {
     return Column(
       children: [
         // Primeira linha: Autor
         _buildInfoItem(
           icon: Icons.person_outline,
           label: 'author'.tr,
-          value: autor,
+          value: controller.selectedNews.author,
           isTablet: isTablet,
         ),
         SizedBox(height: isTablet ? 12 : 10),
@@ -695,7 +628,8 @@ class _NewsPageState extends State<NewsPage> {
         _buildInfoItem(
           icon: Icons.schedule,
           label: 'date'.tr,
-          value: formatData(dataCriacao),
+          value: DateFormat('dd/MM/yyyy')
+              .format(controller.selectedNews.createdAt),
           isTablet: isTablet,
         ),
         SizedBox(height: isTablet ? 12 : 10),
@@ -704,7 +638,9 @@ class _NewsPageState extends State<NewsPage> {
         _buildInfoItem(
           icon: Icons.location_city,
           label: 'city'.tr,
-          value: cidade,
+          value: controller.selectedNews.cities.isNotEmpty
+              ? controller.selectedNews.cities[0]
+              : '',
           isTablet: isTablet,
         ),
         SizedBox(height: isTablet ? 12 : 10),
@@ -713,20 +649,20 @@ class _NewsPageState extends State<NewsPage> {
         _buildInfoItem(
           icon: Icons.category,
           label: 'type'.tr,
-          value: type,
+          value: controller.selectedNews.type,
           isTablet: isTablet,
         ),
         SizedBox(height: isTablet ? 12 : 10),
         _buildInfoItem(
           icon: Icons.category,
           label: 'type'.tr,
-          value: type,
+          value: controller.selectedNews.type,
           isTablet: isTablet,
         ),
         SizedBox(height: isTablet ? 12 : 10),
         // Quinta linha: Categorias
-        _buildCategoriesItem(isTablet, categorias, visibleCategories,
-            hasMoreThanTwoCategories, context),
+        _buildCategoriesItem(isTablet, controller.selectedNews.categories,
+            visibleCategories, hasMoreThanTwoCategories, context),
       ],
     );
   }
@@ -734,16 +670,9 @@ class _NewsPageState extends State<NewsPage> {
   // Widget para construir a linha de informações com categorias responsivas
   Widget _buildInfoRow(
     bool isTablet,
-    String autor,
-    String dataCriacao,
-    String cidade,
-    List<String> categorias,
     List<String> visibleCategories,
     bool hasMoreThanTwoCategories,
-    String type,
     BuildContext context,
-    String Function(String) formatData,
-    String validateBy,
   ) {
     return Column(
       children: [
@@ -754,7 +683,7 @@ class _NewsPageState extends State<NewsPage> {
               child: _buildInfoItem(
                 icon: Icons.person_outline,
                 label: 'author'.tr,
-                value: autor,
+                value: controller.selectedNews.author,
                 isTablet: isTablet,
               ),
             ),
@@ -763,7 +692,8 @@ class _NewsPageState extends State<NewsPage> {
               child: _buildInfoItem(
                 icon: Icons.schedule,
                 label: 'date'.tr,
-                value: formatData(dataCriacao),
+                value: DateFormat('dd/MM/yyyy')
+                    .format(controller.selectedNews.createdAt),
                 isTablet: isTablet,
               ),
             ),
@@ -778,7 +708,9 @@ class _NewsPageState extends State<NewsPage> {
               child: _buildInfoItem(
                 icon: Icons.location_city,
                 label: 'city'.tr,
-                value: cidade,
+                value: controller.selectedNews.cities.isNotEmpty
+                    ? controller.selectedNews.cities[0]
+                    : '',
                 isTablet: isTablet,
               ),
             ),
@@ -787,7 +719,7 @@ class _NewsPageState extends State<NewsPage> {
               child: _buildInfoItem(
                 icon: Icons.category,
                 label: 'type'.tr,
-                value: type,
+                value: controller.selectedNews.type,
                 isTablet: isTablet,
               ),
             ),
@@ -796,15 +728,15 @@ class _NewsPageState extends State<NewsPage> {
         SizedBox(height: isTablet ? 12 : 10),
 
         // Terceira linha: Categorias
-        _buildCategoriesItem(isTablet, categorias, visibleCategories,
-            hasMoreThanTwoCategories, context),
+        _buildCategoriesItem(isTablet, controller.selectedNews.categories,
+            visibleCategories, hasMoreThanTwoCategories, context),
         Row(
           children: [
             Expanded(
               child: _buildInfoItem(
                   icon: Icons.supervisor_account,
                   label: 'reviewer'.tr,
-                  value: validateBy,
+                  value: controller.selectedNews.validatedByName ?? '',
                   isTablet: isTablet),
             )
           ],
