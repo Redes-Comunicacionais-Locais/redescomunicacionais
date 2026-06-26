@@ -5,7 +5,7 @@ import 'package:redescomunicacionais/app/modules/dashboard/controller/home_contr
 class HomeBinding implements Bindings {
   @override
   void dependencies() {
-    Get.put(LocationService(), permanent: true);
+    //Get.put(LocationService(), permanent: true);
     Get.lazyPut<HomeController>(() => HomeController());
   }
 }

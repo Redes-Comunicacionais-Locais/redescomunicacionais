@@ -62,7 +62,7 @@ class HomePage extends GetView<HomeController> {
               ),
               flexibleSpace: Container(
                 decoration: BoxDecoration(
-                  gradient: AppColors.appBarTopGradient(),
+                  gradient: AppColors.appBarBottomGradient(),
                 ),
               ),
               iconTheme: IconThemeData(

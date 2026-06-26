@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:redescomunicacionais/app/services/youtube_service.dart';
 import 'package:redescomunicacionais/app/utils/responsive_utils.dart';
 import 'package:redescomunicacionais/app/modules/news/controller/news_controller.dart';
+import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 
 class NewsPage extends GetView<NewsController> {
   const NewsPage({super.key});
@@ -51,7 +52,11 @@ class NewsPage extends GetView<NewsController> {
         return Scaffold(
           backgroundColor: Colors.black,
           appBar: AppBar(
-            backgroundColor: Colors.black,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.appBarBottomGradient(),
+              ),
+            ),
             title: Text(
               '${'full_type'.tr} ${controller.selectedNews.type}',
               style: TextStyle(
@@ -117,20 +122,30 @@ class NewsPage extends GetView<NewsController> {
                       ResponsiveUtils.calculateResponsiveBorderRadius(
                               isTablet) *
                           0.8),
-                  child: urlImages.isNotEmpty
+                  child: urlImages
+                          .isNotEmpty // Garanta que a condição inicial está aqui
                       ? Image.memory(
                           base64Decode(urlImages),
                           fit: BoxFit.cover,
                           width: double.infinity,
-                          height: isTablet ? 300 : 250,
+                          height: isTablet ? 250 : 200,
                         )
-                      : Image.asset(
-                          controller.getCityImageAsset(
-                              cities.isNotEmpty ? cities[0] : 'default'),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: isTablet ? 300 : 250,
-                        ),
+                      : (cities.isNotEmpty &&
+                              cities[0]
+                                  .isNotEmpty) // Proteção para não quebrar o app se a lista sumir
+                          ? Image.asset(
+                              controller.getCityImageAsset(cities[0]),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: isTablet ? 250 : 200,
+                            )
+                          : Image.asset(
+                              // Um "fallback" caso não tenha imagem em base64 E nem cidade válida
+                              controller.getCityImageAsset('default'),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: isTablet ? 250 : 200,
+                            ),
                 ),
                 SizedBox(height: isTablet ? 25 : 20),
 
@@ -254,7 +269,8 @@ class NewsPage extends GetView<NewsController> {
                   ),
                   SizedBox(height: isTablet ? 20 : 16),
 
-                  if (controller.selectedNews.videoUrl != '')
+                  if (controller.selectedNews.videoUrl != '' &&
+                      controller.selectedNews.videoUrl != null)
                     // Mini player do YouTube
                     Container(
                       margin: EdgeInsets.only(bottom: isTablet ? 20 : 16),
@@ -380,20 +396,30 @@ class NewsPage extends GetView<NewsController> {
               borderRadius: BorderRadius.circular(
                   ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) *
                       0.8),
-              child: urlImages.isNotEmpty
+              child: urlImages
+                      .isNotEmpty // Garanta que a condição inicial está aqui
                   ? Image.memory(
                       base64Decode(urlImages),
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: isTablet ? 250 : 200,
                     )
-                  : Image.asset(
-                      controller.getCityImageAsset(
-                          cities[0].isNotEmpty ? cities[0] : 'default'),
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: isTablet ? 250 : 200,
-                    ),
+                  : (cities.isNotEmpty &&
+                          cities[0]
+                              .isNotEmpty) // Proteção para não quebrar o app se a lista sumir
+                      ? Image.asset(
+                          controller.getCityImageAsset(cities[0]),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: isTablet ? 250 : 200,
+                        )
+                      : Image.asset(
+                          // Um "fallback" caso não tenha imagem em base64 E nem cidade válida
+                          controller.getCityImageAsset('default'),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: isTablet ? 250 : 200,
+                        ),
             ),
           ],
         ),
@@ -482,7 +508,8 @@ class NewsPage extends GetView<NewsController> {
         ),
         SizedBox(height: isTablet ? 25 : 20),
 
-        if (controller.selectedNews.videoUrl != '')
+        if (controller.selectedNews.videoUrl != '' &&
+            controller.selectedNews.videoUrl != null)
           // Mini player do YouTube
           Container(
             padding: EdgeInsets.all(isTablet ? 16 : 12),
@@ -611,7 +638,9 @@ class NewsPage extends GetView<NewsController> {
         _buildInfoItem(
           icon: Icons.location_city,
           label: 'city'.tr,
-          value: controller.selectedNews.cities[0],
+          value: controller.selectedNews.cities.isNotEmpty
+              ? controller.selectedNews.cities[0]
+              : '',
           isTablet: isTablet,
         ),
         SizedBox(height: isTablet ? 12 : 10),
@@ -679,7 +708,9 @@ class NewsPage extends GetView<NewsController> {
               child: _buildInfoItem(
                 icon: Icons.location_city,
                 label: 'city'.tr,
-                value: controller.selectedNews.cities[0],
+                value: controller.selectedNews.cities.isNotEmpty
+                    ? controller.selectedNews.cities[0]
+                    : '',
                 isTablet: isTablet,
               ),
             ),

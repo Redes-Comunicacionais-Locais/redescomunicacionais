@@ -48,11 +48,15 @@ class NewsController extends GetxController {
       QueryDocumentSnapshot<Map<String, dynamic>>? lastDoc) async {
     isLoading(true);
     try {
+      try {
+        await _repository.syncNewsHiveAndFirebase(user);
+      } catch (e) {
+        debugPrint("Erro ao sincronizar notícias: $e");
+      }
       await getPublicNewsFromHive(lastDoc);
       await getOuthersNewsFromHive();
-      await _repository.syncNewsHiveAndFirebase(user);
     } catch (e) {
-      debugPrint("Erro ao sincronizar notícias: $e");
+      throw Exception("Erro ao sincronizar notícias: $e");
     } finally {
       isLoading(false);
     }
@@ -76,7 +80,7 @@ class NewsController extends GetxController {
       outhersNews.sort((a, b) {
         final dateA = a.lastUpdated;
         final dateB = b.lastUpdated;
-        return dateA.compareTo(dateB);
+        return dateB.compareTo(dateA);
       });
 
       // So admin e editor veem as listas de análise, rascunho, rejeitado e deletado
@@ -167,13 +171,8 @@ class NewsController extends GetxController {
         lastUpdated: DateTime.now(),
       );
 
-      try {
-        await _repository.saveNewsToHive(news);
-        await syncNews(null);
-      } catch (e) {
-        debugPrint("Hive falhou: $e.");
-        throw Exception("Erro ao salvar notícia: $e");
-      }
+      await _repository.saveNewsToHive(news);
+      await syncNews(null);
     } catch (e) {
       throw Exception("Erro ao salvar notícia: $e");
     } finally {
@@ -308,7 +307,7 @@ class NewsController extends GetxController {
     'Laje do Muriaé': 'assets/images/cidades/lajedomuriae.jpg',
     'São José de Ubá': 'assets/images/cidades/saojosedeuba.jpg',
     // add more or a 'default' entry
-    'default': 'assets/images/default_city.jpg',
+    'default': 'assets/images/cidades/default_city.jpg',
   };
 
   // Retorna o path do asset JPG para a cidade dada
@@ -356,5 +355,24 @@ class NewsController extends GetxController {
       quillController = QuillController.basic();
       quillController.document.insert(0, selectedNews.body);
     }
+  }
+
+  List<NewsModel> getNewsForCurrentMode() {
+    if (homeController.isDeletedMode.value) {
+      return deletedNewsList.toList();
+    }
+
+    if (homeController.isRejectedMode.value) {
+      return rejectedNewsList.toList();
+    }
+
+    if (homeController.isRevisionMode.value) {
+      return inAnalysisNewsList.toList();
+    }
+
+    if (homeController.isDraftMode.value) {
+      return myDraftsList.toList();
+    }
+    return publishedNewsList.toList();
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/user/controller/user_controller.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
+import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
 
 class UserPage extends StatefulWidget {
@@ -82,6 +83,11 @@ class _UserPageState extends State<UserPage> {
 
     return Scaffold(
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.appBarBottomGradient(),
+          ),
+        ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Obx(

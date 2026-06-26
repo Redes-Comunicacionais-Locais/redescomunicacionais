@@ -28,9 +28,7 @@ class NewsWidgets extends GetView<NewsController> {
                 ),
               );
             }
-            List<NewsModel> selectedNewss = _getNewsForCurrentMode();
-            bool isPublishedMode =
-                controller.homeController.isPublishedMode.value;
+            List<NewsModel> selectedNewss = controller.getNewsForCurrentMode();
 
             if (selectedNewss.isEmpty) {
               return Center(
@@ -55,7 +53,8 @@ class NewsWidgets extends GetView<NewsController> {
                   // Lista vertical de notícias
                   ..._buildNewsList(selectedNewss),
 
-                  if (isPublishedMode && selectedNewss.isNotEmpty)
+                  if (controller.homeController.isPublishedMode.value &&
+                      selectedNewss.isNotEmpty)
                     _buildCreateMoreItem(),
                 ],
               ),
@@ -64,26 +63,6 @@ class NewsWidgets extends GetView<NewsController> {
         ),
       ),
     );
-  }
-
-  List<NewsModel> _getNewsForCurrentMode() {
-    if (controller.homeController.isDeletedMode.value) {
-      return controller.deletedNewsList;
-    }
-
-    if (controller.homeController.isRejectedMode.value) {
-      return controller.rejectedNewsList;
-    }
-
-    if (controller.homeController.isRevisionMode.value) {
-      return controller.inAnalysisNewsList;
-    }
-
-    if (controller.homeController.isDraftMode.value) {
-      return controller.myDraftsList;
-    }
-
-    return controller.publishedNewsList;
   }
 
   List<Widget> _buildNewsList(List<NewsModel> validNews) {
