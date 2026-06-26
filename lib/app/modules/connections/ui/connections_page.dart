@@ -14,16 +14,16 @@ class ConnectionsPage extends GetView<ConnectionsController> {
         elevation: 8,
         foregroundColor: Colors.white,
         title: const Text('Conexões'),
-        actions: [
-        ],
+        actions: [],
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
         flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
+          decoration: BoxDecoration(
+            gradient: AppColors.appBarBottomGradient(),
+          ),
         ),
       ),
-
       body: Obx(
         () => Container(
           width: double.infinity,
@@ -85,7 +85,6 @@ class ConnectionsPage extends GetView<ConnectionsController> {
     );
   }
 
-
   Widget _buildConnectionCard({
     required String title,
     required String description,
@@ -98,7 +97,8 @@ class ConnectionsPage extends GetView<ConnectionsController> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: accentColor.withValues(alpha: 0.65), width: 1.4),
+        border:
+            Border.all(color: accentColor.withValues(alpha: 0.65), width: 1.4),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.22),

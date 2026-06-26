@@ -49,7 +49,7 @@ final Map<String, String> enUsTranslation = {
       'Deleting the account removes access and linked data.',
   'news_revision': 'News review',
   'news_revision_controller': 'News revision controller',
-  'add_news': 'Add news',
+  'add_news': 'Add News',
   'edit_news': 'Edit news',
   'title': 'Title',
   'title_required': 'Title is required.',
@@ -169,4 +169,34 @@ final Map<String, String> enUsTranslation = {
   'central_da_materia': 'News center',
   'central_de_comunicacao': 'Communication center',
   'Conexões': 'Connections',
+  'Cargo atualizado com sucesso': 'Role updated successfully',
+  'Ocorreu um erro ao atualizar o cargo':
+      'An error occurred while updating the role',
+  'Ocorreu um erro ao tentar fazer login com o Google. Por favor, tente novamente':
+      'An error occurred while trying to log in with Google. Please try again',
+  'Ocorreu um erro ao tentar fazer login com o Microsoft. Por favor, tente novamente.':
+      'An error occurred while trying to log in with Microsoft. Please try again.',
+  'Ocorreu um erro ao tentar fazer login com o Apple. Por favor, tente novamente.':
+      'An error occurred while trying to log in with Apple. Please try again.',
+  'Por favor, preencha todos os campos obrigatórios.':
+      'Please fill in all required fields.',
+  'Rascunho salvo com sucesso!': 'Draft saved successfully!',
+  'Erro ao salvar rascunho': 'Error saving draft',
+  'Erro ao publicar matéria': 'Error publishing news',
+  'Digite o corpo da matéria...': 'Type the body of the news...',
+  'Criar nova matéria': 'Create new news',
+  'Comece a criar uma nova matéria': 'Start creating a new news',
+  'Revisar Matérias': 'Review News',
+  'Fila de avaliação e aprovação editorial':
+      'Editorial review and approval queue',
+  'Ver seus rascunhos': 'View your drafts',
+  'Acesse suas matérias salvas como rascunhos': 'Access your saved drafts',
+  'Ver suas matérias rejeitadas': 'View your rejected news',
+  'Acompanhe o que voltou para ajustes':
+      'Track what has been sent back for adjustments',
+  'Ver suas matérias excluídas': 'View your deleted news',
+  'Confira o histórico de exclusões': 'Check the deletion history',
+  'Painel editorial': 'Editorial panel',
+  'Crie e organize as matérias em um único lugar.':
+      'Create and organize news in one place.',
 };

@@ -22,7 +22,7 @@ class CentralDeComunicacaoPage extends GetView<CentralDeComunicacaoController> {
         ),
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: AppColors.appBarTopGradient(),
+            gradient: AppColors.appBarBottomGradient(),
           ),
         ),
       ),

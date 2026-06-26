@@ -39,7 +39,9 @@ class LoginController extends GetxController {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (Get.context != null) {
           PopUps.snackbar(
-            texto: e.toString(),
+            texto:
+                'Ocorreu um erro ao tentar fazer login com o Google. Por favor, tente novamente.'
+                    .tr,
             cor: Colors.red,
           );
         }
@@ -58,7 +60,9 @@ class LoginController extends GetxController {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (Get.context != null) {
           PopUps.snackbar(
-            texto: e.toString(),
+            texto:
+                "Ocorreu um erro ao tentar fazer login com o Microsoft. Por favor, tente novamente."
+                    .tr,
             cor: Colors.red,
           );
         }
@@ -108,7 +112,9 @@ class LoginController extends GetxController {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (Get.context != null) {
           PopUps.snackbar(
-            texto: e.toString(),
+            texto:
+                'Ocorreu um erro ao tentar fazer login com o Apple. Por favor, tente novamente.'
+                    .tr,
             cor: Colors.red,
           );
         }

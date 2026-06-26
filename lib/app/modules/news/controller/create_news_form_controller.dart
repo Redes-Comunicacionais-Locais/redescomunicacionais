@@ -143,7 +143,7 @@ class CreateNewsFormController extends GetxController {
       await _publishNews(draft);
     } else {
       PopUps.snackbar(
-        texto: 'Por favor, preencha todos os campos obrigatórios.',
+        texto: 'Por favor, preencha todos os campos obrigatórios.'.tr,
         cor: Colors.red,
       );
     }
@@ -157,7 +157,6 @@ class CreateNewsFormController extends GetxController {
     final String author = _homeController.user.name!;
     final String email = _homeController.user.email;
     final String videoUrl = _videoUrlController.text;
-
     final String newsState = draft ? NewsStates.rascunho : NewsStates.emAnalise;
 
     try {
@@ -174,15 +173,29 @@ class CreateNewsFormController extends GetxController {
         newsState,
         videoUrl,
       );
-      PopUps.snackbar(
-        texto: 'Notícia publicada com sucesso!',
-        cor: Colors.green,
-      );
+      if (draft) {
+        PopUps.snackbar(
+          texto: 'Rascunho salvo com sucesso!'.tr,
+          cor: Colors.green,
+        );
+      } else {
+        PopUps.snackbar(
+          texto: 'Matéria publicada com sucesso!'.tr,
+          cor: Colors.green,
+        );
+      }
     } catch (e) {
-      PopUps.snackbar(
-        texto: 'Erro ao publicar notícia: $e',
-        cor: Colors.red,
-      );
+      if (draft) {
+        PopUps.snackbar(
+          texto: 'Erro ao salvar rascunho'.tr,
+          cor: Colors.red,
+        );
+      } else {
+        PopUps.snackbar(
+          texto: 'Erro ao publicar matéria'.tr,
+          cor: Colors.red,
+        );
+      }
       return;
     }
 

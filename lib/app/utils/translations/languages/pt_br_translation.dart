@@ -50,7 +50,7 @@ final Map<String, String> ptBrTranslation = {
       'Excluir a conta remove o acesso e os dados vinculados.',
   'news_revision': 'Revisão de matérias',
   'news_revision_controller': 'Controlador de revisão de matérias',
-  'add_news': 'Adicionar matéria',
+  'add_news': 'Adicionar Matéria',
   'edit_news': 'Editar notícia',
   'title': 'Título',
   'title_required': 'O título é obrigatório.',
@@ -170,4 +170,34 @@ final Map<String, String> ptBrTranslation = {
   'central_da_materia': 'Central da Matéria',
   'central_de_comunicacao': 'Central de Comunicação',
   'Conexões': 'Conexões',
+  'Cargo atualizado com sucesso': 'Cargo atualizado com sucesso',
+  'Ocorreu um erro ao atualizar o cargo':
+      'Ocorreu um erro ao atualizar o cargo',
+  'Ocorreu um erro ao tentar fazer login com o Google. Por favor, tente novamente':
+      'Ocorreu um erro ao tentar fazer login com o Google. Por favor, tente novamente',
+  'Ocorreu um erro ao tentar fazer login com o Microsoft. Por favor, tente novamente.':
+      'Ocorreu um erro ao tentar fazer login com o Microsoft. Por favor, tente novamente.',
+  'Ocorreu um erro ao tentar fazer login com o Apple. Por favor, tente novamente.':
+      'Ocorreu um erro ao tentar fazer login com o Apple. Por favor, tente novamente.',
+  'Por favor, preencha todos os campos obrigatórios.':
+      'Por favor, preencha todos os campos obrigatórios.',
+  'Rascunho salvo com sucesso!': 'Rascunho salvo com sucesso!',
+  'Erro ao salvar rascunho': 'Erro ao salvar rascunho',
+  'Erro ao publicar matéria': 'Erro ao publicar matéria',
+  'Digite o corpo da matéria...': 'Digite o corpo da matéria...',
+  'Criar nova matéria': 'Criar nova matéria',
+  'Comece a criar uma nova matéria': 'Comece a criar uma nova matéria',
+  'Revisar Matérias': 'Revisar Matérias',
+  'Fila de avaliação e aprovação editorial':
+      'Fila de avaliação e aprovação editorial',
+  'Ver seus rascunhos': 'Ver seus rascunhos',
+  'Acesse suas matérias salvas como rascunhos':
+      'Acesse suas matérias salvas como rascunhos',
+  'Ver suas matérias rejeitadas': 'Ver suas matérias rejeitadas',
+  'Acompanhe o que voltou para ajustes': 'Acompanhe o que voltou para ajustes',
+  'Ver suas matérias excluídas': 'Ver suas matérias excluídas',
+  'Confira o histórico de exclusões': 'Confira o histórico de exclusões',
+  'Painel editorial': 'Painel editorial',
+  'Crie e organize as matérias em um único lugar.':
+      'Crie e organize as matérias em um único lugar.',
 };

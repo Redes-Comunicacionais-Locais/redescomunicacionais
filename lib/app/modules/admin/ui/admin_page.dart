@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/admin/controller/admin_controller.dart';
 import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
+import 'package:redescomunicacionais/app/utils/components/popups.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
 
@@ -16,7 +17,7 @@ class AdminPage extends GetView<AdminController> {
         title: Text('manage_users'.tr),
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: AppColors.appBarTopGradient(),
+            gradient: AppColors.appBarBottomGradient(),
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -212,8 +213,19 @@ class AdminPage extends GetView<AdminController> {
                         await _showConfirmDialog(email, currentRole, newRole);
                     if (confirm == true) {
                       if (userId.isNotEmpty) {
-                        await controller.userRepository
-                            .updateRole(userId, newRole, controller.user.email);
+                        try {
+                          await controller.userRepository.updateRole(
+                              userId, newRole, controller.user.email);
+                          PopUps.snackbar(
+                            texto: 'Cargo atualizado com sucesso'.tr,
+                            cor: Colors.green,
+                          );
+                        } catch (e) {
+                          PopUps.snackbar(
+                            texto: 'Ocorreu um erro ao atualizar o cargo'.tr,
+                            cor: Colors.red,
+                          );
+                        }
                       }
                       // Recarrega a lista
                       await controller.loadAllUsers();

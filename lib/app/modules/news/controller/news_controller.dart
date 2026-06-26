@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart' show Colors, debugPrint;
+import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
+import 'package:redescomunicacionais/app/modules/dashboard/controller/home_controller.dart';
 import 'package:redescomunicacionais/app/modules/news/data/model/news_model.dart';
 import 'package:redescomunicacionais/app/modules/news/data/repository/news_repository.dart';
 import 'package:redescomunicacionais/app/modules/news/utils/news_states.dart';
@@ -14,6 +18,9 @@ class NewsController extends GetxController {
   final NewsRepository _repository = NewsRepository();
   final UserRepository _userRepository = UserRepository();
 
+  late HomeController homeController;
+  QuillController quillController = QuillController.basic();
+
   UserModel user = UserModel.empty();
 
   QueryDocumentSnapshot<Map<String, dynamic>>? lastDocument;
@@ -24,6 +31,8 @@ class NewsController extends GetxController {
   RxList<NewsModel> deletedNewsList = <NewsModel>[].obs;
   RxList<NewsModel> publishedNewsList = <NewsModel>[].obs;
 
+  late NewsModel selectedNews;
+
   RxBool isLoading = false.obs;
   RxnInt selectedCardIndex = RxnInt();
 
@@ -31,14 +40,26 @@ class NewsController extends GetxController {
   onInit() async {
     super.onInit();
     user = await _userRepository.getCurrentUser();
-    await getPublicNewsFromHive(null);
-    await getOuthersNewsFromHive();
-    await _repository.syncNewsHiveAndFirebase(user);
+    homeController = Get.find<HomeController>();
+    await syncNews(null);
   }
 
-  // Abre a página de detalhe
-  void openNews(NewsModel news) {
-    Get.toNamed(Routes.NEWS_PAGE, arguments: toNewsArguments(news));
+  Future<void> syncNews(
+      QueryDocumentSnapshot<Map<String, dynamic>>? lastDoc) async {
+    isLoading(true);
+    try {
+      try {
+        await _repository.syncNewsHiveAndFirebase(user);
+      } catch (e) {
+        debugPrint("Erro ao sincronizar notícias: $e");
+      }
+      await getPublicNewsFromHive(lastDoc);
+      await getOuthersNewsFromHive();
+    } catch (e) {
+      throw Exception("Erro ao sincronizar notícias: $e");
+    } finally {
+      isLoading(false);
+    }
   }
 
   Future<void> getMoreNews() async {
@@ -48,47 +69,19 @@ class NewsController extends GetxController {
     await getPublicNewsFromHive(lastDocument);
   }
 
-  // Prepara o map de argumentos usado nas rotas de detalhe
-  Map<String, dynamic> toNewsArguments(NewsModel news) {
-    return {
-      "titulo": news.title,
-      "subtitulo": news.subtitle,
-      "cidade": news.cities.isNotEmpty ? news.cities.join(', ') : '',
-      "categoria": news.categories.isNotEmpty ? news.categories.join(', ') : '',
-      "corpo": news.body,
-      "imgurl": news.urlImages.isNotEmpty ? news.urlImages[0] : '',
-      "autor": news.author,
-      "dataCriacao": news.createdAt.toString(),
-      "type": news.type,
-      "videoUrl": news.videoUrl,
-      "validatedBy": news.validatedBy ?? '',
-      "validatedByName": news.validatedByName ?? '',
-    };
-  }
-
-  // Abre a página de edição (usada quando o usuário pode editar)
-  void openEditNews(NewsModel news) {
-    Get.toNamed(Routes.EDIT_NEWS, arguments: {
-      "newsId": news.id,
-      "titulo": news.title,
-      "subtitulo": news.subtitle,
-      "cidade": news.cities,
-      "categoria": news.categories,
-      "corpo": news.body,
-      "imgurl": news.urlImages.isNotEmpty ? news.urlImages[0] : '',
-      "autor": news.author,
-      "dataCriacao": news.createdAt.toString(),
-      "type": news.type,
-      "status": news.status,
-    });
-  }
-
   Future<void> getOuthersNewsFromHive() async {
     try {
       isLoading(true);
       await _repository
           .getOuthersNews(user); // Atualiza o Hive com os dados do Firebase
+
       List<NewsModel> outhersNews = await _repository.getOuthersNewsFromHive();
+
+      outhersNews.sort((a, b) {
+        final dateA = a.lastUpdated;
+        final dateB = b.lastUpdated;
+        return dateB.compareTo(dateA);
+      });
 
       // So admin e editor veem as listas de análise, rascunho, rejeitado e deletado
       if (user.role == UserRoles.admin || user.role == UserRoles.editor) {
@@ -127,6 +120,12 @@ class NewsController extends GetxController {
       lastDocument = await _repository.getPublicNewsPaginated(
           ld); // Atualiza o Hive com os dados do Firebase e obtém o próximo ponteiro de paginação
       List<NewsModel> publicNews = await _repository.getPublicNewsFromHive();
+
+      publicNews.sort((a, b) {
+        final dateA = a.lastUpdated;
+        final dateB = b.lastUpdated;
+        return dateA.compareTo(dateB);
+      });
 
       publishedNewsList.assignAll(
         publicNews
@@ -172,17 +171,8 @@ class NewsController extends GetxController {
         lastUpdated: DateTime.now(),
       );
 
-      //  Tentar salvar no Hive
-      try {
-        await _repository.saveNewsToHive(news);
-        _repository.syncNewsHiveAndFirebase(
-            user); // Sincroniza os dados após atualização
-        getPublicNewsFromHive(null);
-        getOuthersNewsFromHive();
-      } catch (e) {
-        debugPrint("Hive falhou: $e.");
-        throw Exception("Erro ao salvar notícia: $e");
-      }
+      await _repository.saveNewsToHive(news);
+      await syncNews(null);
     } catch (e) {
       throw Exception("Erro ao salvar notícia: $e");
     } finally {
@@ -190,7 +180,6 @@ class NewsController extends GetxController {
     }
   }
 
-  // Função para "deletar" a noticia (na verdade, muda o status para "deletado")
   Future<void> hideNews({
     required String newsId,
     required String status,
@@ -205,14 +194,12 @@ class NewsController extends GetxController {
       );
       return;
     }
+
     isLoading(true);
 
     try {
       await _repository.hideNews(newsId, status, userEmail);
-      _repository.syncNewsHiveAndFirebase(
-          user); // Sincroniza os dados após atualização
-      getPublicNewsFromHive(null);
-      getOuthersNewsFromHive();
+      await syncNews(null);
       PopUps.snackbar(
         texto: '$type excluída com sucesso!',
         cor: Colors.green,
@@ -257,10 +244,7 @@ class NewsController extends GetxController {
         validatorName,
         newsType,
       );
-      _repository.syncNewsHiveAndFirebase(
-          user); // Sincroniza os dados após atualização
-      getPublicNewsFromHive(null);
-      getOuthersNewsFromHive();
+      await syncNews(null);
       PopUps.snackbar(
         texto: isApproved
             ? 'Matéria aprovada com sucesso!'
@@ -278,13 +262,12 @@ class NewsController extends GetxController {
     }
   }
 
-  // Verifica se o usuário atual é o autor (p/ habilitar editar/excluir)
   bool canEdit(NewsModel news) {
     return user.email == news.createdBy;
   }
 
   bool canDelete(NewsModel news) {
-    return user.role == UserRoles.editor || user.role == UserRoles.admin;
+    return user.email == news.createdBy;
   }
 
   bool canReReview(NewsModel news) {
@@ -297,7 +280,16 @@ class NewsController extends GetxController {
     return isEditorOrAdmin && isNotAuthor && isRevisableStatus;
   }
 
-  // Controla seleção de cards (toggle)
+  bool isAllListsEmpty() {
+    return publishedNewsList.isEmpty &&
+        inAnalysisNewsList.isEmpty &&
+        myDraftsList.isEmpty &&
+        rejectedNewsList.isEmpty &&
+        deletedNewsList.isEmpty;
+  }
+
+  bool isSelected(int index) => selectedCardIndex.value == index;
+
   void toggleSelected(int index) {
     if (selectedCardIndex.value == index) {
       selectedCardIndex.value = null;
@@ -305,8 +297,6 @@ class NewsController extends GetxController {
       selectedCardIndex.value = index;
     }
   }
-
-  bool isSelected(int index) => selectedCardIndex.value == index;
 
   // Mapeamento city -> asset path para fallback de imagens
   final Map<String, String> _cityImageAssets = {
@@ -317,12 +307,72 @@ class NewsController extends GetxController {
     'Laje do Muriaé': 'assets/images/cidades/lajedomuriae.jpg',
     'São José de Ubá': 'assets/images/cidades/saojosedeuba.jpg',
     // add more or a 'default' entry
-    'default': 'assets/images/default_city.jpg',
+    'default': 'assets/images/cidades/default_city.jpg',
   };
 
   // Retorna o path do asset JPG para a cidade dada
   String getCityImageAsset(String? city) {
     final key = (city == null || city.isEmpty) ? 'default' : city;
     return _cityImageAssets[key] ?? _cityImageAssets['default']!;
+  }
+
+  // Abre a página de detalhe
+  void openNews(NewsModel news) {
+    selectedNews = news;
+    Get.toNamed(Routes.NEWS_PAGE);
+  }
+
+  // Abre a página de edição (usada quando o usuário pode editar)
+  void openEditNews(NewsModel news) {
+    Get.toNamed(Routes.EDIT_NEWS, arguments: {
+      "newsId": news.id,
+      "titulo": news.title,
+      "subtitulo": news.subtitle,
+      "cidade": news.cities,
+      "categoria": news.categories,
+      "corpo": news.body,
+      "imgurl": news.urlImages.isNotEmpty ? news.urlImages[0] : '',
+      "autor": news.author,
+      "dataCriacao": news.createdAt.toString(),
+      "type": news.type,
+      "status": news.status,
+    });
+  }
+
+  void startQuillController() {
+    // Carrega o conteúdo Delta no controller
+    try {
+      if (selectedNews.body.isNotEmpty) {
+        final deltaJson = jsonDecode(selectedNews.body);
+        final document = Document.fromJson(deltaJson);
+        quillController = QuillController(
+          document: document,
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      }
+    } catch (e) {
+      // Se falhar ao decodificar, usa texto simples
+      quillController = QuillController.basic();
+      quillController.document.insert(0, selectedNews.body);
+    }
+  }
+
+  List<NewsModel> getNewsForCurrentMode() {
+    if (homeController.isDeletedMode.value) {
+      return deletedNewsList.toList();
+    }
+
+    if (homeController.isRejectedMode.value) {
+      return rejectedNewsList.toList();
+    }
+
+    if (homeController.isRevisionMode.value) {
+      return inAnalysisNewsList.toList();
+    }
+
+    if (homeController.isDraftMode.value) {
+      return myDraftsList.toList();
+    }
+    return publishedNewsList.toList();
   }
 }

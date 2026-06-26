@@ -8,43 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart'; // Para formatar datas
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
 
-class NewsWindowsPage extends StatefulWidget {
-  NewsWindowsPage({
-    super.key,
-    RxBool? isRevisionMode,
-    RxBool? isDraftMode,
-    RxBool? isRejectedMode,
-    RxBool? isDeletedMode,
-  })  : isRevisionMode = isRevisionMode ?? false.obs,
-        isDraftMode = isDraftMode ?? false.obs,
-        isRejectedMode = isRejectedMode ?? false.obs,
-        isDeletedMode = isDeletedMode ?? false.obs;
-
-  final RxBool isRevisionMode;
-  final RxBool isDraftMode;
-  final RxBool isRejectedMode;
-  final RxBool isDeletedMode;
-
-  @override
-  State<NewsWindowsPage> createState() => _NewsWindowsPageState();
-}
-
-class _NewsWindowsPageState extends State<NewsWindowsPage> {
-  late ScrollController _scrollController;
-  late NewsController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    _controller = Get.find<NewsController>();
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
+class NewsWidgets extends GetView<NewsController> {
+  const NewsWidgets({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,13 +20,7 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
         ),
         child: Obx(
           () {
-            final bool allListsEmpty = _controller.publishedNewsList.isEmpty &&
-                _controller.inAnalysisNewsList.isEmpty &&
-                _controller.myDraftsList.isEmpty &&
-                _controller.rejectedNewsList.isEmpty &&
-                _controller.deletedNewsList.isEmpty;
-
-            if (_controller.isLoading.value || allListsEmpty) {
+            if (controller.isLoading.value || controller.isAllListsEmpty()) {
               return const Center(
                 child: BlinkingLoadingIcon(
                   size: 36,
@@ -69,15 +28,9 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
                 ),
               );
             }
+            List<NewsModel> selectedNewss = controller.getNewsForCurrentMode();
 
-            final List<NewsModel> validNews = _getNewsForCurrentMode();
-            final List<NewsModel> sortedNews = _sortByCreatedAt(validNews);
-            final bool isPublishedMode = !widget.isDeletedMode.value &&
-                !widget.isRejectedMode.value &&
-                !widget.isRevisionMode.value &&
-                !widget.isDraftMode.value;
-
-            if (sortedNews.isEmpty) {
+            if (selectedNewss.isEmpty) {
               return Center(
                 child: Text(
                   'no_news_found'.tr,
@@ -91,21 +44,17 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
               // Detecta toque fora dos cards para fechar o menu
               behavior: HitTestBehavior.translucent,
               onTap: () {
-                _controller.selectedCardIndex.value = null;
+                controller.selectedCardIndex.value = null;
               },
               child: ListView(
-                controller: _scrollController,
+                controller: ScrollController(),
                 children: [
-                  //const SizedBox(height: 16.0), // Espaço superior
-
-                  // Cards horizontais
-                  //_buildHorizontalCards(sortedNews),
-
                   const SizedBox(height: 16.0),
-
                   // Lista vertical de notícias
-                  ..._buildNewsList(sortedNews),
-                  if (isPublishedMode && sortedNews.isNotEmpty)
+                  ..._buildNewsList(selectedNewss),
+
+                  if (controller.homeController.isPublishedMode.value &&
+                      selectedNewss.isNotEmpty)
                     _buildCreateMoreItem(),
                 ],
               ),
@@ -116,102 +65,14 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
     );
   }
 
-  List<NewsModel> _getNewsForCurrentMode() {
-    if (widget.isDeletedMode.value) {
-      return _controller.deletedNewsList;
-    }
-
-    if (widget.isRejectedMode.value) {
-      return _controller.rejectedNewsList;
-    }
-
-    if (widget.isRevisionMode.value) {
-      return _controller.inAnalysisNewsList;
-    }
-
-    if (widget.isDraftMode.value) {
-      return _controller.myDraftsList;
-    }
-
-    return _controller.publishedNewsList;
-  }
-
-  List<NewsModel> _sortByCreatedAt(List<NewsModel> newsList) {
-    final sortedList = List<NewsModel>.from(newsList);
-    sortedList.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return sortedList;
-  }
-
-  // ignore: unused_element
-  Widget _buildHorizontalCards(List<NewsModel> validNews) {
-    return SizedBox(
-      height: 120.0,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: validNews.map<Widget>((n) {
-            return GestureDetector(
-              onTap: () => _controller.openNews(n),
-              child: Card(
-                color: Colors.grey[900],
-                margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: SizedBox(
-                  width: 120.0,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(8.0)),
-                        child:
-                            n.urlImages.isNotEmpty && n.urlImages[0].isNotEmpty
-                                ? _buildSafeImage(n.urlImages[0], 70.0)
-                                : Image.asset(
-                                    _controller.getCityImageAsset(
-                                        n.cities.isNotEmpty
-                                            ? n.cities[0]
-                                            : 'default'),
-                                    fit: BoxFit.cover,
-                                    width: 120.0,
-                                    height: 70.0,
-                                  ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          n.title,
-                          style: const TextStyle(
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
   List<Widget> _buildNewsList(List<NewsModel> validNews) {
     return validNews.asMap().entries.map<Widget>(
       (entry) {
-        final index = entry.key;
-        final news = entry.value;
+        int index = entry.key;
+        NewsModel news = entry.value;
 
         return Obx(() {
-          final isSelected = _controller.isSelected(index);
+          bool isSelected = controller.isSelected(index);
 
           return Column(
             children: [
@@ -234,46 +95,39 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
                     runSpacing: 4.0,
                     children: [
                       // Ícone de editar (lápis)
-                      GestureDetector(
-                        onTap: () {
-                          if (_controller.canEdit(news)) {
-                            _controller.openEditNews(news);
-                          } else {
-                            _showAccessDeniedDialog(Get.context!);
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.edit,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              SizedBox(width: 8.0),
-                              Text(
-                                'edit'.tr,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 25.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      if (_controller.canDelete(news))
+                      if (controller.canEdit(news))
                         GestureDetector(
                           onTap: () {
-                            hideNewsPopup(
-                                news.id,
-                                NewsStates.deletado,
-                                _controller.user.email,
-                                news.createdBy,
-                                news.type);
+                            controller.openEditNews(news);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                                SizedBox(width: 8.0),
+                                Text(
+                                  'edit'.tr,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 25.0,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      if (controller.canDelete(news))
+                        GestureDetector(
+                          onTap: () {
+                            _hideNewsPopup(news.id, controller.user.email,
+                                news.createdBy, news.type);
                           },
                           child: Container(
                             padding: const EdgeInsets.all(8.0),
@@ -298,9 +152,7 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
                             ),
                           ),
                         ),
-
-                      if (widget.isRevisionMode.value ||
-                          _controller.canReReview(news))
+                      if (controller.canReReview(news))
                         GestureDetector(
                           onTap: () => _showReviewDialog(news),
                           child: Container(
@@ -326,37 +178,7 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
                             ),
                           ),
                         ),
-
-                      if (widget.isDeletedMode.value)
-                        GestureDetector(
-                          onTap: () => _showObservationDialog(
-                            news.excludedObservation,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.sticky_note_2_outlined,
-                                  color: Colors.orangeAccent,
-                                  size: 30,
-                                ),
-                                SizedBox(width: 8.0),
-                                Text(
-                                  'observations'.tr,
-                                  style: TextStyle(
-                                    color: Colors.orangeAccent,
-                                    fontSize: 25.0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                      if (widget.isRejectedMode.value)
+                      if (controller.homeController.isRejectedMode.value)
                         GestureDetector(
                           onTap: () => _showObservationDialog(
                             news.rejectedObservation,
@@ -390,8 +212,8 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
 
               // Card da notícia
               GestureDetector(
-                onTap: () => _controller.openNews(news),
-                onLongPress: () => _controller.toggleSelected(index),
+                onTap: () => controller.openNews(news),
+                onLongPress: () => controller.toggleSelected(index),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
@@ -448,7 +270,7 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
                               ? _buildSafeImage(news.urlImages[0], 200.0)
                               : // se não houver base64, usa asset local por city
                               Image.asset(
-                                  _controller.getCityImageAsset(
+                                  controller.getCityImageAsset(
                                       news.cities.isNotEmpty
                                           ? news.cities[0]
                                           : 'default'),
@@ -511,7 +333,7 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
   Widget _buildCreateMoreItem() {
     return GestureDetector(
       onTap: () {
-        _controller.getMoreNews();
+        controller.getMoreNews();
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -535,8 +357,8 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
     );
   }
 
-  Future<void> hideNewsPopup(String newsId, String status, String userEmail,
-      String authorEmail, String type) async {
+  Future<void> _hideNewsPopup(
+      String newsId, String userEmail, String authorEmail, String type) async {
     await Get.dialog(
       AlertDialog(
         backgroundColor: Colors.grey[900],
@@ -557,9 +379,9 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
           TextButton(
             onPressed: () async {
               Get.back();
-              await _controller.hideNews(
+              await controller.hideNews(
                 newsId: newsId,
-                status: status,
+                status: NewsStates.deletado,
                 userEmail: userEmail,
                 type: type,
                 creator: authorEmail,
@@ -571,85 +393,6 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
       ),
       barrierDismissible: true,
     );
-  }
-
-  void _showAccessDeniedDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.grey[900],
-          title:
-              Text('access_denied'.tr, style: TextStyle(color: Colors.white)),
-          content: Text(
-            'only_author_can_edit'.tr,
-            style: TextStyle(color: Colors.white70),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('ok'.tr, style: const TextStyle(color: Colors.blue)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // Função para calcular e formatar a data
-  String _getFormattedDate(String dataCriacao) {
-    try {
-      final creationDate = DateTime.parse(dataCriacao);
-      final now = DateTime.now();
-      final difference = now.difference(creationDate);
-
-      if (difference.inSeconds < 60) {
-        return '${difference.inSeconds} ${'seconds_ago'.tr}';
-      } else if (difference.inMinutes < 60) {
-        return '${difference.inMinutes} ${'minutes_ago'.tr}';
-      } else if (difference.inHours < 24) {
-        return '${difference.inHours} ${'hours_ago'.tr}';
-      } else {
-        return DateFormat('dd/MM/yyyy').format(creationDate);
-      }
-    } catch (e) {
-      return dataCriacao;
-    }
-  }
-
-  // Função para construir imagem segura com tratamento de erro
-  Widget _buildSafeImage(String base64String, double height) {
-    try {
-      return Image.memory(
-        base64Decode(base64String),
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: height,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            width: double.infinity,
-            height: height,
-            color: Colors.grey[800],
-            child: const Icon(
-              Icons.image_not_supported,
-              color: Colors.grey,
-              size: 40,
-            ),
-          );
-        },
-      );
-    } catch (e) {
-      return Container(
-        width: double.infinity,
-        height: height,
-        color: Colors.grey[800],
-        child: const Icon(
-          Icons.image_not_supported,
-          color: Colors.grey,
-          size: 40,
-        ),
-      );
-    }
   }
 
   Future<void> _showReviewDialog(NewsModel news) async {
@@ -760,11 +503,10 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
           ],
         ),
         actions: [
-          // Novo botão de voltar adicionado à esquerda
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
-              'cancel'.tr, // Mapeado no arquivo de idiomas como "Cancelar"
+              'cancel'.tr,
               style: TextStyle(color: Colors.grey[400]),
             ),
           ),
@@ -772,13 +514,13 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
             onPressed: () async {
               final reason = _reasonController.text.trim();
               Get.back();
-              await _controller.reviewNews(
+              await controller.reviewNews(
                 newsId: news.id,
                 isApproved: accepted,
                 reason: reason,
-                validator: _controller.user.email,
+                validator: controller.user.email,
                 creator: news.createdBy,
-                validatorName: _controller.user.name ?? '',
+                validatorName: controller.user.name ?? '',
                 newsType: news.type,
               );
             },
@@ -791,5 +533,61 @@ class _NewsWindowsPageState extends State<NewsWindowsPage> {
       ),
       barrierDismissible: true,
     );
+  }
+
+  // Função para calcular e formatar a data
+  String _getFormattedDate(String dataCriacao) {
+    try {
+      final creationDate = DateTime.parse(dataCriacao);
+      final now = DateTime.now();
+      final difference = now.difference(creationDate);
+
+      if (difference.inSeconds < 60) {
+        return '${difference.inSeconds} ${'seconds_ago'.tr}';
+      } else if (difference.inMinutes < 60) {
+        return '${difference.inMinutes} ${'minutes_ago'.tr}';
+      } else if (difference.inHours < 24) {
+        return '${difference.inHours} ${'hours_ago'.tr}';
+      } else {
+        return DateFormat('dd/MM/yyyy').format(creationDate);
+      }
+    } catch (e) {
+      return dataCriacao;
+    }
+  }
+
+  // Função para construir imagem segura com tratamento de erro
+  Widget _buildSafeImage(String base64String, double height) {
+    try {
+      return Image.memory(
+        base64Decode(base64String),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: height,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: double.infinity,
+            height: height,
+            color: Colors.grey[800],
+            child: const Icon(
+              Icons.image_not_supported,
+              color: Colors.grey,
+              size: 40,
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      return Container(
+        width: double.infinity,
+        height: height,
+        color: Colors.grey[800],
+        child: const Icon(
+          Icons.image_not_supported,
+          color: Colors.grey,
+          size: 40,
+        ),
+      );
+    }
   }
 }

@@ -49,7 +49,7 @@ final Map<String, String> esEsTranslation = {
       'Eliminar la cuenta quita el acceso y los datos vinculados.',
   'news_revision': 'Revision de noticias',
   'news_revision_controller': 'Controlador de revision de noticias',
-  'add_news': 'Agregar noticia',
+  'add_news': 'Agregar Noticia',
   'edit_news': 'Editar noticia',
   'title': 'Titulo',
   'title_required': 'El titulo es obligatorio.',
@@ -169,4 +169,34 @@ final Map<String, String> esEsTranslation = {
   'central_da_materia': 'Centro de la noticia',
   'central_de_comunicacao': 'Centro de comunicacion',
   'Conexões': 'Conexiones',
+  'Cargo atualizado com sucesso': 'Rol actualizado con exito',
+  'Ocorreu um erro ao atualizar o cargo':
+      'Ocurrio un error al actualizar el rol',
+  'Ocorreu um erro ao tentar fazer login com o Google. Por favor, tente novamente':
+      'Ocurrio un error al intentar iniciar sesion con Google. Por favor, intente nuevamente',
+  'Ocorreu um erro ao tentar fazer login com o Microsoft. Por favor, tente novamente.':
+      'Ocurrio un error al intentar iniciar sesion con Microsoft. Por favor, intente nuevamente.',
+  'Ocorreu um erro ao tentar fazer login com o Apple. Por favor, tente novamente.':
+      'Ocurrio un error al intentar iniciar sesion con Apple. Por favor, intente nuevamente.',
+  'Por favor, preencha todos os campos obrigatórios.':
+      'Por favor, complete todos los campos obligatorios.',
+  'Rascunho salvo com sucesso!': 'Borrador guardado con exito!',
+  'Erro ao salvar rascunho': 'Error al guardar borrador',
+  'Erro ao publicar matéria': 'Error al publicar noticia',
+  'Digite o corpo da matéria...': 'Escriba el cuerpo de la noticia...',
+  'Criar nova matéria': 'Crear nueva noticia',
+  'Comece a criar uma nova matéria': 'Comience a crear una nueva noticia',
+  'Revisar Matérias': 'Revisar noticias',
+  'Fila de avaliação e aprovação editorial':
+      'Cola de revision y aprobacion editorial',
+  'Ver seus rascunhos': 'Ver tus borradores',
+  'Acesse suas matérias salvas como rascunhos':
+      'Accede a tus borradores guardados',
+  'Ver suas matérias rejeitadas': 'Ver tus noticias rechazadas',
+  'Acompanhe o que voltou para ajustes': 'Siga lo que volvio para ajustes',
+  'Ver suas matérias excluídas': 'Ver tus noticias eliminadas',
+  'Confira o histórico de exclusões': 'Verifique el historial de eliminaciones',
+  'Painel editorial': 'Panel editorial',
+  'Crie e organize as matérias em um único lugar.':
+      'Cree y organice las noticias en un solo lugar.',
 };

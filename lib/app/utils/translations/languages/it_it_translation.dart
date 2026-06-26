@@ -49,7 +49,7 @@ final Map<String, String> itItTranslation = {
       'Eliminare l account rimuove accesso e dati collegati.',
   'news_revision': 'Revisione notizie',
   'news_revision_controller': 'Controller revisione notizie',
-  'add_news': 'Aggiungi notizia',
+  'add_news': 'Aggiungi Notizia',
   'edit_news': 'Modifica notizia',
   'title': 'Titolo',
   'title_required': 'Il titolo e obbligatorio.',
@@ -169,4 +169,36 @@ final Map<String, String> itItTranslation = {
   'central_da_materia': 'Centro notizie',
   'central_de_comunicacao': 'Centro comunicazione',
   'Conexões': 'Connessioni',
+  'Cargo atualizado com sucesso': 'Ruolo aggiornato con successo',
+  'Ocorreu um erro ao atualizar o cargo':
+      'Si e verificato un errore durante l aggiornamento del ruolo',
+  'Ocorreu um erro ao tentar fazer login com o Google. Por favor, tente novamente':
+      'Si e verificato un errore durante il tentativo di accesso con Google. Per favore, riprova',
+  'Ocorreu um erro ao tentar fazer login com o Microsoft. Por favor, tente novamente.':
+      'Si e verificato un errore durante il tentativo di accesso con Microsoft. Per favore, riprova.',
+  'Ocorreu um erro ao tentar fazer login com o Apple. Por favor, tente novamente.':
+      'Si e verificato un errore durante il tentativo di accesso con Apple.',
+  'Por favor, preencha todos os campos obrigatórios.':
+      'Per favore, compila tutti i campi obbligatori.',
+  'Rascunho salvo com sucesso!': 'Bozza salvata con successo!',
+  'Erro ao salvar rascunho': 'Errore durante il salvataggio della bozza',
+  'Erro ao publicar matéria': 'Errore durante la pubblicazione della notizia',
+  'Digite o corpo da matéria...': 'Digita il corpo della notizia...',
+  'Criar nova matéria': 'Crea nuova notizia',
+  'Comece a criar uma nova matéria': 'Inizia a creare una nuova notizia',
+  'Revisar Matérias': 'Revisionare notizie',
+  'Fila de avaliação e aprovação editorial':
+      'Coda di revisione e approvazione editoriale',
+  'Ver seus rascunhos': 'Visualizza le tue bozze',
+  'Acesse suas matérias salvas como rascunhos':
+      'Accedi alle tue notizie salvate come bozze',
+  'Ver suas matérias rejeitadas': 'Visualizza le tue notizie rifiutate',
+  'Acompanhe o que voltou para ajustes':
+      'Segui quello che e tornato per le modifiche',
+  'Ver suas matérias excluídas': 'Visualizza le tue notizie eliminate',
+  'Confira o histórico de exclusões':
+      'Controlla la cronologia delle eliminazioni',
+  'Painel editorial': 'Pannello editoriale',
+  'Crie e organize as matérias em um único lugar.':
+      'Crea e organizza le notizie in un unico posto.',
 };

@@ -131,9 +131,13 @@ class _EditNewsPageState extends State<EditNewsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('edit_news'.tr),
-        backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.appBarBottomGradient(),
+          ),
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
