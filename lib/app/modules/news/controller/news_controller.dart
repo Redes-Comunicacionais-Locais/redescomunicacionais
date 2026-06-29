@@ -122,9 +122,9 @@ class NewsController extends GetxController {
       List<NewsModel> publicNews = await _repository.getPublicNewsFromHive();
 
       publicNews.sort((a, b) {
-        final dateA = a.lastUpdated;
-        final dateB = b.lastUpdated;
-        return dateA.compareTo(dateB);
+        final dateA = a.createdAt;
+        final dateB = b.createdAt;
+        return dateB.compareTo(dateA);
       });
 
       publishedNewsList.assignAll(

@@ -81,6 +81,7 @@ class HomePage extends GetView<HomeController> {
                           controller.isDraftMode.value = false;
                           controller.isRejectedMode.value = false;
                           controller.isDeletedMode.value = false;
+                          controller.isPublishedMode.value = true;
                         },
                         icon:
                             const Icon(Icons.arrow_back, color: Colors.orange),

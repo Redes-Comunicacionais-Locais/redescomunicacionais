@@ -302,6 +302,7 @@ class NewsProvider {
 
     try {
       List<NewsModel> hiveNewsList = await getOuthersNewsFromHive();
+      hiveNewsList.addAll(await getPublicNewsFromHive());
 
       for (var hiveNews in hiveNewsList) {
         try {
@@ -316,6 +317,13 @@ class NewsProvider {
               await _deleteNewsFromHive(hiveNews.id);
             }
           } else {
+            if (hiveNews.createdBy != user.email &&
+                (hiveNews.status == NewsStates.rascunho ||
+                    hiveNews.status == NewsStates.rejeitado ||
+                    hiveNews.status == NewsStates.deletado)) {
+              // Se a notícia foi criada por outro usuário e está em rascunho, rejeitada ou deletada, remove do Hive local
+              await _deleteNewsFromHive(hiveNews.id);
+            }
             // Ambas existem: compara as datas de modificação para ver quem ganha
             DateTime? fbDate = fbNews.lastUpdated;
             DateTime? hiveDate = hiveNews.lastUpdated;

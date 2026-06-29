@@ -416,16 +416,17 @@ class NewsWidgets extends GetView<NewsController> {
               style: TextStyle(color: Colors.grey[400]),
             ),
           ),
-          TextButton(
-            onPressed: () async {
-              Get.back();
-              await _showReasonDialog(news, true);
-            },
-            child: Text(
-              'accept'.tr,
-              style: const TextStyle(color: Colors.green),
+          if (news.status != NewsStates.publicado)
+            TextButton(
+              onPressed: () async {
+                Get.back();
+                await _showReasonDialog(news, true);
+              },
+              child: Text(
+                'accept'.tr,
+                style: const TextStyle(color: Colors.green),
+              ),
             ),
-          ),
           TextButton(
             onPressed: () async {
               Get.back();
