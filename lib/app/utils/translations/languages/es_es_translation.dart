@@ -36,7 +36,8 @@ final Map<String, String> esEsTranslation = {
   'login_with_apple': 'Entrar con Apple',
   'login_anonymously': 'Entrar anonimamente',
   'confirm_deletion': 'Confirmar eliminacion',
-  'confirm_delete_account_message': 'Estas seguro de que deseas eliminar tu cuenta? Esta accion no tiene vuelta atras y todos los datos se perderan.',
+  'confirm_delete_account_message':
+      'Estas seguro de que deseas eliminar tu cuenta? Esta accion no tiene vuelta atras y todos los datos se perderan.',
   'delete_account': 'Eliminar cuenta',
   'your_data': 'Tus datos',
   'update_display_name': 'Actualiza tu nombre visible',
@@ -44,10 +45,11 @@ final Map<String, String> esEsTranslation = {
   'enter_your_name': 'Ingresa tu nombre',
   'save_changes': 'Guardar cambios',
   'danger_zone': 'Zona de peligro',
-  'delete_account_warning': 'Eliminar la cuenta quita el acceso y los datos vinculados.',
+  'delete_account_warning':
+      'Eliminar la cuenta quita el acceso y los datos vinculados.',
   'news_revision': 'Revision de noticias',
   'news_revision_controller': 'Controlador de revision de noticias',
-  'add_news': 'Agregar noticia',
+  'add_news': 'Agregar Noticia',
   'edit_news': 'Editar noticia',
   'title': 'Titulo',
   'title_required': 'El titulo es obligatorio.',
@@ -62,7 +64,8 @@ final Map<String, String> esEsTranslation = {
   'paste_youtube_link_here': 'Pegue aqui un enlace de video de YouTube',
   'add_image': 'Agregar imagen',
   'change_image': 'Cambiar imagen',
-  'image_requirements': 'La imagen debe estar en formato JPG o JPEG y, preferiblemente, tener un tamano maximo de 500 KB. Las imagenes mayores se comprimiran, lo que puede causar perdida de calidad y lentitud en la carga. Para una mejor visualizacion, se recomienda usar imagenes en orientacion horizontal.',
+  'image_requirements':
+      'Las imagenes mayores se comprimiran, lo que puede causar perdida de calidad y lentitud en la carga. Para una mejor visualizacion, se recomienda usar imagenes en orientacion horizontal.',
   'publish_news': 'Publicar noticia',
   'save_draft_news': 'Guardar borrador',
   'update_news': 'Actualizar noticia',
@@ -86,9 +89,10 @@ final Map<String, String> esEsTranslation = {
   'network_type': 'Tipo de red',
   'last_check': 'Ultima verificacion',
   'ranges': 'Rangos:',
-  'real_connection_checked_every_5_min': 'La conexion real se verifica automaticamente cada 5 minutos.',
+  'real_connection_checked_every_5_min':
+      'La conexion real se verifica automaticamente cada 5 minutos.',
   'close': 'Cerrar',
-  'full_type': 'Tipo completo',
+  'full_type': '',
   'info_of': 'Informacion de',
   'content_of': 'Contenido de',
   'author': 'Autor',
@@ -109,7 +113,8 @@ final Map<String, String> esEsTranslation = {
   'error': 'Error',
   'ok': 'OK',
   'access_denied': 'Acceso denegado',
-  'only_author_can_edit': 'No puede editar esta noticia porque no es el autor. Solo el autor original puede hacer cambios.',
+  'only_author_can_edit':
+      'No puede editar esta noticia porque no es el autor. Solo el autor original puede hacer cambios.',
   'seconds_ago': 'segundos atras',
   'minutes_ago': 'minutos atras',
   'hours_ago': 'horas atras',
@@ -137,11 +142,13 @@ final Map<String, String> esEsTranslation = {
   '> 15 min: vermelho': '> 15 min: rojo',
   'obtaining_location': 'Obteniendo ubicacion...',
   'location_request_title': 'Solicitud de Ubicacion',
-  'location_permission_description_android': 'La aplicacion le gustaria acceder a su ubicacion para proporcionar mejor informacion sobre su area. Si esta de acuerdo, seleccione \'Confirmar\'. De lo contrario, seleccione \'Continuar sin ubicacion\'.',
+  'location_permission_description_android':
+      'La aplicacion le gustaria acceder a su ubicacion para proporcionar mejor informacion sobre su area. Si esta de acuerdo, seleccione \'Confirmar\'. De lo contrario, seleccione \'Continuar sin ubicacion\'.',
   'location_not_provided': 'Ubicacion no proporcionada',
   'continue_without_location': 'Continuar sin ubicacion',
   'allow_location': 'Permitir ubicacion',
-  'location_permission_description_ios': 'Usamos su ubicacion para mostrarle noticias mas cerca de usted.',
+  'location_permission_description_ios':
+      'Usamos su ubicacion para mostrarle noticias mas cerca de usted.',
   'continue': 'Continuar',
   'city_not_found': 'Ciudad no encontrada',
   'error_updating_location': 'Error al actualizar la ubicacion',
@@ -151,10 +158,45 @@ final Map<String, String> esEsTranslation = {
   'image_selected_success': 'Imagen seleccionada exitosamente!',
   'error_processing_image': 'Error al procesar la imagen.',
   'image_too_large': 'La imagen aun es demasiado grande!',
-  'image_compressed': 'La imagen excedio el limite de 500KB y fue comprimida. Este proceso puede resultar en una perdida de calidad de la imagen.',
+  'image_compressed':
+      'La imagen excedio el limite de 500KB y fue comprimida. Este proceso puede resultar en una perdida de calidad de la imagen.',
   'watch_on_youtube': 'Ver en YouTube',
   'youtube_url_placeholder': 'https://www.youtube.com/watch?v=...',
-  'processing_image_message': 'Procesando tu imagen... Esto puede tomar algunos segundos.',
+  'processing_image_message':
+      'Procesando tu imagen... Esto puede tomar algunos segundos.',
   'invalid_youtube_url': 'URL de YouTube invalida',
   'crop_image_title': 'Editar imagen',
+  'central_da_materia': 'Centro de la noticia',
+  'central_de_comunicacao': 'Centro de comunicacion',
+  'Conexões': 'Conexiones',
+  'Cargo atualizado com sucesso': 'Rol actualizado con exito',
+  'Ocorreu um erro ao atualizar o cargo':
+      'Ocurrio un error al actualizar el rol',
+  'Ocorreu um erro ao tentar fazer login com o Google. Por favor, tente novamente':
+      'Ocurrio un error al intentar iniciar sesion con Google. Por favor, intente nuevamente',
+  'Ocorreu um erro ao tentar fazer login com o Microsoft. Por favor, tente novamente.':
+      'Ocurrio un error al intentar iniciar sesion con Microsoft. Por favor, intente nuevamente.',
+  'Ocorreu um erro ao tentar fazer login com o Apple. Por favor, tente novamente.':
+      'Ocurrio un error al intentar iniciar sesion con Apple. Por favor, intente nuevamente.',
+  'Por favor, preencha todos os campos obrigatórios.':
+      'Por favor, complete todos los campos obligatorios.',
+  'Rascunho salvo com sucesso!': 'Borrador guardado con exito!',
+  'Erro ao salvar rascunho': 'Error al guardar borrador',
+  'Erro ao publicar matéria': 'Error al publicar noticia',
+  'Digite o corpo da matéria...': 'Escriba el cuerpo de la noticia...',
+  'Criar nova matéria': 'Crear nueva noticia',
+  'Comece a criar uma nova matéria': 'Comience a crear una nueva noticia',
+  'Revisar Matérias': 'Revisar noticias',
+  'Fila de avaliação e aprovação editorial':
+      'Cola de revision y aprobacion editorial',
+  'Ver seus rascunhos': 'Ver tus borradores',
+  'Acesse suas matérias salvas como rascunhos':
+      'Accede a tus borradores guardados',
+  'Ver suas matérias rejeitadas': 'Ver tus noticias rechazadas',
+  'Acompanhe o que voltou para ajustes': 'Siga lo que volvio para ajustes',
+  'Ver suas matérias excluídas': 'Ver tus noticias eliminadas',
+  'Confira o histórico de exclusões': 'Verifique el historial de eliminaciones',
+  'Painel editorial': 'Panel editorial',
+  'Crie e organize as matérias em um único lugar.':
+      'Cree y organice las noticias en un solo lugar.',
 };

@@ -8,22 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart'; // Para formatar datas
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
 
-class NewsWindowsPage extends GetView<NewsController> {
-  NewsWindowsPage({
-    super.key,
-    RxBool? isRevisionMode,
-    RxBool? isDraftMode,
-    RxBool? isRejectedMode,
-    RxBool? isDeletedMode,
-  })  : isRevisionMode = isRevisionMode ?? false.obs,
-        isDraftMode = isDraftMode ?? false.obs,
-        isRejectedMode = isRejectedMode ?? false.obs,
-        isDeletedMode = isDeletedMode ?? false.obs;
-
-  final RxBool isRevisionMode;
-  final RxBool isDraftMode;
-  final RxBool isRejectedMode;
-  final RxBool isDeletedMode;
+class NewsWidgets extends GetView<NewsController> {
+  const NewsWidgets({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +20,7 @@ class NewsWindowsPage extends GetView<NewsController> {
         ),
         child: Obx(
           () {
-            final bool allListsEmpty = controller.publishedNewsList.isEmpty &&
-                controller.inAnalysisNewsList.isEmpty &&
-                controller.myDraftsList.isEmpty &&
-                controller.rejectedNewsList.isEmpty &&
-                controller.deletedNewsList.isEmpty;
-
-            if (controller.isLoading.value || allListsEmpty) {
+            if (controller.isLoading.value || controller.isAllListsEmpty()) {
               return const Center(
                 child: BlinkingLoadingIcon(
                   size: 36,
@@ -48,11 +28,9 @@ class NewsWindowsPage extends GetView<NewsController> {
                 ),
               );
             }
+            List<NewsModel> selectedNewss = controller.getNewsForCurrentMode();
 
-            final List<NewsModel> validNews = _getNewsForCurrentMode();
-            final List<NewsModel> sortedNews = _sortByCreatedAt(validNews);
-
-            if (sortedNews.isEmpty) {
+            if (selectedNewss.isEmpty) {
               return Center(
                 child: Text(
                   'no_news_found'.tr,
@@ -69,16 +47,15 @@ class NewsWindowsPage extends GetView<NewsController> {
                 controller.selectedCardIndex.value = null;
               },
               child: ListView(
+                controller: ScrollController(),
                 children: [
-                  //const SizedBox(height: 16.0), // Espaço superior
-
-                  // Cards horizontais
-                  //_buildHorizontalCards(sortedNews),
-
                   const SizedBox(height: 16.0),
-
                   // Lista vertical de notícias
-                  ..._buildNewsList(sortedNews),
+                  ..._buildNewsList(selectedNewss),
+
+                  if (controller.homeController.isPublishedMode.value &&
+                      selectedNewss.isNotEmpty)
+                    _buildCreateMoreItem(),
                 ],
               ),
             );
@@ -88,100 +65,14 @@ class NewsWindowsPage extends GetView<NewsController> {
     );
   }
 
-  List<NewsModel> _getNewsForCurrentMode() {
-    if (isDeletedMode.value) {
-      return controller.deletedNewsList;
-    }
-
-    if (isRejectedMode.value) {
-      return controller.rejectedNewsList;
-    }
-
-    if (isRevisionMode.value) {
-      return controller.inAnalysisNewsList;
-    }
-
-    if (isDraftMode.value) {
-      return controller.myDraftsList;
-    }
-
-    return controller.publishedNewsList;
-  }
-
-  List<NewsModel> _sortByCreatedAt(List<NewsModel> newsList) {
-    final sortedList = List<NewsModel>.from(newsList);
-    sortedList.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return sortedList;
-  }
-
-  Widget _buildHorizontalCards(List<NewsModel> validNews) {
-    return SizedBox(
-      height: 120.0,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: validNews.map<Widget>((n) {
-            return GestureDetector(
-              onTap: () => controller.openNews(n),
-              child: Card(
-                color: Colors.grey[900],
-                margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: SizedBox(
-                  width: 120.0,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(8.0)),
-                        child: n.urlImages.isNotEmpty &&
-                                n.urlImages[0].isNotEmpty
-                            ? _buildSafeImage(n.urlImages[0], 70.0)
-                            : Image.asset(
-                                controller.getCityImageAsset(n.cities.isNotEmpty
-                                    ? n.cities[0]
-                                    : 'default'),
-                                fit: BoxFit.cover,
-                                width: 120.0,
-                                height: 70.0,
-                              ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          n.title,
-                          style: const TextStyle(
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
   List<Widget> _buildNewsList(List<NewsModel> validNews) {
     return validNews.asMap().entries.map<Widget>(
       (entry) {
-        final index = entry.key;
-        final news = entry.value;
+        int index = entry.key;
+        NewsModel news = entry.value;
 
         return Obx(() {
-          final isSelected = controller.isSelected(index);
+          bool isSelected = controller.isSelected(index);
 
           return Column(
             children: [
@@ -204,46 +95,39 @@ class NewsWindowsPage extends GetView<NewsController> {
                     runSpacing: 4.0,
                     children: [
                       // Ícone de editar (lápis)
-                      GestureDetector(
-                        onTap: () {
-                          if (controller.canEdit(news)) {
+                      if (controller.canEdit(news))
+                        GestureDetector(
+                          onTap: () {
                             controller.openEditNews(news);
-                          } else {
-                            _showAccessDeniedDialog(Get.context!);
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.edit,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              SizedBox(width: 8.0),
-                              Text(
-                                'edit'.tr,
-                                style: TextStyle(
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.edit,
                                   color: Colors.white,
-                                  fontSize: 25.0,
-                                  fontWeight: FontWeight.w600,
+                                  size: 30,
                                 ),
-                              ),
-                            ],
+                                SizedBox(width: 8.0),
+                                Text(
+                                  'edit'.tr,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 25.0,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
                       if (controller.canDelete(news))
                         GestureDetector(
                           onTap: () {
-                            hideNewsPopup(
-                                news.id,
-                                NewsStates.deletado,
-                                controller.user.email,
-                                news.createdBy,
-                                news.type);
+                            _hideNewsPopup(news.id, controller.user.email,
+                                news.createdBy, news.type);
                           },
                           child: Container(
                             padding: const EdgeInsets.all(8.0),
@@ -268,8 +152,7 @@ class NewsWindowsPage extends GetView<NewsController> {
                             ),
                           ),
                         ),
-
-                      if (isRevisionMode.value || controller.canReReview(news))
+                      if (controller.canReReview(news))
                         GestureDetector(
                           onTap: () => _showReviewDialog(news),
                           child: Container(
@@ -295,37 +178,7 @@ class NewsWindowsPage extends GetView<NewsController> {
                             ),
                           ),
                         ),
-
-                      if (isDeletedMode.value)
-                        GestureDetector(
-                          onTap: () => _showObservationDialog(
-                            news.excludedObservation,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.sticky_note_2_outlined,
-                                  color: Colors.orangeAccent,
-                                  size: 30,
-                                ),
-                                SizedBox(width: 8.0),
-                                Text(
-                                  'observations'.tr,
-                                  style: TextStyle(
-                                    color: Colors.orangeAccent,
-                                    fontSize: 25.0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                      if (isRejectedMode.value)
+                      if (controller.homeController.isRejectedMode.value)
                         GestureDetector(
                           onTap: () => _showObservationDialog(
                             news.rejectedObservation,
@@ -356,7 +209,7 @@ class NewsWindowsPage extends GetView<NewsController> {
                     ],
                   ),
                 ),
-              
+
               // Card da notícia
               GestureDetector(
                 onTap: () => controller.openNews(news),
@@ -477,8 +330,35 @@ class NewsWindowsPage extends GetView<NewsController> {
     ).toList();
   }
 
-  Future<void> hideNewsPopup(String newsId, String status, String userEmail,
-      String authorEmail, String type) async {
+  Widget _buildCreateMoreItem() {
+    return GestureDetector(
+      onTap: () {
+        controller.getMoreNews();
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 16.0),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(color: Colors.white24, width: 1.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 34,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _hideNewsPopup(
+      String newsId, String userEmail, String authorEmail, String type) async {
     await Get.dialog(
       AlertDialog(
         backgroundColor: Colors.grey[900],
@@ -501,9 +381,10 @@ class NewsWindowsPage extends GetView<NewsController> {
               Get.back();
               await controller.hideNews(
                 newsId: newsId,
-                status: status,
+                status: NewsStates.deletado,
                 userEmail: userEmail,
                 type: type,
+                creator: authorEmail,
               );
             },
             child: Text('delete'.tr, style: const TextStyle(color: Colors.red)),
@@ -514,26 +395,144 @@ class NewsWindowsPage extends GetView<NewsController> {
     );
   }
 
-  void _showAccessDeniedDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.grey[900],
-          title:
-              Text('access_denied'.tr, style: TextStyle(color: Colors.white)),
-          content: Text(
-            'only_author_can_edit'.tr,
-            style: TextStyle(color: Colors.white70),
+  Future<void> _showReviewDialog(NewsModel news) async {
+    await Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: Text(
+          'news_review'.tr,
+          style: const TextStyle(color: Colors.white),
+        ),
+        content: Text(
+          'choose_action_for_news'.tr,
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          // Botão de voltar adicionado para manter a consistência do fluxo
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'cancel'.tr, // Usa o "Cancelar" mapeado nas suas traduções
+              style: TextStyle(color: Colors.grey[400]),
+            ),
           ),
-          actions: [
+          if (news.status != NewsStates.publicado)
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('ok'.tr, style: const TextStyle(color: Colors.blue)),
+              onPressed: () async {
+                Get.back();
+                await _showReasonDialog(news, true);
+              },
+              child: Text(
+                'accept'.tr,
+                style: const TextStyle(color: Colors.green),
+              ),
+            ),
+          TextButton(
+            onPressed: () async {
+              Get.back();
+              await _showReasonDialog(news, false);
+            },
+            child: Text(
+              'reject'.tr,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+  Future<void> _showObservationDialog(String? observation) async {
+    final text = (observation ?? '').trim();
+
+    await Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: Text(
+          'observations'.tr,
+          style: const TextStyle(color: Colors.white),
+        ),
+        content: Text(
+          text.isEmpty ? 'no_observation_available'.tr : text,
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('close'.tr, style: const TextStyle(color: Colors.blue)),
+          ),
+        ],
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+  Future<void> _showReasonDialog(NewsModel news, bool accepted) async {
+    final TextEditingController _reasonController = TextEditingController();
+
+    await Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: Text(
+          accepted ? 'reason_to_accept'.tr : 'reason_to_reject'.tr,
+          style: const TextStyle(color: Colors.white),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'write_reason'.tr,
+              style: const TextStyle(color: Colors.white70),
+            ),
+            const SizedBox(height: 8.0),
+            TextField(
+              controller: _reasonController,
+              maxLines: 4,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'write_reason_here'.tr,
+                hintStyle: const TextStyle(color: Colors.white38),
+                filled: true,
+                fillColor: Colors.grey[850],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
           ],
-        );
-      },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'cancel'.tr,
+              style: TextStyle(color: Colors.grey[400]),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              final reason = _reasonController.text.trim();
+              Get.back();
+              await controller.reviewNews(
+                newsId: news.id,
+                isApproved: accepted,
+                reason: reason,
+                validator: controller.user.email,
+                creator: news.createdBy,
+                validatorName: controller.user.name ?? '',
+                newsType: news.type,
+              );
+            },
+            child: Text(
+              'send'.tr,
+              style: TextStyle(color: accepted ? Colors.green : Colors.red),
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible: true,
     );
   }
 
@@ -591,130 +590,5 @@ class NewsWindowsPage extends GetView<NewsController> {
         ),
       );
     }
-  }
-
-  Future<void> _showReviewDialog(NewsModel news) async {
-    await Get.dialog(
-      AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: Text(
-          'news_review'.tr,
-          style: TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          'choose_action_for_news'.tr,
-          style: TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              Get.back();
-              await _showReasonDialog(news, true);
-            },
-            child:
-                Text('accept'.tr, style: const TextStyle(color: Colors.green)),
-          ),
-          TextButton(
-            onPressed: () async {
-              Get.back();
-              await _showReasonDialog(news, false);
-            },
-            child: Text('reject'.tr, style: const TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-      barrierDismissible: true,
-    );
-  }
-
-  Future<void> _showObservationDialog(String? observation) async {
-    final text = (observation ?? '').trim();
-
-    await Get.dialog(
-      AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: Text(
-          'observations'.tr,
-          style: const TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          text.isEmpty ? 'no_observation_available'.tr : text,
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text('close'.tr, style: const TextStyle(color: Colors.blue)),
-          ),
-        ],
-      ),
-      barrierDismissible: true,
-    );
-  }
-
-  Future<void> _showReasonDialog(NewsModel news, bool accepted) async {
-    final TextEditingController _reasonController = TextEditingController();
-
-    await Get.dialog(
-      AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: Text(
-          accepted ? 'reason_to_accept'.tr : 'reason_to_reject'.tr,
-          style: const TextStyle(color: Colors.white),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'write_reason'.tr,
-              style: TextStyle(color: Colors.white70),
-            ),
-            const SizedBox(height: 8.0),
-            TextField(
-              controller: _reasonController,
-              maxLines: 4,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'write_reason_here'.tr,
-                hintStyle: TextStyle(color: Colors.white38),
-                filled: true,
-                fillColor: Colors.grey[850],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child:
-                Text('cancel'.tr, style: const TextStyle(color: Colors.blue)),
-          ),
-          TextButton(
-            onPressed: () async {
-              final reason = _reasonController.text.trim();
-              Get.back();
-              await controller.reviewNews(
-                newsId: news.id,
-                isApproved: accepted,
-                reason: reason,
-                validator: controller.user.email,
-                creator: news.createdBy,
-                validatorName: controller.user.name ?? '',
-                newsType: news.type,
-              );
-            },
-            child: Text(
-              'send'.tr,
-              style: TextStyle(color: accepted ? Colors.green : Colors.red),
-            ),
-          ),
-        ],
-      ),
-      barrierDismissible: true,
-    );
   }
 }

@@ -22,7 +22,7 @@ Future<void> main() async {
   runApp(
     GetMaterialApp(
       title: 'Redes Comunicacionais',
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
       getPages: AppPages.routes,
       initialRoute: Routes.INITIAL,
 
