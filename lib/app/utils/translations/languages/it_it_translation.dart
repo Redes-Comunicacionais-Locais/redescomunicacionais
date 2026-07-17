@@ -201,4 +201,5 @@ final Map<String, String> itItTranslation = {
   'Painel editorial': 'Pannello editoriale',
   'Crie e organize as matérias em um único lugar.':
       'Crea e organizza le notizie in un unico posto.',
+  'Carregar mais Matérias': 'Carica altri notizie',
 };
