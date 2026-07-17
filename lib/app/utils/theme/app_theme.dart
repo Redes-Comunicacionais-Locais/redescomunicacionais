@@ -6,17 +6,11 @@ final ThemeData appThemeData = ThemeData(
   hintColor: Colors.cyan[600],
   appBarTheme: const AppBarTheme(
     color: Colors.black,
-    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+    titleTextStyle: TextStyle(
+      color: Colors.white,
+      fontSize: 20,
+    ),
   ),
 );
-//Possivel mudança de temas
-/*
-final ThemeData appThemeDataDark = ThemeData(
-  primaryColor: Colors.black,
-  brightness: Brightness.light,
-  hintColor: Colors.cyan[600],
-  appBarTheme: const AppBarTheme(
-    color: Colors.black,
-    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
-  ),
-);*/
+
+final ThemeData appThemeDataDark = ThemeData.dark();
