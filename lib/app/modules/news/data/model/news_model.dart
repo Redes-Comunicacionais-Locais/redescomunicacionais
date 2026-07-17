@@ -46,6 +46,9 @@ class NewsModel {
   @HiveField(26)
   DateTime lastUpdated;
 
+  @HiveField(31)
+  Map<String, dynamic>? publicationTerms;
+
   // ==========================================
   // 3. CRIAÇÃO E AUTORIA
   // ==========================================
@@ -130,6 +133,7 @@ class NewsModel {
     this.excludedBy,
     this.excludedAt,
     this.excludedObservation,
+    this.publicationTerms,
   }) : id = id ?? Uuid().v4();
 
   Map<String, dynamic> toMap() {
@@ -159,6 +163,7 @@ class NewsModel {
       'excludedBy': excludedBy,
       'excludedAt': excludedAt != null ? Timestamp.fromDate(excludedAt!) : null,
       'excludedObservation': excludedObservation,
+      'publicationTerms': publicationTerms,
     };
 
     const requiredKeys = {
@@ -212,6 +217,9 @@ class NewsModel {
       excludedBy: map['excludedBy'] as String?,
       excludedAt: _parseDate(map['excludedAt']),
       excludedObservation: map['excludedObservation'] as String?,
+      publicationTerms: map['publicationTerms'] != null
+          ? Map<String, dynamic>.from(map['publicationTerms'])
+          : null,
     );
   }
 
