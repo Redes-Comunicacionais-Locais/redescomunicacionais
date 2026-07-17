@@ -66,7 +66,7 @@ class NewsController extends GetxController {
     if (lastDocument == null) {
       return; // Não há mais notícias para carregar
     }
-    await getPublicNewsFromHive(lastDocument);
+    await getPublicNewsFromHive(lastDocument, isGetMoreNews: true);
   }
 
   Future<void> getOuthersNewsFromHive() async {
@@ -114,9 +114,12 @@ class NewsController extends GetxController {
   }
 
   Future<void> getPublicNewsFromHive(
-      QueryDocumentSnapshot<Map<String, dynamic>>? ld) async {
+      QueryDocumentSnapshot<Map<String, dynamic>>? ld,
+      {bool isGetMoreNews = false}) async {
     try {
-      isLoading(true);
+      if (!isGetMoreNews) {
+        isLoading(true);
+      }
       lastDocument = await _repository.getPublicNewsPaginated(
           ld); // Atualiza o Hive com os dados do Firebase e obtém o próximo ponteiro de paginação
       List<NewsModel> publicNews = await _repository.getPublicNewsFromHive();

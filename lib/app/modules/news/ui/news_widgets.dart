@@ -345,12 +345,9 @@ class NewsWidgets extends GetView<NewsController> {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(
-              Icons.add,
-              color: Colors.white,
-              size: 34,
-            ),
+          children: [
+            Text('Carregar mais Matérias'.tr,
+                style: TextStyle(color: Colors.white))
           ],
         ),
       ),
