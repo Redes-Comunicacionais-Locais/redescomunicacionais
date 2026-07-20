@@ -66,7 +66,7 @@ class NewsController extends GetxController {
     if (lastDocument == null) {
       return; // Não há mais notícias para carregar
     }
-    await getPublicNewsFromHive(lastDocument);
+    await getPublicNewsFromHive(lastDocument, isGetMoreNews: true);
   }
 
   Future<void> getOuthersNewsFromHive() async {
@@ -114,9 +114,12 @@ class NewsController extends GetxController {
   }
 
   Future<void> getPublicNewsFromHive(
-      QueryDocumentSnapshot<Map<String, dynamic>>? ld) async {
+      QueryDocumentSnapshot<Map<String, dynamic>>? ld,
+      {bool isGetMoreNews = false}) async {
     try {
-      isLoading(true);
+      if (!isGetMoreNews) {
+        isLoading(true);
+      }
       lastDocument = await _repository.getPublicNewsPaginated(
           ld); // Atualiza o Hive com os dados do Firebase e obtém o próximo ponteiro de paginação
       List<NewsModel> publicNews = await _repository.getPublicNewsFromHive();
@@ -139,19 +142,19 @@ class NewsController extends GetxController {
     }
   }
 
-  Future<void> addNews(
-    String title,
-    String? subtitle,
-    List<String> cities,
-    List<String> categories,
-    String body,
-    List<String> urlImages,
-    String author,
-    String email,
-    String type,
-    String status,
-    String? videoUrl,
-  ) async {
+  Future<String> addNews(
+      String title,
+      String? subtitle,
+      List<String> cities,
+      List<String> categories,
+      String body,
+      List<String> urlImages,
+      String author,
+      String email,
+      String type,
+      String status,
+      String? videoUrl,
+      ) async {
     isLoading(true);
 
     try {
@@ -172,11 +175,30 @@ class NewsController extends GetxController {
       );
 
       await _repository.saveNewsToHive(news);
+
       await syncNews(null);
+
+      return news.id;
+
     } catch (e) {
       throw Exception("Erro ao salvar notícia: $e");
+
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<void> savePublicationTerms({
+    required String newsId,
+    required Map<String, dynamic> terms,
+  }) async {
+    try {
+      await _repository.savePublicationTerms(
+        newsId: newsId,
+        terms: terms,
+      );
+    } catch (e) {
+      throw Exception("Erro ao salvar formulário: $e");
     }
   }
 

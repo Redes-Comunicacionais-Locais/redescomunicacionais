@@ -60,6 +60,8 @@ class NewsCenterPage extends GetView<NewsCenterController> {
                             accentColor: Colors.greenAccent,
                             onTap: () => Get.toNamed(Routes.CREATE_NEWS),
                           ),
+
+
                           _ActionCard(
                             title: 'Revisar Matérias'.tr,
                             subtitle:
