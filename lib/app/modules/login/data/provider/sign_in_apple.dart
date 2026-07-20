@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/modules/user/data/repository/user_repository.dart';
 
 class SignInApple {
@@ -11,7 +10,7 @@ class SignInApple {
     _firebaseAuth = FirebaseAuth.instance;
   }
 
-  Future<UserModel> signInWithApple() async {
+  Future<void> signInWithApple() async {
     try {
       // Usa o provider nativo do Firebase em todas as plataformas
       final appleProvider = AppleAuthProvider();
@@ -36,7 +35,7 @@ class SignInApple {
       rethrow;
     }
 
-      throw Exception("Erro ao fazer login com Apple");
+    throw Exception("Erro ao fazer login com Apple");
   }
 
   Future<void> _onAppleSignIn(UserCredential credential) async {
@@ -52,7 +51,7 @@ class SignInApple {
     }
   }
 
-  Future<UserModel> _createUserDoc(User userCredential) async {
+  Future<void> _createUserDoc(User userCredential) async {
     try {
       return await _userRepository.createUserDoc(
         userCredential.email ?? '',

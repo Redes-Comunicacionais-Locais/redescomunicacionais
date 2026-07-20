@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/controller/home_controller.dart';
 import 'package:redescomunicacionais/app/modules/login/controller/login_controller.dart';
-import 'package:redescomunicacionais/app/modules/user/controller/user_controller.dart';
+import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
+import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 
-class MenuPage extends StatelessWidget {
-  final HomeController _homeController = Get.find<HomeController>();
-  final UserController _userController = Get.find<UserController>();
+class MenuPage extends GetView<HomeController> {
   final bool isHorizontal;
   final double? iconSize;
   final bool? isTablet;
 
-  MenuPage({
+  const MenuPage({
     super.key,
     this.isHorizontal = false,
     this.iconSize,
@@ -38,174 +37,188 @@ class MenuPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return isHorizontal
-        ? _buildHorizontalMenu(context)
-        : _buildDrawerMenu(context);
+    return GetBuilder<HomeController>(
+      builder: (_) {
+        return isHorizontal
+            ? _buildHorizontalMenu(context)
+            : _buildDrawerMenu(context);
+      },
+    );
   }
 
-  /// Menu para layout vertical (Drawer)
   Widget _buildDrawerMenu(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.black,
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Colors.blue,
-                  Colors.black,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.darkBlueToBlackGradient(),
+        ),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.white12,
+                    backgroundImage: NetworkImage(
+                      _profileImageUrl,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _profileName,
+                          style: const TextStyle(
+                            fontSize: 13.0,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          _profileEmail,
+                          style: const TextStyle(
+                            fontSize: 10.0,
+                            color: Colors.white,
+                            fontStyle: FontStyle.italic,
+                            fontFamily: 'Montserrat',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: NetworkImage(_homeController.user.urlImage ??
-                      'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'),
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${_homeController.user.name}',
-                      style: const TextStyle(
-                        fontSize: 10.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Montserrat',
-                      ),
-                    ),
-                    Text(
-                      _homeController.user.email,
-                      style: const TextStyle(
-                        fontSize: 10.0,
-                        color: Colors.white,
-                        fontStyle: FontStyle.italic,
-                        fontFamily: 'Montserrat',
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+            _buildAdminItem(context, isDrawer: true),
+            _buildRestrictedMenuItem(
+              context,
+              icon: Icons.newspaper,
+              title: 'central_da_materia'.tr,
+              onTap: () => Get.toNamed(Routes.NEWSCENTER),
             ),
-          ),
-          _buildCreateNewsItem(context, isDrawer: true),
-          _buildAdminItem(context, isDrawer: true),
-          _buildRestrictedMenuItem(
-            context,
-            icon: Icons.newspaper,
-            title: 'Central da notícia'.tr,
-            onTap: () => Get.toNamed(Routes.NEWSCENTER),
-          ),
-          _buildRestrictedMenuItem(
-            context,
-            icon: Icons.chat_bubble_outline,
-            title: 'Central de Comnunicação'.tr,
-            onTap: () => Get.toNamed(Routes.CENTRAL_DE_COMUNICACAO),
-          ),
-          if (!_homeController.isAnonymousUser)
+            if (!controller.isAnonymousUser)
+              ListTile(
+                leading:
+                    const Icon(Icons.chat_bubble_outline, color: Colors.white),
+                title: Text(
+                  'central_de_comunicacao'.tr,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Get.back();
+                  Get.toNamed(Routes.CENTRAL_DE_COMUNICACAO);
+                },
+              ),
+            if (!controller.isAnonymousUser)
+              ListTile(
+                leading: const Icon(Icons.person_outline, color: Colors.white),
+                title: Text(
+                  'Seus Dados'.tr,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Get.back();
+                  Get.toNamed(Routes.USER);
+                },
+              ),
             ListTile(
-              leading: const Icon(Icons.person_outline, color: Colors.white),
+              leading: const Icon(Icons.wifi, color: Colors.white),
               title: Text(
-                'Seus Dados'.tr,
+                'Conexões'.tr,
                 style: const TextStyle(color: Colors.white),
               ),
               onTap: () {
-                Navigator.pop(context);
-                Get.toNamed(Routes.USER);
+                Get.back();
+                Get.toNamed(Routes.CONNECTIONS);
               },
             ),
             ListTile(
-            leading: const Icon(Icons.wifi, color: Colors.white),
-            title: Text(
-              'Conexões',
-              style: const TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              Get.toNamed(Routes.CONNECTIONS);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.info_outline, color: Colors.white),
-            title: Text(
-              'Sobre'.tr,
-              style: const TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              _showAboutDialog(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.language, color: Colors.white),
-            title: Text(
-              'language'.tr,
-              style: const TextStyle(color: Colors.white),
-            ),
-            trailing: DropdownButtonHideUnderline(
-              child: DropdownButton<Locale>(
-                dropdownColor: Colors.black,
-                value: _safeCurrentLocale(),
-                iconEnabledColor: Colors.white,
+              leading: const Icon(Icons.info_outline, color: Colors.white),
+              title: Text(
+                'Sobre'.tr,
                 style: const TextStyle(color: Colors.white),
-                items: [
-                  DropdownMenuItem(
-                    value: const Locale('pt', 'BR'),
-                    child: Text('language_portuguese_brazil'.tr),
-                  ),
-                  DropdownMenuItem(
-                    value: const Locale('en', 'US'),
-                    child: Text('language_english_us'.tr),
-                  ),
-                  DropdownMenuItem(
-                    value: const Locale('it', 'IT'),
-                    child: Text('language_italian'.tr),
-                  ),
-                  DropdownMenuItem(
-                    value: const Locale('es', 'ES'),
-                    child: Text('language_spanish'.tr),
-                  ),
-                ],
-                onChanged: (newValue) {
-                  if (newValue != null) {
-                    Get.updateLocale(newValue);
-                  }
-                },
+              ),
+              onTap: () {
+                Get.back();
+                _showAboutDialog(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.language, color: Colors.white),
+              title: Text(
+                'language'.tr,
+                style: const TextStyle(color: Colors.white),
+              ),
+              trailing: DropdownButtonHideUnderline(
+                child: DropdownButton<Locale>(
+                  dropdownColor: Colors.black,
+                  value: _safeCurrentLocale(),
+                  iconEnabledColor: Colors.white,
+                  style: const TextStyle(color: Colors.white),
+                  items: [
+                    DropdownMenuItem(
+                      value: const Locale('pt', 'BR'),
+                      child: Text('language_portuguese_brazil'.tr),
+                    ),
+                    DropdownMenuItem(
+                      value: const Locale('en', 'US'),
+                      child: Text('language_english_us'.tr),
+                    ),
+                    DropdownMenuItem(
+                      value: const Locale('it', 'IT'),
+                      child: Text('language_italian'.tr),
+                    ),
+                    DropdownMenuItem(
+                      value: const Locale('es', 'ES'),
+                      child: Text('language_spanish'.tr),
+                    ),
+                  ],
+                  onChanged: (newValue) {
+                    if (newValue != null) {
+                      Get.updateLocale(newValue);
+                    }
+                  },
+                ),
               ),
             ),
-          ),
-          ListTile(
-            leading: Icon(
-              _homeController.isAnonymousUser ? Icons.login : Icons.exit_to_app,
-              color: Colors.white,
+            ListTile(
+              leading: Icon(
+                controller.isAnonymousUser ? Icons.login : Icons.exit_to_app,
+                color: Colors.white,
+              ),
+              title: Text(
+                controller.isAnonymousUser ? 'Entrar'.tr : 'Sair'.tr,
+                style: const TextStyle(color: Colors.white),
+              ),
+              onTap: () {
+                Get.back();
+                if (controller.isAnonymousUser) {
+                  Get.toNamed(Routes.LOGIN);
+                } else {
+                  LoginController().logout();
+                }
+              },
             ),
-            title: Text(
-              _homeController.isAnonymousUser ? 'Entrar'.tr : 'Sair'.tr,
-              style: const TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              LoginController().logout();
-            },
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  /// Menu para layout horizontal
   Widget _buildHorizontalMenu(BuildContext context) {
     return Column(
       children: [
-        // Header com perfil
         Container(
           padding: EdgeInsets.symmetric(
             vertical: isTablet! ? 15.0 : 12.0,
@@ -217,10 +230,8 @@ class MenuPage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: isTablet! ? 25 : 20,
-                    backgroundImage: _homeController.user.urlImage != null
-                        ? NetworkImage(_homeController.user.urlImage!)
-                        : const NetworkImage(
-                            'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'),
+                    backgroundColor: Colors.white12,
+                    backgroundImage: NetworkImage(_profileImageUrl),
                   ),
                   SizedBox(width: isTablet! ? 12.0 : 8.0),
                   Expanded(
@@ -228,7 +239,7 @@ class MenuPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _homeController.user.name ?? 'rcl_user'.tr,
+                          _profileName,
                           style: TextStyle(
                             fontSize: isTablet! ? 12.0 : 10.0,
                             color: Colors.white,
@@ -238,7 +249,7 @@ class MenuPage extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          _homeController.user.email,
+                          _profileEmail,
                           style: TextStyle(
                             fontSize: isTablet! ? 10.0 : 8.0,
                             color: Colors.white70,
@@ -260,7 +271,6 @@ class MenuPage extends StatelessWidget {
             ],
           ),
         ),
-        // Menu items
         Expanded(
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(
@@ -272,7 +282,7 @@ class MenuPage extends StatelessWidget {
                 _buildHorizontalMenuTile(
                   icon: Icons.help_outline,
                   title: 'help'.tr,
-                  onTap: () => _homeController.goUserGuide(),
+                  onTap: () => controller.goUserGuide(),
                 ),
                 _buildHorizontalMenuTile(
                   icon: Icons.search,
@@ -282,29 +292,27 @@ class MenuPage extends StatelessWidget {
                 SizedBox(height: isTablet! ? 15.0 : 10.0),
                 Divider(color: Colors.white.withOpacity(0.2), thickness: 0.5),
                 SizedBox(height: isTablet! ? 15.0 : 10.0),
-                _buildCreateNewsItem(context, isDrawer: false),
                 _buildAdminItem(context, isDrawer: false),
-                // _buildReviewItem(context, isDrawer: false),
-                //_buildDraftsItem(context, isDrawer: false),
                 SizedBox(height: isTablet! ? 15.0 : 10.0),
                 Divider(color: Colors.white.withOpacity(0.2), thickness: 0.5),
                 SizedBox(height: isTablet! ? 15.0 : 10.0),
                 _buildRestrictedHorizontalMenuTile(
-                  icon: Icons.chat_bubble_outline,
+                  icon: Icons.newspaper,
                   title: 'Central da notícia'.tr,
                   onTap: () => Get.toNamed(Routes.NEWSCENTER),
                 ),
-                _buildRestrictedHorizontalMenuTile(
-                  icon: Icons.chat_bubble_outline,
-                  title: 'Central de Comnunicação'.tr,
-                  onTap: () => Get.toNamed(Routes.CENTRAL_DE_COMUNICACAO),
-                ),
+                if (!controller.isAnonymousUser)
+                  _buildHorizontalMenuTile(
+                    icon: Icons.chat_bubble_outline,
+                    title: 'Central de Comnunicação'.tr,
+                    onTap: () => Get.toNamed(Routes.CENTRAL_DE_COMUNICACAO),
+                  ),
                 _buildHorizontalMenuTile(
                   icon: Icons.info_outline,
                   title: 'Sobre'.tr,
                   onTap: () => _showAboutDialog(context),
                 ),
-                if (!_homeController.isAnonymousUser)
+                if (!controller.isAnonymousUser)
                   _buildHorizontalMenuTile(
                     icon: Icons.person_outline,
                     title: 'Seus Dados'.tr,
@@ -316,12 +324,17 @@ class MenuPage extends StatelessWidget {
                   onTap: () => _showLanguageDialog(context),
                 ),
                 _buildHorizontalMenuTile(
-                  icon: _homeController.isAnonymousUser
+                  icon: controller.isAnonymousUser
                       ? Icons.login
                       : Icons.exit_to_app,
-                  title:
-                      _homeController.isAnonymousUser ? 'Entrar'.tr : 'Sair'.tr,
-                  onTap: () => LoginController().logout(),
+                  title: controller.isAnonymousUser ? 'Entrar'.tr : 'Sair'.tr,
+                  onTap: () {
+                    if (controller.isAnonymousUser) {
+                      Get.toNamed(Routes.LOGIN);
+                    } else {
+                      LoginController().logout();
+                    }
+                  },
                   iconColor: Colors.red,
                 ),
                 SizedBox(height: isTablet! ? 20.0 : 15.0),
@@ -333,131 +346,75 @@ class MenuPage extends StatelessWidget {
     );
   }
 
-  /// Build item para Criar Matéria com verificação de permissão
-  Widget _buildCreateNewsItem(BuildContext context, {required bool isDrawer}) {
-    return Obx(() {
-      _userController.loadUserRole(_homeController.user.id);
-      final hasPermission =
-          _userController.isAdmin.value || _userController.isEditor.value;
-
-      if (!hasPermission) {
-        return const SizedBox.shrink();
-      }
-
-      if (isDrawer) {
-        return ListTile(
-          leading: Icon(
-            Icons.article_outlined,
-            color: Colors.white,
-          ),
-          title: Text(
-            'Criar Matéria'.tr,
-            style: const TextStyle(color: Colors.white),
-          ),
-          onTap: () {
-            Navigator.pop(context);
-            Get.toNamed(Routes.CREATE_NEWS);
-          },
-        );
-      } else {
-        return _buildHorizontalMenuTile(
-          icon: Icons.article_outlined,
-          title: 'Criar Matéria'.tr,
-          onTap: () => Get.toNamed(Routes.CREATE_NEWS),
-          iconColor: Colors.white,
-        );
-      }
-    });
-  }
-
-  /// Build item para Admin com verificação de permissão
   Widget _buildAdminItem(BuildContext context, {required bool isDrawer}) {
-    return Obx(() {
-      _userController.loadUserRole(_homeController.user.id);
-      final isAdmin = _userController.isAdmin.value;
+    if (controller.user.role != UserRoles.admin) {
+      return const SizedBox.shrink();
+    }
 
-      if (!isAdmin) {
-        return const SizedBox.shrink();
-      }
+    if (isDrawer) {
+      return ListTile(
+        leading: const Icon(Icons.person_outline, color: Colors.white),
+        title: Text(
+          'Admin'.tr,
+          style: const TextStyle(color: Colors.white),
+        ),
+        onTap: () {
+          Get.back();
+          Get.toNamed(Routes.ADMIN);
+        },
+      );
+    }
 
-      if (isDrawer) {
-        return ListTile(
-          leading: const Icon(Icons.person_outline, color: Colors.white),
-          title: Text(
-            'Admin'.tr,
-            style: const TextStyle(color: Colors.white),
-          ),
-          onTap: () {
-            Navigator.pop(context);
-            Get.toNamed(Routes.ADMIN);
-          },
-        );
-      } else {
-        return _buildHorizontalMenuTile(
-          icon: Icons.person_outline,
-          title: 'Admin'.tr,
-          onTap: () => Get.toNamed(Routes.ADMIN),
-          iconColor: Colors.white,
-        );
-      }
-    });
+    return _buildHorizontalMenuTile(
+      icon: Icons.person_outline,
+      title: 'Admin'.tr,
+      onTap: () => Get.toNamed(Routes.ADMIN),
+      iconColor: Colors.white,
+    );
   }
 
-  /// Itens que só aparecem para admin/editor
   Widget _buildRestrictedMenuItem(
     BuildContext context, {
     required IconData icon,
     required String title,
     required VoidCallback onTap,
   }) {
-    return Obx(() {
-      _userController.loadUserRole(_homeController.user.id);
-      final hasPermission =
-          _userController.isAdmin.value || _userController.isEditor.value;
+    if (controller.user.role != UserRoles.admin &&
+        controller.user.role != UserRoles.editor) {
+      return const SizedBox.shrink();
+    }
 
-      if (!hasPermission) {
-        return const SizedBox.shrink();
-      }
-
-      return ListTile(
-        leading: Icon(icon, color: Colors.white),
-        title: Text(
-          title,
-          style: const TextStyle(color: Colors.white),
-        ),
-        onTap: () {
-          Navigator.pop(context);
-          onTap();
-        },
-      );
-    });
+    return ListTile(
+      leading: Icon(icon, color: Colors.white),
+      title: Text(
+        title,
+        style: const TextStyle(color: Colors.white),
+      ),
+      onTap: () {
+        Get.back();
+        onTap();
+      },
+    );
   }
 
-  /// Itens horizontais que só aparecem para admin/editor
   Widget _buildRestrictedHorizontalMenuTile({
     required IconData icon,
     required String title,
     required VoidCallback onTap,
   }) {
-    return Obx(() {
-      _userController.loadUserRole(_homeController.user.id);
-      final hasPermission =
-          _userController.isAdmin.value || _userController.isEditor.value;
+    if (controller.user.role != UserRoles.admin &&
+        controller.user.role != UserRoles.editor) {
+      return const SizedBox.shrink();
+    }
 
-      if (!hasPermission) {
-        return const SizedBox.shrink();
-      }
-
-      return _buildHorizontalMenuTile(
-        icon: icon,
-        title: title,
-        onTap: onTap,
-        iconColor: Colors.white,
-      );
-    });
+    return _buildHorizontalMenuTile(
+      icon: icon,
+      title: title,
+      onTap: onTap,
+      iconColor: Colors.white,
+    );
   }
 
-  /// Builder para itens de menu no layout horizontal
   Widget _buildHorizontalMenuTile({
     required IconData icon,
     required String title,
@@ -492,7 +449,6 @@ class MenuPage extends StatelessWidget {
     );
   }
 
-  /// Dialog "Sobre"
   void _showAboutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -513,8 +469,8 @@ class MenuPage extends StatelessWidget {
                   style: const TextStyle(color: Colors.white),
                 ),
                 onTap: () {
-                  Navigator.pop(context);
-                  _homeController.goAboutUs();
+                  Get.back();
+                  controller.goAboutUs();
                 },
               ),
               ListTile(
@@ -524,8 +480,8 @@ class MenuPage extends StatelessWidget {
                   style: const TextStyle(color: Colors.white),
                 ),
                 onTap: () {
-                  Navigator.pop(context);
-                  _homeController.goUserGuide();
+                  Get.back();
+                  controller.goUserGuide();
                 },
               ),
               ListTile(
@@ -535,15 +491,15 @@ class MenuPage extends StatelessWidget {
                   style: const TextStyle(color: Colors.white),
                 ),
                 onTap: () {
-                  Navigator.pop(context);
-                  _homeController.goFAQ();
+                  Get.back();
+                  controller.goFAQ();
                 },
               ),
               const SizedBox(height: 16),
               Center(
                 child: Obx(
                   () => Text(
-                    '${'version_label'.tr}: ${_homeController.appVersion.value}',
+                    '${'version_label'.tr}: ${controller.appVersion.value}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,
@@ -559,12 +515,11 @@ class MenuPage extends StatelessWidget {
     );
   }
 
-  /// Dialog para filtro de notícias
   void _showFilterDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        TextEditingController searchController = TextEditingController();
+        final TextEditingController searchController = TextEditingController();
         return AlertDialog(
           title: Text('filter_news'.tr),
           content: TextField(
@@ -576,14 +531,14 @@ class MenuPage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Get.back();
               },
               child: Text('cancel'.tr),
             ),
             TextButton(
               onPressed: () {
-                _homeController.filterNewsByName(searchController.text);
-                Navigator.of(context).pop();
+                controller.filterNewsByName(searchController.text);
+                Get.back();
               },
               child: Text('filter'.tr),
             ),
@@ -593,7 +548,6 @@ class MenuPage extends StatelessWidget {
     );
   }
 
-  /// Dialog para trocar idioma
   void _showLanguageDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -630,12 +584,11 @@ class MenuPage extends StatelessWidget {
     );
   }
 
-  /// Option de idioma
   Widget _buildLanguageOption(String label, Locale locale) {
     return InkWell(
       onTap: () {
         Get.updateLocale(locale);
-        Navigator.pop(Get.context!);
+        Get.back();
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -645,5 +598,37 @@ class MenuPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String get _profileName {
+    final name = controller.user.name?.trim();
+    if (name != null && name.isNotEmpty) {
+      return name;
+    }
+
+    if (controller.isAnonymousUser) {
+      return 'rcl_user'.tr;
+    }
+
+    return controller.user.email.isNotEmpty
+        ? controller.user.email
+        : 'rcl_user'.tr;
+  }
+
+  String get _profileEmail {
+    if (controller.isAnonymousUser) {
+      return 'Convidado';
+    }
+
+    return controller.user.email;
+  }
+
+  String get _profileImageUrl {
+    final imageUrl = controller.user.urlImage?.trim();
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return imageUrl;
+    }
+
+    return 'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png';
   }
 }

@@ -13,7 +13,11 @@ class CreateNewsPage extends GetView<CreateNewsFormController> {
     return Scaffold(
       appBar: AppBar(
         title: Text('add_news'.tr),
-        backgroundColor: Colors.black,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.appBarBottomGradient(),
+          ),
+        ),
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
       ),

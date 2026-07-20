@@ -3,7 +3,6 @@ import 'package:redescomunicacionais/app/modules/dashboard/controller/home_contr
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 
 class NewsCenterController extends GetxController {
-
   late HomeController _homeController;
 
   @override
@@ -11,6 +10,7 @@ class NewsCenterController extends GetxController {
     _homeController = Get.find<HomeController>();
     super.onInit();
   }
+
   void openNewsMode(String mode) {
     switch (mode) {
       case 'revision':
@@ -18,28 +18,30 @@ class NewsCenterController extends GetxController {
         _homeController.isDraftMode.value = false;
         _homeController.isRejectedMode.value = false;
         _homeController.isDeletedMode.value = false;
+        _homeController.isPublishedMode.value = false;
         break;
       case 'drafts':
         _homeController.isRevisionMode.value = false;
         _homeController.isDraftMode.value = true;
         _homeController.isRejectedMode.value = false;
         _homeController.isDeletedMode.value = false;
+        _homeController.isPublishedMode.value = false;
         break;
       case 'rejected':
         _homeController.isRevisionMode.value = false;
         _homeController.isDraftMode.value = false;
         _homeController.isRejectedMode.value = true;
         _homeController.isDeletedMode.value = false;
+        _homeController.isPublishedMode.value = false;
         break;
       case 'deleted':
         _homeController.isRevisionMode.value = false;
         _homeController.isDraftMode.value = false;
         _homeController.isRejectedMode.value = false;
         _homeController.isDeletedMode.value = true;
+        _homeController.isPublishedMode.value = false;
         break;
     }
     Get.toNamed(Routes.HOME);
   }
-
- 
 }

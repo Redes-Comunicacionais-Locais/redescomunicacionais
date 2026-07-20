@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/controller/home_controller.dart';
-import 'package:redescomunicacionais/app/modules/connections/controller/connections_controller.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
-import 'package:redescomunicacionais/app/modules/news/ui/news_windows.page.dart';
+import 'package:redescomunicacionais/app/modules/news/ui/news_widgets.dart';
 import 'package:redescomunicacionais/app/utils/responsive_utils.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/utils/menu_drawer.dart';
@@ -25,10 +24,8 @@ class HomePage extends GetView<HomeController> {
     double appBarTitleSize = ResponsiveUtils.calculateAppBarTitleSize(
         screenWidth, isTablet, useHorizontalLayout);
     double iconSize = ResponsiveUtils.calculateIconSize(screenWidth, isTablet);
-    double bottomBarHeight =
-        ResponsiveUtils.calculateBottomBarHeight(screenHeight, isTablet);
-    double bottomBarFontSize =
-        ResponsiveUtils.calculateBottomBarFontSize(screenWidth, isTablet);
+    ResponsiveUtils.calculateBottomBarHeight(screenHeight, isTablet);
+    ResponsiveUtils.calculateBottomBarFontSize(screenWidth, isTablet);
 
     return Scaffold(
       appBar: useHorizontalLayout
@@ -48,28 +45,15 @@ class HomePage extends GetView<HomeController> {
                             : controller.isDeletedMode.value
                                 ? 'Matérias excluídas'.tr
                                 : 'app_short_name'.tr;
-                return Row(
-                  children: [
-                    SizedBox(width: isTablet ? 10.0 : 8.0),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            titleText,
-                            style: TextStyle(
-                              fontSize: appBarTitleSize,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                return Text(
+                  titleText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: appBarTitleSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 );
               }),
               shape: const RoundedRectangleBorder(
@@ -78,7 +62,7 @@ class HomePage extends GetView<HomeController> {
               ),
               flexibleSpace: Container(
                 decoration: BoxDecoration(
-                  gradient: AppColors.appBarTopGradient(),
+                  gradient: AppColors.appBarBottomGradient(),
                 ),
               ),
               iconTheme: IconThemeData(
@@ -97,7 +81,7 @@ class HomePage extends GetView<HomeController> {
                           controller.isDraftMode.value = false;
                           controller.isRejectedMode.value = false;
                           controller.isDeletedMode.value = false;
-                          controller.isMyDraftsMode.value = false;
+                          controller.isPublishedMode.value = true;
                         },
                         icon:
                             const Icon(Icons.arrow_back, color: Colors.orange),
@@ -111,7 +95,9 @@ class HomePage extends GetView<HomeController> {
                       onPressed: () => Get.toNamed(Routes.CONNECTIONS),
                       icon: Icon(
                         Icons.wifi,
-                        color: conn.isInternetConnected.value ? Colors.green : Colors.red,
+                        color: conn.isInternetConnected.value
+                            ? Colors.green
+                            : Colors.red,
                         size: iconSize,
                       ),
                     ),
@@ -155,7 +141,6 @@ class HomePage extends GetView<HomeController> {
                     );
                   },
                 ),
-          
                 IconButton(
                   iconSize: iconSize,
                   icon: const Icon(Icons.help_outline),
@@ -171,7 +156,7 @@ class HomePage extends GetView<HomeController> {
           await controller.refreshDashboardData();
         },
         child: Obx(
-          () => controller.isLoadingLocation.value
+          () => false
               ? Container(
                   decoration: BoxDecoration(
                     gradient: AppColors.darkBlueToBlackGradient(),
@@ -192,38 +177,9 @@ class HomePage extends GetView<HomeController> {
                       appBarTitleSize,
                       iconSize,
                     )
-                  : _buildVerticalLayout(
-                      context,
-                      screenHeight,
-                      isTablet,
-                    ),
+                  : _buildVerticalLayout(),
         ),
       ),
-      bottomNavigationBar: useHorizontalLayout
-          ? null
-          : Container(
-              color: Colors.black,
-              height: bottomBarHeight,
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * (isTablet ? 0.05 : 0.02),
-                vertical: isTablet ? 8.0 : 4.0,
-              ),
-              child: Center(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Obx(() => Text(
-                        controller.locationService.city.value,
-                        style: TextStyle(
-                          fontSize: bottomBarFontSize,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )),
-                ),
-              ),
-            ),
     );
   }
 
@@ -279,17 +235,17 @@ class HomePage extends GetView<HomeController> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Obx(() => Text(
-                              controller.locationService.city.value,
-                              style: TextStyle(
-                                fontSize: isTablet ? 12.0 : 10.0,
-                                color: Colors.white.withOpacity(0.8),
-                                fontWeight: FontWeight.w500,
-                              ),
-                              textAlign: TextAlign.center,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ))
+                        Text(
+                          '',
+                          style: TextStyle(
+                            fontSize: isTablet ? 12.0 : 10.0,
+                            color: Colors.white.withOpacity(0.8),
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        )
                       ],
                     ),
                   ),
@@ -300,12 +256,8 @@ class HomePage extends GetView<HomeController> {
 
           // Lado direito - Conteúdo principal
           Expanded(
-            child: NewsWindowsPage(
+            child: NewsWidgets(
               key: ValueKey(controller.recreateKey),
-              isRevisionMode: controller.isRevisionMode,
-              isDraftMode: controller.isDraftMode,
-              isRejectedMode: controller.isRejectedMode,
-              isDeletedMode: controller.isDeletedMode,
             ),
           ),
         ],
@@ -314,27 +266,14 @@ class HomePage extends GetView<HomeController> {
   }
 
   // Layout vertical para mobile portrait
-  Widget _buildVerticalLayout(
-    BuildContext context,
-    double screenHeight,
-    bool isTablet,
-  ) {
+  Widget _buildVerticalLayout() {
     return Container(
       decoration: BoxDecoration(
         gradient: AppColors.darkBlueToBlackGradient(),
       ),
-      child: NewsWindowsPage(
+      child: NewsWidgets(
         key: ValueKey(controller.recreateKey),
-        isRevisionMode: controller.isRevisionMode,
-        isDraftMode: controller.isDraftMode,
-        isRejectedMode: controller.isRejectedMode,
-        isDeletedMode: controller.isDeletedMode,
       ),
     );
   }
-
- 
-
- 
 }
-

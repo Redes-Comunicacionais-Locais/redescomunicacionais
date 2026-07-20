@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:redescomunicacionais/app/modules/news/data/model/news_model.dart';
 import 'package:redescomunicacionais/app/modules/news/utils/news_states.dart';
+import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
+import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
 
 class NewsProvider {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -21,6 +23,91 @@ class NewsProvider {
     }
   }
 
+  Future<QueryDocumentSnapshot<Map<String, dynamic>>?> getPublicNewsPaginated({
+    QueryDocumentSnapshot<Map<String, dynamic>>? lastDocument,
+  }) async {
+    try {
+      QueryDocumentSnapshot<Map<String, dynamic>>? nextLastDocument;
+
+      Query<Map<String, dynamic>> query = _firestore
+          .collection(collectionPath)
+          .where('status', whereIn: [NewsStates.publicado])
+          .orderBy('createdAt', descending: true)
+          .limit(10);
+
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
+      QuerySnapshot<Map<String, dynamic>> snapshot = await query.get();
+
+      if (snapshot.docs.isNotEmpty) {
+        nextLastDocument = snapshot.docs.last;
+      }
+
+      List<NewsModel> newsList = snapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data();
+        data['id'] = doc.id;
+        return NewsModel.fromMap(data);
+      }).toList();
+
+      await saveNewsListToHive(newsList);
+
+      return nextLastDocument;
+    } catch (e) {
+      throw Exception("Erro ao buscar notícias públicas paginadas: $e");
+    }
+  }
+
+  Future<void> getOuthersNews(UserModel user) async {
+    try {
+      if (user.role != UserRoles.admin && user.role != UserRoles.editor) {
+        throw Exception("Acesso negado: Usuário não é admin ou editor.");
+      }
+
+      Map<String, QueryDocumentSnapshot<Map<String, dynamic>>> docs = {};
+
+      List<Future<QuerySnapshot<Map<String, dynamic>>>> futures = [
+        // Suas próprias privadas (Rascunho, Rejeitado, Deletado)
+        _firestore
+            .collection(collectionPath)
+            .where('status', whereIn: [
+              NewsStates.rascunho,
+              NewsStates.rejeitado,
+              NewsStates.deletado,
+            ])
+            .where('createdBy', isEqualTo: user.email)
+            .get(),
+
+        // Todas as matérias que aguardam análise no sistema
+        _firestore
+            .collection(collectionPath)
+            .where('status', whereIn: [NewsStates.emAnalise]).get(),
+      ];
+
+      List<QuerySnapshot<Map<String, dynamic>>> snapshots =
+          await Future.wait(futures);
+
+      // Agrupa os resultados removendo duplicatas por ID
+      for (var snapshot in snapshots) {
+        for (var doc in snapshot.docs) {
+          docs[doc.id] = doc;
+        }
+      }
+
+      // Mapeia o resultado final unificado
+      List<NewsModel> othersNewsList = docs.values.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return NewsModel.fromMap(data);
+      }).toList();
+
+      await saveNewsListToHive(othersNewsList);
+    } catch (e) {
+      throw Exception("Erro ao buscar matérias de administração: $e");
+    }
+  }
+
   Future<void> saveNewsToHive(NewsModel news) async {
     try {
       // Verifiqua se a box já está aberta para evitar lentidão
@@ -35,48 +122,81 @@ class NewsProvider {
     }
   }
 
-  Future<List<NewsModel>> getNewsFromHive() async {
+  Future<void> saveNewsListToHive(List<NewsModel> newsList) async {
+    if (newsList.isEmpty) return;
+
+    try {
+      var box = Hive.isBoxOpen(collectionPath)
+          ? Hive.box<NewsModel>(collectionPath)
+          : await Hive.openBox<NewsModel>(collectionPath);
+
+      final Map<String, NewsModel> newsMap = {
+        for (var news in newsList) news.id: news
+      };
+
+      await box.putAll(newsMap);
+    } catch (e) {
+      throw Exception("Erro ao salvar a lista no Hive local: $e");
+    }
+  }
+
+  Future<List<NewsModel>> getPublicNewsFromHive() async {
     try {
       final box = Hive.isBoxOpen(collectionPath)
           ? Hive.box<NewsModel>(collectionPath)
           : await Hive.openBox<NewsModel>(collectionPath);
 
-      List<NewsModel> list = box.values.toList().cast<NewsModel>();
+      List<NewsModel> allList = box.values.toList().cast<NewsModel>();
 
-      list.sort((a, b) {
-        final dateA = a.lastUpdated ?? a.createdAt;
-        final dateB = b.lastUpdated ?? b.createdAt;
+      List<NewsModel> publicList =
+          allList.where((news) => news.status == NewsStates.publicado).toList();
 
-        return dateB.compareTo(dateA);
-      });
-
-      return list;
+      return publicList;
     } catch (e) {
-      throw Exception("Erro ao buscar no Hive: $e");
+      throw Exception("Erro ao buscar notícias públicas no Hive: $e");
     }
   }
 
-  Future<List<NewsModel>> _getNewsFromFirebase() async {
+  Future<List<NewsModel>> getOuthersNewsFromHive() async {
     try {
-      QuerySnapshot querySnapshot = await _firestore
-          .collection(collectionPath)
-          .orderBy('createdAt',
-              descending:
-                  true) // Ordena por createdAt do mais recente para o mais antigo
-          .get();
+      final box = Hive.isBoxOpen(collectionPath)
+          ? Hive.box<NewsModel>(collectionPath)
+          : await Hive.openBox<NewsModel>(collectionPath);
 
-      return querySnapshot.docs.map((doc) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id;
-        return NewsModel.fromMap(data);
+      List<NewsModel> allList = box.values.toList().cast<NewsModel>();
+
+      List<NewsModel> internalList = allList.where((news) {
+        return news.status == NewsStates.rascunho ||
+            news.status == NewsStates.rejeitado ||
+            news.status == NewsStates.deletado ||
+            news.status == NewsStates.emAnalise;
       }).toList();
+
+      return internalList;
     } catch (e) {
-      throw Exception("Erro ao buscar as matérias: $e");
+      throw Exception("Erro ao buscar notícias internas no Hive: $e");
+    }
+  }
+
+  Future<void> _deleteNewsFromHive(String newsId) async {
+    try {
+      var box = await Hive.openBox<NewsModel>(collectionPath);
+
+      // Verifica se a notícia realmente existe no Hive antes de deletar
+      if (box.containsKey(newsId)) {
+        await box.delete(newsId);
+        debugPrint("Notícia ID $newsId deletada com sucesso do Hive.");
+      } else {
+        debugPrint("A notícia ID $newsId não foi encontrada no Hive.");
+      }
+    } catch (e) {
+      debugPrint("Erro ao deletar a notícia do Hive: $e");
+      throw Exception("Erro ao remover dados locais: $e");
     }
   }
 
   Future<void> hideNews(String newsId, String status, String userEmail) async {
-    final now = DateTime.now();
+    DateTime now = DateTime.now();
 
     try {
       if (Hive.isBoxOpen(collectionPath)) {
@@ -171,62 +291,72 @@ class NewsProvider {
     }
   }
 
-  Future<void> syncNewsHiveAndFirebase() async {
+  Future<void> syncNewsHiveAndFirebase(UserModel user) async {
+    bool isAdminOrEditor =
+        user.role == UserRoles.admin || user.role == UserRoles.editor;
+
+    if (!isAdminOrEditor) {
+      debugPrint("Usuário comum: Sincronização em segundo plano pulada.");
+      return;
+    }
+
     try {
-      List<NewsModel> firebaseNewsList = await _getNewsFromFirebase();
-      List<NewsModel> hiveNewsList = await getNewsFromHive();
+      List<NewsModel> hiveNewsList = await getOuthersNewsFromHive();
+      hiveNewsList.addAll(await getPublicNewsFromHive());
 
-      Map<String, NewsModel> firebaseMap = {
-        for (var news in firebaseNewsList) news.id: news
-      };
-      Map<String, NewsModel> hiveMap = {
-        for (var news in hiveNewsList) news.id: news
-      };
-
-      Set<String> allIds = {...firebaseMap.keys, ...hiveMap.keys};
-
-      for (String id in allIds) {
-        // Usando try-catch individual para não travar o loop inteiro se um ID der erro
+      for (var hiveNews in hiveNewsList) {
         try {
-          NewsModel? fbNews = firebaseMap[id];
-          NewsModel? hiveNews = hiveMap[id];
+          NewsModel? fbNews = await _getNewsByIdFromFirebase(hiveNews.id);
 
-          if (fbNews != null && hiveNews == null) {
-            // Existe apenas no Firebase: baixar para o celular
-            await saveNewsToHive(fbNews);
-          } else if (fbNews == null && hiveNews != null) {
-            // Existe apenas no celular: subir para a nuvem
-            await _saveNewsToFirebase(hiveNews);
-          } else if (fbNews != null && hiveNews != null) {
-            // Existe nos dois: Verificar quem ganha
-
-            final fbDate = fbNews.lastUpdated;
-            final hiveDate = hiveNews.lastUpdated;
+          if (fbNews == null) {
+            // Se não existe no Firebase mas o autor criou localmente offline, envia pro servidor
+            if (hiveNews.createdBy == user.email) {
+              await _saveNewsToFirebase(hiveNews);
+            } else {
+              // Se sumiu do Firebase, remove do Hive local
+              await _deleteNewsFromHive(hiveNews.id);
+            }
+          } else {
+            if (hiveNews.createdBy != user.email &&
+                (hiveNews.status == NewsStates.rascunho ||
+                    hiveNews.status == NewsStates.rejeitado ||
+                    hiveNews.status == NewsStates.deletado)) {
+              // Se a notícia foi criada por outro usuário e está em rascunho, rejeitada ou deletada, remove do Hive local
+              await _deleteNewsFromHive(hiveNews.id);
+            }
+            // Ambas existem: compara as datas de modificação para ver quem ganha
+            DateTime? fbDate = fbNews.lastUpdated;
+            DateTime? hiveDate = hiveNews.lastUpdated;
 
             if (fbDate != null && hiveDate != null) {
-              if (fbDate.isAfter(hiveDate)) {
-                // Firebase é mais novo -> Atualiza só o Hive
+              DateTime cleanFbDate = trimDateTime(fbDate);
+              DateTime cleanHiveDate = trimDateTime(hiveDate);
+
+              if (cleanFbDate.isAfter(cleanHiveDate)) {
                 await saveNewsToHive(fbNews);
-              } else if (hiveDate.isAfter(fbDate)) {
-                // Hive é mais novo -> Atualiza só o Firebase
+              } else if (cleanHiveDate.isAfter(cleanFbDate)) {
                 await _saveNewsToFirebase(hiveNews);
               }
-              // Se forem iguais, não faz nada! Economiza processamento.
-            } else if (fbDate != null) {
-              // Só Firebase tem data -> Atualiza Hive
-              await saveNewsToHive(fbNews);
-            } else if (hiveDate != null) {
-              // Só Hive tem data -> Atualiza Firebase
-              await _saveNewsToFirebase(hiveNews);
             }
           }
         } catch (e) {
-          debugPrint("Erro ao sincronizar a notícia ID $id: $e");
-          // Continua para o próximo ID mesmo se este falhar
+          debugPrint("Erro ao sincronizar a notícia ID ${hiveNews.id}: $e");
         }
       }
     } catch (e) {
       throw Exception("Erro fatal ao sincronizar Hive e Firebase: $e");
     }
+  }
+
+  Future<NewsModel?> _getNewsByIdFromFirebase(String id) async {
+    var doc = await _firestore.collection(collectionPath).doc(id).get();
+    if (!doc.exists) return null;
+    final data = doc.data()!;
+    data['id'] = doc.id;
+    return NewsModel.fromMap(data);
+  }
+
+  DateTime trimDateTime(DateTime dt) {
+    return DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second);
   }
 }
