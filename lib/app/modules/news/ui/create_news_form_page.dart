@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:redescomunicacionais/app/modules/news/controller/create_news_form_controller.dart';
 import 'package:redescomunicacionais/app/utils/components/markdown_editor.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
+import 'package:redescomunicacionais/app/modules/news/ui/publication_terms_dialog.dart';
 
 class CreateNewsPage extends GetView<CreateNewsFormController> {
   const CreateNewsPage({super.key});
