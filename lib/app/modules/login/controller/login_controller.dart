@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pointycastle/api.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/modules/user/data/repository/user_repository.dart';
 import 'package:redescomunicacionais/app/modules/login/data/repository/login_repository.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
+import 'package:redescomunicacionais/app/services/keys_services/key_storage_service.dart';
+import 'package:redescomunicacionais/app/services/keys_services/keys_service.dart';
+import 'package:redescomunicacionais/app/services/keys_services/public_key_model.dart';
 import 'package:redescomunicacionais/app/utils/components/popups.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class LoginController extends GetxController {
   final LoginRepository _repository = LoginRepository();
   final UserRepository _userRepository = UserRepository();
-
   final RxString appVersion = 'Carregando...'.obs;
 
   @override
@@ -32,6 +35,7 @@ class LoginController extends GetxController {
     try {
       await _repository.logoutGoogle();
       await _repository.signInGoogle();
+      await _createKeys();
       Get.offAllNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro de Login: $e");
@@ -53,6 +57,7 @@ class LoginController extends GetxController {
     try {
       await _repository.logoutGoogle();
       await _repository.logoutMicrosoft();
+      await _createKeys();
       Get.offAllNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro de Login Microsoft: $e");
@@ -75,7 +80,7 @@ class LoginController extends GetxController {
       await _repository.trySignInGoogle().timeout(const Duration(seconds: 10),
           onTimeout: () =>
               throw Exception("Tempo esgotado para login silencioso"));
-
+      await _createKeys();
       Get.offAllNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro no tryLogin: $e");
@@ -86,6 +91,7 @@ class LoginController extends GetxController {
   Future<void> tryLoginMicrosoft() async {
     try {
       await _repository.trySignInMicrosoft();
+      await _createKeys();
       Get.offAllNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro no tryLoginMicrosoft: $e");
@@ -105,6 +111,7 @@ class LoginController extends GetxController {
       await _repository.logoutGoogle();
       await _repository.logoutMicrosoft();
       await _repository.signInAppleAuth();
+      await _createKeys();
       Get.offAllNamed(Routes.HOME);
     } catch (e) {
       debugPrint("Erro de Login Apple: $e");
@@ -128,5 +135,45 @@ class LoginController extends GetxController {
     UserModel anonymousUser = UserModel.empty();
     await _repository.createUserDocInHive(anonymousUser);
     Get.offAllNamed(Routes.HOME);
+  }
+
+  Future<void> _createKeys() async {
+    final storage = KeyStorageService();
+    String privateKey = '';
+    try {
+      privateKey = await _userRepository.getPrivateKeyInStorage() ?? '';
+    } catch (e) {
+      //TODO: VERIFICAR OQUE FAZER SE DER ERRO AO BUSCAR A CHAVE
+      debugPrint("Erro ao buscar chave privada do usuario");
+    }
+
+    if (privateKey.isEmpty) {
+      try {
+        final keys = KeysServices.generateKeyPair();
+
+        final privateKeyString = KeysServices.exportPrivateKey(keys.privateKey);
+        final publicKeyString = KeysServices.exportPublicKey(keys.publicKey);
+        final publicKeyModel = await _createPublicKeyModel(publicKeyString);
+        await _userRepository.createPublicKeyInFirebase(publicKeyModel);
+        await storage.savePrivateKey(privateKeyString);
+      } catch (e) {
+        debugPrint("Erro ao criar e salvar chave privada do usuario");
+      }
+    }
+  }
+
+  Future<PublicKeyModel> _createPublicKeyModel(String publicKeyString) async {
+    try {
+      final user = await _userRepository.getCurrentUser();
+      return PublicKeyModel(
+        id: user.email,
+        email: user.email,
+        publicKey: publicKeyString,
+        createdAt: DateTime.now(),
+        lastUpdated: DateTime.now(),
+      );
+    } catch (e) {
+      throw Exception("Erro ao criar public Key Model");
+    }
   }
 }

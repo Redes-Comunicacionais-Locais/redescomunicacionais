@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
+import 'package:redescomunicacionais/app/services/keys_services/key_storage_service.dart';
+import 'package:redescomunicacionais/app/services/keys_services/public_key_model.dart';
 
 class UserProvider {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final KeyStorageService _keyStorageService = KeyStorageService();
 
   // Armazena sempre na mesma chave para garantir apenas uma entrada
   final String hiveUserKey = 'current_user';
@@ -132,7 +135,7 @@ class UserProvider {
         throw Exception("Nenhum usuário encontrado no Firebase");
       }
 
-      UserModel user = UserModel.fromMap(doc.data() as Map<String, dynamic>);
+      UserModel user = UserModel.fromJson(doc.data() as Map<String, dynamic>);
       debugPrint("Usuário recuperado do Firebase: ${user.name}");
       return user;
     } catch (e) {
@@ -247,7 +250,7 @@ class UserProvider {
 
       DocumentSnapshot updatedDoc = await docRef.get();
       UserModel updatedUser =
-          UserModel.fromMap(updatedDoc.data() as Map<String, dynamic>);
+          UserModel.fromJson(updatedDoc.data() as Map<String, dynamic>);
       _updateUserRoleinRoles(userId, role, adminEmail);
       updateUserInHive(updatedUser);
     } catch (e) {
@@ -297,7 +300,7 @@ class UserProvider {
 
       DocumentSnapshot updatedDoc = await docRef.get();
       UserModel updatedUser =
-          UserModel.fromMap(updatedDoc.data() as Map<String, dynamic>);
+          UserModel.fromJson(updatedDoc.data() as Map<String, dynamic>);
       updateUserInHive(updatedUser);
     } catch (e) {
       throw Exception("Erro ao atualizar e recuperar usuário: $e");
@@ -345,6 +348,35 @@ class UserProvider {
         );
         return userWithTimestamp;
       }
+    }
+  }
+
+  Future<bool> checkPublicKeyInFirebase(String email) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('public_keys').doc(email).get();
+
+      if (!doc.exists) {
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception("Erro ao verificar chaves do usuário no Firebase: $e");
+    }
+  }
+
+  Future<String?> getPrivateKeyInStorage() async {
+    return await _keyStorageService.getPrivateKey();
+  }
+
+  Future<void> createPublicKeyInFirebase(PublicKeyModel publicKeyModel) async {
+    try {
+      await _firestore.collection('public_keys').doc(publicKeyModel.email).set(
+            publicKeyModel.toJson(),
+            SetOptions(merge: true),
+          );
+    } catch (e) {
+      throw Exception("Erro ao criar public Key");
     }
   }
 }

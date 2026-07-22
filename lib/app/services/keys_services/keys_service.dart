@@ -18,7 +18,7 @@ class KeysServices {
   static const String _privHeader = "-----BEGIN NEIGHBOR_NEWS PRIVATE KEY-----";
   static const String _privFooter = "-----END NEIGHBOR_NEWS PRIVATE KEY-----";
 
-  static AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey> gerarParDeChaves() {
+  static AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey> generateKeyPair() {
     final secureRandom = FortunaRandom();
     final random = Random.secure();
     final seeds = List<int>.generate(32, (_) => random.nextInt(256));
@@ -39,7 +39,7 @@ class KeysServices {
     );
   }
 
-  static String exportarChavePublica(RSAPublicKey key) {
+  static String exportPublicKey(RSAPublicKey key) {
     final modulus = key.modulus.toString();
     final exponent = key.exponent.toString();
     final rawString = "$modulus|$exponent";
@@ -49,7 +49,7 @@ class KeysServices {
     return "$_pubHeader\n$base64Key\n$_pubFooter";
   }
 
-  static String exportarChavePrivada(RSAPrivateKey key) {
+  static String exportPrivateKey(RSAPrivateKey key) {
     final modulus = key.modulus.toString();
     final privateExponent = key.privateExponent.toString();
     final rawString = "$modulus|$privateExponent";
@@ -59,7 +59,7 @@ class KeysServices {
     return "$_privHeader\n$base64Key\n$_privFooter";
   }
 
-  static RSAPublicKey importarChavePublica(String pemString) {
+  static RSAPublicKey importPublicKey(String pemString) {
     if (!pemString.contains(_pubHeader) || !pemString.contains(_pubFooter)) {
       throw FormatException(
           "Chave inválida! Esta chave não pertence ao projeto Neighbor News.");
@@ -80,7 +80,7 @@ class KeysServices {
     return RSAPublicKey(modulus, exponent);
   }
 
-  static RSAPrivateKey importarChavePrivada(String pemString) {
+  static RSAPrivateKey importPrivateKey(String pemString) {
     if (!pemString.contains(_privHeader) || !pemString.contains(_privFooter)) {
       throw FormatException(
           "Chave inválida! Esta chave não pertence ao projeto Neighbor News.");
@@ -101,7 +101,7 @@ class KeysServices {
     return RSAPrivateKey(modulus, privateExponent, null, null);
   }
 
-  static String assinar(String newsBody, RSAPrivateKey privateKey) {
+  static String toSign(String newsBody, RSAPrivateKey privateKey) {
     final signer =
         RSASigner(SHA256Digest(), '0609608648016503040201'); // OID para SHA-256
     signer.init(true, PrivateKeyParameter<RSAPrivateKey>(privateKey));
@@ -112,7 +112,7 @@ class KeysServices {
     return base64.encode(signature.bytes);
   }
 
-  static bool verificar(
+  static bool toCheck(
       String newsBody, String assinaturaBase64, RSAPublicKey publicKey) {
     try {
       final verifier = RSASigner(SHA256Digest(), '0609608648016503040201');

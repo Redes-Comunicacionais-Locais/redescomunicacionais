@@ -91,43 +91,6 @@ class UserModel extends HiveObject {
     return fallback;
   }
 
-  // fromMap (do Firestore)
-  factory UserModel.fromMap(Map<String, dynamic> map) {
-    return UserModel(
-      id: map['id'],
-      name: map['name'],
-      email: map['email'],
-      urlImage: map['urlImage'],
-      role: map['role'] ?? 'user',
-      createdAt: _readDateTime(
-        map['createdAt'],
-        fallback: DateTime.now(),
-      ),
-      roleUpdatedAt: map['roleUpdatedAt'] != null
-          ? _readDateTime(
-              map['roleUpdatedAt'],
-              fallback: DateTime.now(),
-            )
-          : null,
-      roleUpdatedBy: map['roleUpdatedBy'],
-      status: map['status'] ?? 'active',
-      statusUpdatedAt: map['statusUpdatedAt'] != null
-          ? _readDateTime(
-              map['statusUpdatedAt'],
-              fallback: DateTime.now(),
-            )
-          : null,
-      statusUpdatedBy: map['statusUpdatedBy'],
-      statusObservation: map['statusObservation'],
-      lastUpdated: map['lastUpdated'] != null
-          ? _readDateTime(
-              map['lastUpdated'],
-              fallback: DateTime.now(),
-            )
-          : null,
-    );
-  }
-
   // toJson
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};

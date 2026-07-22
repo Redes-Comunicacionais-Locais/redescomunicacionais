@@ -1,5 +1,6 @@
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/modules/user/data/provider/user_provider.dart';
+import 'package:redescomunicacionais/app/services/keys_services/public_key_model.dart';
 
 class UserRepository {
   UserRepository();
@@ -36,5 +37,13 @@ class UserRepository {
 
   Future<void> updateUserName(String userId, String name) {
     return _userProvider.updateUserName(userId, name);
+  }
+
+  Future<String?> getPrivateKeyInStorage() async {
+    return await _userProvider.getPrivateKeyInStorage();
+  }
+
+  Future<void> createPublicKeyInFirebase(PublicKeyModel publicKeyModel) async {
+    return _userProvider.createPublicKeyInFirebase(publicKeyModel);
   }
 }
