@@ -63,7 +63,7 @@ final Map<String, String> ptBrTranslation = {
   'select_at_least_one_type': 'Selecione pelo menos um tipo.',
   'youtube_url_optional': 'URL do YouTube (opcional)',
   'paste_youtube_link_here': 'Cole aqui um link do vídeo do YouTube',
-  'add_image': 'Adicionar imagem',
+  'add_image': 'Adicionar imagens',
   'change_image': 'Alterar imagem',
   'image_requirements':
       'Imagens com grande tamanho serão comprimidas, o que pode causar perda de qualidade e lentidão no carregamento. Para uma melhor visualização, recomenda-se o uso de imagens com orientação paisagem.',

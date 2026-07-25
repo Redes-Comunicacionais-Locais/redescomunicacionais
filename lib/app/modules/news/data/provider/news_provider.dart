@@ -340,7 +340,23 @@ class NewsProvider {
             }
           }
         } catch (e) {
-          debugPrint("Erro ao sincronizar a notícia ID ${hiveNews.id}: $e");
+          debugPrint("======================================");
+          debugPrint("ID: ${hiveNews.id}");
+          debugPrint("Título: ${hiveNews.title}");
+
+          final tamanho = hiveNews.toMap().toString().length;
+          debugPrint("Tamanho aproximado do documento: $tamanho caracteres");
+
+          debugPrint("Quantidade de imagens: ${hiveNews.urlImages.length}");
+
+          for (int i = 0; i < hiveNews.urlImages.length; i++) {
+            debugPrint(
+              "Imagem $i: ${(hiveNews.urlImages[i].length / 1024).toStringAsFixed(2)} KB (Base64)",
+            );
+          }
+
+          debugPrint("Erro: $e");
+          debugPrint("======================================");
         }
       }
     } catch (e) {

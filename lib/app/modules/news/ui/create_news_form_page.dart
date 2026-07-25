@@ -339,21 +339,61 @@ class CreateNewsPage extends GetView<CreateNewsFormController> {
   }
 
   Widget _buildImagePreview(CreateNewsFormController controller) {
-    return Center(
-      child: Obx(() {
-        if (controller.imageController.base64String != null) {
-          return Column(
-            children: [
-              Image.memory(
-                base64Decode(controller.imageController.base64String!),
-                height: 150,
-              ),
-            ],
-          );
-        }
+    return Obx(() {
+      final images = controller.imageController.base64Images;
+
+      if (images.isEmpty) {
         return const SizedBox.shrink();
-      }),
-    );
+      }
+
+      return SizedBox(
+        height: 170,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: images.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.memory(
+                      base64Decode(images[index]),
+                      width: 170,
+                      height: 170,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                  Positioned(
+                    top: 5,
+                    right: 5,
+                    child: GestureDetector(
+                      onTap: () {
+                        controller.imageController.removeImage(index);
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        padding: const EdgeInsets.all(4),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+    });
   }
 
   Widget _buildImageMessage(CreateNewsFormController controller) {

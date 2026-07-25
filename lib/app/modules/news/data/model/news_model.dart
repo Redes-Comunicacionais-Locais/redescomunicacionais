@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'package:hive/hive.dart';
+import 'package:flutter/foundation.dart';
 part 'news_model.g.dart';
+
 
 @HiveType(typeId: 1)
 class NewsModel {
@@ -184,39 +186,40 @@ class NewsModel {
 
   factory NewsModel.fromMap(Map<String, dynamic> map) {
     return NewsModel(
-      // === Ajustado com 'as String' para garantir tipagem estrita ===
-      id: map['id'] as String,
-      title: map['title'] as String,
-      subtitle: map['subtitle'] as String?,
-      body: map['body'] as String,
-      
-      // === Ajustado com '?? []' para o caso de chaves removidas pelo toMap ===
+      id: map['id']?.toString() ?? '',
+      title: map['title']?.toString() ?? '',
+      subtitle: map['subtitle']?.toString(),
+      body: map['body']?.toString() ?? '',
+
       cities: List<String>.from(map['cities'] ?? []),
       categories: List<String>.from(map['categories'] ?? []),
       urlImages: List<String>.from(map['urlImages'] ?? []),
-      
-      videoUrl: map['videoUrl'] as String?,
-      type: map['type'] as String,
-      status: map['status'] as String,
-      
-      // === Parse de datas obrigatórias com fallback de segurança ===
-      lastUpdated: _parseDate(map['lastUpdated']) ?? DateTime.now(),
-      author: map['author'] as String,
-      createdBy: map['createdBy'] as String,
-      createdAt: _parseDate(map['createdAt'])!, 
 
-      // === Campos opcionais mapeados com segurança usando cast de nulos ===
-      validatedBy: map['validatedBy'] as String?,
-      validatedByName: map['validatedByName'] as String?,
+      videoUrl: map['videoUrl']?.toString(),
+      type: map['type']?.toString() ?? '',
+      status: map['status']?.toString() ?? '',
+
+      lastUpdated: _parseDate(map['lastUpdated']) ?? DateTime.now(),
+
+      author: map['author']?.toString() ?? '',
+      createdBy: map['createdBy']?.toString() ?? '',
+      createdAt: _parseDate(map['createdAt']) ?? DateTime.now(),
+
+      validatedBy: map['validatedBy']?.toString(),
+      validatedByName: map['validatedByName']?.toString(),
       validatedAt: _parseDate(map['validatedAt']),
-      validatedObservation: map['validatedObservation'] as String?,
-      rejectedBy: map['rejectedBy'] as String?,
+      validatedObservation: map['validatedObservation']?.toString(),
+
+      rejectedBy: map['rejectedBy']?.toString(),
       rejectedAt: _parseDate(map['rejectedAt']),
-      rejectedObservation: map['rejectedObservation'] as String?,
+      rejectedObservation: map['rejectedObservation']?.toString(),
+
       editedAt: _parseDate(map['editedAt']),
-      excludedBy: map['excludedBy'] as String?,
+
+      excludedBy: map['excludedBy']?.toString(),
       excludedAt: _parseDate(map['excludedAt']),
-      excludedObservation: map['excludedObservation'] as String?,
+      excludedObservation: map['excludedObservation']?.toString(),
+
       publicationTerms: map['publicationTerms'] != null
           ? Map<String, dynamic>.from(map['publicationTerms'])
           : null,

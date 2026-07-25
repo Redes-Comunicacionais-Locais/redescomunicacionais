@@ -103,7 +103,6 @@ class NewsPage extends GetView<NewsController> {
     bool hasMoreThanTwoCategories,
     BuildContext context,
   ) {
-    String urlImages = controller.selectedNews.urlImages[0];
     List<String> cities = controller.selectedNews.cities;
     return Row(
       children: [
@@ -119,33 +118,72 @@ class NewsPage extends GetView<NewsController> {
                 // Container da imagem (usa asset se imgurl vazio)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(
-                      ResponsiveUtils.calculateResponsiveBorderRadius(
-                              isTablet) *
-                          0.8),
-                  child: urlImages
-                          .isNotEmpty // Garanta que a condição inicial está aqui
-                      ? Image.memory(
-                          base64Decode(urlImages),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: isTablet ? 250 : 200,
-                        )
-                      : (cities.isNotEmpty &&
-                              cities[0]
-                                  .isNotEmpty) // Proteção para não quebrar o app se a lista sumir
-                          ? Image.asset(
-                              controller.getCityImageAsset(cities[0]),
+                      ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) * 0.8),
+                  child: controller.selectedNews.urlImages.isNotEmpty
+                      ? SizedBox(
+                    height: isTablet ? 250 : 200,
+                    child: PageView.builder(
+                        itemCount: controller.selectedNews.urlImages.length,
+                        itemBuilder: (context, index) {
+                          final image = controller.selectedNews.urlImages[index];
+
+
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => Scaffold(
+                                    backgroundColor: Colors.black,
+                                    appBar: AppBar(
+                                      backgroundColor: Colors.black,
+                                      iconTheme: const IconThemeData(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    body: PageView.builder(
+                                      itemCount: controller.selectedNews.urlImages.length,
+                                      itemBuilder: (context, fullIndex) {
+                                        return InteractiveViewer(
+                                          minScale: 1,
+                                          maxScale: 4,
+                                          child: Center(
+                                            child: Image.memory(
+                                              base64Decode(
+                                                controller.selectedNews.urlImages[fullIndex],
+                                              ),
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.memory(
+                              base64Decode(image),
                               fit: BoxFit.cover,
                               width: double.infinity,
-                              height: isTablet ? 250 : 200,
-                            )
-                          : Image.asset(
-                              // Um "fallback" caso não tenha imagem em base64 E nem cidade válida
-                              controller.getCityImageAsset('default'),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: isTablet ? 250 : 200,
                             ),
+                          );
+                        },
+                    ),
+                  )
+                      : (cities.isNotEmpty && cities[0].isNotEmpty)
+                      ? Image.asset(
+                    controller.getCityImageAsset(cities[0]),
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: isTablet ? 250 : 200,
+                  )
+                      : Image.asset(
+                    controller.getCityImageAsset('default'),
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: isTablet ? 250 : 200,
+                  ),
                 ),
                 SizedBox(height: isTablet ? 25 : 20),
 
@@ -384,7 +422,6 @@ class NewsPage extends GetView<NewsController> {
     bool hasMoreThanTwoCategories,
     BuildContext context,
   ) {
-    String urlImages = controller.selectedNews.urlImages[0];
     List<String> cities = controller.selectedNews.cities;
     return ListView(
       padding: ResponsiveUtils.calculateResponsivePadding(
@@ -394,37 +431,77 @@ class NewsPage extends GetView<NewsController> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(
-                  ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) *
-                      0.8),
-              child: urlImages
-                      .isNotEmpty // Garanta que a condição inicial está aqui
-                  ? Image.memory(
-                      base64Decode(urlImages),
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: isTablet ? 250 : 200,
-                    )
-                  : (cities.isNotEmpty &&
-                          cities[0]
-                              .isNotEmpty) // Proteção para não quebrar o app se a lista sumir
-                      ? Image.asset(
-                          controller.getCityImageAsset(cities[0]),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: isTablet ? 250 : 200,
-                        )
-                      : Image.asset(
-                          // Um "fallback" caso não tenha imagem em base64 E nem cidade válida
-                          controller.getCityImageAsset('default'),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: isTablet ? 250 : 200,
-                        ),
+                  ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) * 0.8),
+              child: controller.selectedNews.urlImages.isNotEmpty
+                  ? SizedBox(
+                height: isTablet ? 250 : 200,
+                child: PageView.builder(
+                  itemCount: controller.selectedNews.urlImages.length,
+                  itemBuilder: (context, index) {
+                    final image = controller.selectedNews.urlImages[index];
+
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => Scaffold(
+                              backgroundColor: Colors.black,
+                              appBar: AppBar(
+                                backgroundColor: Colors.black,
+                                iconTheme: const IconThemeData(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              body: PageView.builder(
+                                itemCount: controller.selectedNews.urlImages.length,
+                                itemBuilder: (context, fullIndex) {
+                                  return Center(
+                                    child: InteractiveViewer(
+                                      minScale: 1,
+                                      maxScale: 5,
+                                      child: Image.memory(
+                                        base64Decode(
+                                          controller.selectedNews.urlImages[fullIndex],
+                                        ),
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      child: Image.memory(
+                        base64Decode(image),
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: isTablet ? 250 : 200,
+                      ),
+                    );
+                  },
+                ),
+              )
+                  : (cities.isNotEmpty && cities[0].isNotEmpty)
+                  ? Image.asset(
+                controller.getCityImageAsset(cities[0]),
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: isTablet ? 250 : 200,
+              )
+                  : Image.asset(
+                controller.getCityImageAsset('default'),
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: isTablet ? 250 : 200,
+              ),
             ),
           ],
         ),
         SizedBox(height: isTablet ? 25 : 20),
-        //Título
+// Título
         Text(
           controller.selectedNews.title,
           style: TextStyle(

@@ -188,10 +188,28 @@ Future<void> _publishNews(
   final String subtitle = _subtitleController.text;
   final String body = _getBodyText();
 
-  List<String> urlImages = [
-    _imageController.base64String ?? ""
-  ];
+    List<String> urlImages = _imageController.base64Images.toList();
+  if (urlImages.isEmpty) {
+    urlImages.add("");
+  }
+  final totalSize = urlImages.fold<int>(
+    0,
+        (sum, image) => sum + image.length,
+  );
 
+  debugPrint(
+    "Tamanho total Base64: ${(totalSize / 1024).toStringAsFixed(2)} KB",
+  );
+
+  const maxFirestoreSize = 1000000; // margem de segurança
+
+  if (totalSize > maxFirestoreSize) {
+    PopUps.snackbar(
+      texto: "As imagens são muito grandes. Escolha imagens menores.",
+      cor: Colors.red,
+    );
+    return;
+  }
   final String author = _homeController.user.name!;
   final String email = _homeController.user.email;
   final String videoUrl = _videoUrlController.text;
@@ -295,9 +313,12 @@ void _clearForm() {
 
   _type.value = null;
 
+  _imageController.clearImages();
+
   _showCategoryError.value = false;
   _showCityError.value = false;
   _showTypeError.value = false;
+
 
 }
 
