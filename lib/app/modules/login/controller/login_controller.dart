@@ -149,12 +149,21 @@ class LoginController extends GetxController {
 
     if (privateKey.isEmpty) {
       try {
+        final user = await _userRepository.getCurrentUser();
+
         final keys = KeysServices.generateKeyPair();
 
         final privateKeyString = KeysServices.exportPrivateKey(keys.privateKey);
         final publicKeyString = KeysServices.exportPublicKey(keys.publicKey);
-        final publicKeyModel = await _createPublicKeyModel(publicKeyString);
-        await _userRepository.createPublicKeyInFirebase(publicKeyModel);
+
+        bool isUpdatePublicKey = await _userRepository
+            .updatePublicKeyInFirebase(user.email, publicKeyString);
+        if (!isUpdatePublicKey) {
+          final publicKeyModel =
+              await _createPublicKeyModel(publicKeyString, user);
+          await _userRepository.createPublicKeyInFirebase(publicKeyModel);
+        }
+
         await storage.savePrivateKey(privateKeyString);
       } catch (e) {
         debugPrint("Erro ao criar e salvar chave privada do usuario");
@@ -162,9 +171,9 @@ class LoginController extends GetxController {
     }
   }
 
-  Future<PublicKeyModel> _createPublicKeyModel(String publicKeyString) async {
+  Future<PublicKeyModel> _createPublicKeyModel(
+      String publicKeyString, UserModel user) async {
     try {
-      final user = await _userRepository.getCurrentUser();
       return PublicKeyModel(
         id: user.email,
         email: user.email,

@@ -351,17 +351,37 @@ class UserProvider {
     }
   }
 
-  Future<bool> checkPublicKeyInFirebase(String email) async {
+  Future<bool> updatePublicKeyInFirebase(
+      String email, String newPublicKey) async {
     try {
-      DocumentSnapshot doc =
-          await _firestore.collection('public_keys').doc(email).get();
+      DocumentReference docRef =
+          _firestore.collection('public_keys').doc(email);
+      DocumentSnapshot doc = await docRef.get();
 
       if (!doc.exists) {
         return false;
       }
+
+      final data = doc.data() as Map<String, dynamic>?;
+      final String? currentPublicKey = data?['publicKey'];
+
+      Map<String, dynamic> updateData = {
+        'publicKey': newPublicKey,
+        'lastUpdated': DateTime.now(),
+      };
+
+      // Se existir uma chave pública atual, move para a lista de revogadas
+      if (currentPublicKey != null && currentPublicKey.isNotEmpty) {
+        updateData['revokedPublicKeys'] =
+            FieldValue.arrayUnion([currentPublicKey]);
+      }
+
+      await docRef.update(updateData);
+
       return true;
     } catch (e) {
-      throw Exception("Erro ao verificar chaves do usuário no Firebase: $e");
+      throw Exception(
+          "Erro ao verificar e atualizar chaves do usuário no Firebase: $e");
     }
   }
 
