@@ -251,8 +251,12 @@ class UserProvider {
       DocumentSnapshot updatedDoc = await docRef.get();
       UserModel updatedUser =
           UserModel.fromJson(updatedDoc.data() as Map<String, dynamic>);
-      _updateUserRoleinRoles(userId, role, adminEmail);
-      updateUserInHive(updatedUser);
+          
+      await _updateUserRoleinRoles(userId, role, adminEmail);
+
+      if(updatedUser.email == adminEmail) {
+        await updateUserInHive(updatedUser);
+      }
     } catch (e) {
       throw Exception("Erro ao atualizar e recuperar usuário: $e");
     }
