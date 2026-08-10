@@ -9,14 +9,14 @@ class UserPage extends StatefulWidget {
   const UserPage({super.key});
 
   @override
-  State<UserPage> createState() => _UserPageState();
+  State createState() => _UserPageState();
 }
 
-class _UserPageState extends State<UserPage> {
+class _UserPageState extends State {
   final TextEditingController _nameController = TextEditingController();
   bool _isNameInitialized = false;
 
-  UserController get controller => Get.find<UserController>();
+  UserController get controller => Get.find();
 
   @override
   void dispose() {
@@ -24,8 +24,8 @@ class _UserPageState extends State<UserPage> {
     super.dispose();
   }
 
-  Future<void> _confirmDeleteAccount(BuildContext context) async {
-    final bool? confirm = await showDialog<bool>(
+  Future _confirmDeleteAccount(BuildContext context) async {
+    final bool? confirm = await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -42,7 +42,7 @@ class _UserPageState extends State<UserPage> {
               onPressed: () => Navigator.pop(context, true),
               child: Text(
                 'delete_account'.tr,
-                style: TextStyle(color: Colors.red),
+                style: const TextStyle(color: Colors.red),
               ),
             ),
           ],
@@ -51,6 +51,7 @@ class _UserPageState extends State<UserPage> {
     );
 
     if (confirm != true) return;
+
     await controller.deleteCurrentUserAccount();
   }
 
@@ -62,7 +63,9 @@ class _UserPageState extends State<UserPage> {
 
     return Card(
       elevation: 0,
-      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+      color: theme.colorScheme.surfaceContainerHighest.withValues(
+        alpha: 0.4,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
@@ -88,12 +91,15 @@ class _UserPageState extends State<UserPage> {
             gradient: AppColors.appBarBottomGradient(),
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(
+          color: theme.colorScheme.onSurface,
+        ),
       ),
       body: Obx(
-        () {
+            () {
           if (controller.isDataLoading.value) {
             _isNameInitialized = false;
+
             return const Center(
               child: BlinkingLoadingIcon(
                 size: 36,
@@ -104,7 +110,10 @@ class _UserPageState extends State<UserPage> {
           if (!_isNameInitialized) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
-              _nameController.text = controller.currentUser.name ?? '';
+
+              _nameController.text =
+                  controller.currentUser.name ?? '';
+
               _isNameInitialized = true;
             });
           }
@@ -125,35 +134,43 @@ class _UserPageState extends State<UserPage> {
                             CircleAvatar(
                               radius: 22,
                               backgroundColor:
-                                  theme.colorScheme.primaryContainer,
+                              theme.colorScheme.primaryContainer,
                               child: Icon(
                                 Icons.person_outline,
-                                color: theme.colorScheme.onPrimaryContainer,
+                                color: theme
+                                    .colorScheme
+                                    .onPrimaryContainer,
                               ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'your_data'.tr,
-                                    style:
-                                        theme.textTheme.titleMedium?.copyWith(
+                                    style: theme
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     'update_display_name'.tr,
-                                    style: theme.textTheme.bodySmall,
+                                    style:
+                                    theme.textTheme.bodySmall,
                                   ),
                                 ],
                               ),
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 20),
+
                         TextField(
                           controller: _nameController,
                           onChanged: (value) {
@@ -163,13 +180,16 @@ class _UserPageState extends State<UserPage> {
                           decoration: InputDecoration(
                             labelText: 'name'.tr,
                             hintText: 'enter_your_name'.tr,
-                            prefixIcon: const Icon(Icons.badge_outlined),
+                            prefixIcon:
+                            const Icon(Icons.badge_outlined),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                         ),
+
                         const SizedBox(height: 12),
+
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -179,7 +199,8 @@ class _UserPageState extends State<UserPage> {
                             color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: theme.colorScheme.outlineVariant,
+                              color:
+                              theme.colorScheme.outlineVariant,
                             ),
                           ),
                           child: Row(
@@ -187,85 +208,125 @@ class _UserPageState extends State<UserPage> {
                               Icon(
                                 Icons.mail_outline,
                                 size: 18,
-                                color: theme.colorScheme.onSurfaceVariant,
+                                color: theme
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   controller.currentUser.email,
-                                  style: theme.textTheme.bodyMedium,
-                                  overflow: TextOverflow.ellipsis,
+                                  style:
+                                  theme.textTheme.bodyMedium,
+                                  overflow:
+                                  TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
                           ),
                         ),
+
                         const SizedBox(height: 16),
+
                         FilledButton.icon(
-                          onPressed: controller.isSavingData.value
+                          onPressed:
+                          controller.isSavingData.value
                               ? null
                               : () async {
-                                  controller.currentUser.name =
-                                      _nameController.text;
-                                  await controller.saveCurrentUserName();
-                                  {
-                                    Get.offAllNamed(
-                                      Routes.HOME,
-                                    );
-                                  }
-                                },
+                            controller.currentUser.name =
+                                _nameController.text;
+
+                            await controller
+                                .saveCurrentUserName();
+
+                            if (mounted) {
+                              Get.offAllNamed(
+                                Routes.HOME,
+                              );
+                            }
+                          },
                           icon: controller.isSavingData.value
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: BlinkingLoadingIcon(
-                                    size: 16,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Icon(Icons.save_outlined),
-                          label: Text('save_changes'.tr),
+                              ? SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: BlinkingLoadingIcon(
+                              size: 16,
+                              color: theme
+                                  .colorScheme
+                                  .onSurface,
+                            ),
+                          )
+                              : const Icon(
+                            Icons.save_outlined,
+                          ),
+                          label: Text(
+                            'save_changes'.tr,
+                          ),
                         ),
                       ],
                     ),
                   ),
+
                   const SizedBox(height: 16),
+
                   _buildSectionCard(
                     context: context,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                      CrossAxisAlignment.start,
                       children: [
                         Text(
                           'danger_zone'.tr,
-                          style: theme.textTheme.titleMedium?.copyWith(
+                          style: theme
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
                             fontWeight: FontWeight.w700,
                           ),
                         ),
+
                         const SizedBox(height: 6),
+
                         Text(
                           'delete_account_warning'.tr,
                           style: theme.textTheme.bodySmall,
                         ),
+
                         const SizedBox(height: 14),
+
                         OutlinedButton.icon(
-                          onPressed: controller.isDeletingAccount.value
+                          onPressed:
+                          controller.isDeletingAccount.value
                               ? null
-                              : () => _confirmDeleteAccount(context),
-                          icon: controller.isDeletingAccount.value
+                              : () =>
+                              _confirmDeleteAccount(
+                                context,
+                              ),
+                          icon:
+                          controller.isDeletingAccount.value
                               ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: BlinkingLoadingIcon(
-                                    size: 16,
-                                    color: Colors.red,
-                                  ),
-                                )
-                              : const Icon(Icons.delete_outline),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: theme.colorScheme.error,
-                            side: BorderSide(color: theme.colorScheme.error),
+                            width: 16,
+                            height: 16,
+                            child:
+                            BlinkingLoadingIcon(
+                              size: 16,
+                              color: Colors.red,
+                            ),
+                          )
+                              : const Icon(
+                            Icons.delete_outline,
                           ),
-                          label: Text('delete_account'.tr),
+                          style:
+                          OutlinedButton.styleFrom(
+                            foregroundColor:
+                            theme.colorScheme.error,
+                            side: BorderSide(
+                              color: theme.colorScheme.error,
+                            ),
+                          ),
+                          label: Text(
+                            'delete_account'.tr,
+                          ),
                         ),
                       ],
                     ),

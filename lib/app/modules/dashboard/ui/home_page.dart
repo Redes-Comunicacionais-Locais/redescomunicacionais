@@ -7,6 +7,7 @@ import 'package:redescomunicacionais/app/utils/responsive_utils.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/utils/menu_drawer.dart';
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
+import 'package:redescomunicacionais/app/utils/theme/theme_controller.dart';
 
 class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
@@ -27,13 +28,15 @@ class HomePage extends GetView<HomeController> {
     ResponsiveUtils.calculateBottomBarHeight(screenHeight, isTablet);
     ResponsiveUtils.calculateBottomBarFontSize(screenWidth, isTablet);
 
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: useHorizontalLayout
           ? null
           : AppBar(
               centerTitle: false,
               elevation: isTablet ? 8.0 : 4.0,
-              foregroundColor: Colors.white,
+              foregroundColor: theme.colorScheme.onSurface,
               titleSpacing: isTablet ? 16.0 : 12.0,
               title: Obx(() {
                 final titleText = controller.isRevisionMode.value
@@ -52,7 +55,7 @@ class HomePage extends GetView<HomeController> {
                   style: TextStyle(
                     fontSize: appBarTitleSize,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: theme.colorScheme.onSurface,
                   ),
                 );
               }),
@@ -60,15 +63,17 @@ class HomePage extends GetView<HomeController> {
                 borderRadius:
                     BorderRadius.vertical(bottom: Radius.circular(10)),
               ),
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  gradient: AppColors.appBarBottomGradient(),
+              flexibleSpace: Get.find<ThemeController>().isLight
+                ? null
+                : Container(
+                  decoration: BoxDecoration(
+                    gradient: AppColors.appBarBottomGradient(),
+                  ),
                 ),
-              ),
-              iconTheme: IconThemeData(
-                color: Colors.white,
-                size: iconSize,
-              ),
+        iconTheme: IconThemeData(
+          color: theme.colorScheme.onSurface,
+          size: iconSize,
+        ),
               toolbarHeight: isTablet ? 82.0 : 74.0,
               actions: [
                 Obx(() => controller.isRevisionMode.value ||
@@ -268,7 +273,12 @@ class HomePage extends GetView<HomeController> {
   // Layout vertical para mobile portrait
   Widget _buildVerticalLayout() {
     return Container(
-      decoration: BoxDecoration(
+      color: Get.find<ThemeController>().isLight
+          ? Colors.white
+          : null,
+      decoration: Get.find<ThemeController>().isLight
+          ? null
+          : BoxDecoration(
         gradient: AppColors.darkBlueToBlackGradient(),
       ),
       child: NewsWidgets(

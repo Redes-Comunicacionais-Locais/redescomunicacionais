@@ -54,18 +54,18 @@ class UserController extends GetxController {
 
     try {
       isSavingData.value = true;
+
       await _repository.updateUserName(
-          currentUser.id, currentUser.name!.trim());
+        currentUser.id,
+        currentUser.name!.trim(),
+      );
+
       currentUser = await _repository.getCurrentUser();
 
       if (isClosed) {
         return;
       }
 
-      PopUps.snackbar(
-        texto: 'Nome atualizado com sucesso.',
-        cor: Colors.green,
-      );
     } catch (e) {
       PopUps.snackbar(
         texto: 'Não foi possível atualizar o nome: $e',
