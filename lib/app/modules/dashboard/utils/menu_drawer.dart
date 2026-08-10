@@ -590,7 +590,7 @@ class MenuPage extends GetView<HomeController> {
                   value: false,
                   groupValue: themeController.isLight,
                   title: const Text('Tema Clássico'),
-                  subtitle: const Text('Tema atual do aplicativo'),
+                  subtitle: const Text('Interface original'),
                   onChanged: (_) {
                     themeController.setClassicTheme();
                     Get.back();
