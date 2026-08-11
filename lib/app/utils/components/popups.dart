@@ -8,12 +8,15 @@ class PopUps {
     required String texto,
     required Color cor,
   }) {
-    final currentContext = Get.context;
+    // Remove qualquer SnackBar do Flutter que esteja visível.
+    final context = Get.context;
 
-    if (currentContext != null) {
-      final messenger = ScaffoldMessenger.maybeOf(currentContext);
+    if (context != null) {
+      final messenger = ScaffoldMessenger.maybeOf(context);
+
       if (messenger != null) {
-        messenger.hideCurrentSnackBar();
+        messenger.clearSnackBars();
+
         messenger.showSnackBar(
           SnackBar(
             content: Text(texto),
@@ -22,16 +25,21 @@ class PopUps {
             duration: const Duration(seconds: 3),
           ),
         );
+
         return;
       }
     }
 
+    // Remove qualquer GetSnackBar antigo antes de mostrar outro.
     Get.closeAllSnackbars();
+
     Get.showSnackbar(
       GetSnackBar(
         messageText: Text(
           texto,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(
+            color: Colors.white,
+          ),
         ),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: cor,
@@ -40,5 +48,23 @@ class PopUps {
         duration: const Duration(seconds: 3),
       ),
     );
+  }
+
+  /// Use quando trocar o tema.
+  /// Remove tanto SnackBar do Flutter quanto GetSnackBar.
+  static void clear() {
+    // Flutter SnackBar
+    final context = Get.context;
+
+    if (context != null) {
+      final messenger = ScaffoldMessenger.maybeOf(context);
+
+      if (messenger != null) {
+        messenger.clearSnackBars();
+      }
+    }
+
+    // GetX SnackBar
+    Get.closeAllSnackbars();
   }
 }

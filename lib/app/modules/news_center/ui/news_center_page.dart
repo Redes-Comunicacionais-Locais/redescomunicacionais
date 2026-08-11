@@ -1,34 +1,61 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/news_center/controller/news_center_controller.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
+import 'package:redescomunicacionais/app/utils/theme/theme_controller.dart';
 
 class NewsCenterPage extends GetView<NewsCenterController> {
   const NewsCenterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final themeController = Get.find<ThemeController>();
+
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: themeController.isLight
+          ? theme.scaffoldBackgroundColor
+          : null,
+
       appBar: AppBar(
         centerTitle: true,
-        elevation: 8,
-        foregroundColor: Colors.white,
-        title: Text('central_da_materia'.tr),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-        ),
-        flexibleSpace: Container(
+        elevation: 2,
+
+        backgroundColor: themeController.isLight
+            ? theme.scaffoldBackgroundColor
+            : null,
+
+        foregroundColor: theme.colorScheme.onSurface,
+
+        flexibleSpace: themeController.isLight
+            ? null
+            : Container(
           decoration: BoxDecoration(
             gradient: AppColors.appBarBottomGradient(),
           ),
         ),
+
+        title: Text(
+          'central_da_materia'.tr,
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(10),
+          ),
+        ),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: themeController.isLight
+            ? BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+        )
+            : BoxDecoration(
           gradient: AppColors.darkBlueToBlackGradient(),
         ),
         child: SafeArea(
@@ -57,40 +84,46 @@ class NewsCenterPage extends GetView<NewsCenterController> {
                             title: 'Criar nova matéria'.tr,
                             subtitle: 'Comece a criar uma nova matéria'.tr,
                             icon: Icons.create_rounded,
-                            accentColor: Colors.greenAccent,
-                            onTap: () => Get.toNamed(Routes.CREATE_NEWS),
+                            accentColor: Colors.green,
+                            onTap: () =>
+                                Get.toNamed(Routes.CREATE_NEWS),
                           ),
-
-
                           _ActionCard(
                             title: 'Revisar Matérias'.tr,
                             subtitle:
-                                'Fila de avaliação e aprovação editorial'.tr,
+                            'Fila de avaliação e aprovação editorial'.tr,
                             icon: Icons.fact_check_rounded,
-                            accentColor: Colors.lightBlueAccent,
-                            onTap: () => controller.openNewsMode('revision'),
+                            accentColor: Colors.lightBlue,
+                            onTap: () =>
+                                controller.openNewsMode('revision'),
                           ),
                           _ActionCard(
                             title: 'Ver seus rascunhos'.tr,
                             subtitle:
-                                'Acesse suas matérias salvas como rascunhos'.tr,
+                            'Acesse suas matérias salvas como rascunhos'
+                                .tr,
                             icon: Icons.drafts_outlined,
-                            accentColor: Colors.amberAccent,
-                            onTap: () => controller.openNewsMode('drafts'),
+                            accentColor: Colors.amber.shade700,
+                            onTap: () =>
+                                controller.openNewsMode('drafts'),
                           ),
                           _ActionCard(
                             title: 'Ver suas matérias rejeitadas'.tr,
-                            subtitle: 'Acompanhe o que voltou para ajustes'.tr,
+                            subtitle:
+                            'Acompanhe o que voltou para ajustes'.tr,
                             icon: Icons.report_outlined,
                             accentColor: Colors.redAccent,
-                            onTap: () => controller.openNewsMode('rejected'),
+                            onTap: () =>
+                                controller.openNewsMode('rejected'),
                           ),
                           _ActionCard(
                             title: 'Ver suas matérias excluídas'.tr,
-                            subtitle: 'Confira o histórico de exclusões'.tr,
+                            subtitle:
+                            'Confira o histórico de exclusões'.tr,
                             icon: Icons.delete_outline_rounded,
-                            accentColor: Colors.deepOrangeAccent,
-                            onTap: () => controller.openNewsMode('deleted'),
+                            accentColor: Colors.deepOrange,
+                            onTap: () =>
+                                controller.openNewsMode('deleted'),
                           ),
                         ],
                       ),
@@ -106,25 +139,22 @@ class NewsCenterPage extends GetView<NewsCenterController> {
   }
 
   Widget _buildHero(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withOpacity(0.12),
-            Colors.white.withOpacity(0.04),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.14)),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.28),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
+            color: theme.shadowColor.withOpacity(0.10),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -134,13 +164,15 @@ class NewsCenterPage extends GetView<NewsCenterController> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: theme.colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.white.withOpacity(0.18)),
+              border: Border.all(
+                color: theme.colorScheme.outlineVariant,
+              ),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.newspaper_rounded,
-              color: Colors.white,
+              color: theme.colorScheme.onPrimaryContainer,
               size: 34,
             ),
           ),
@@ -152,7 +184,7 @@ class NewsCenterPage extends GetView<NewsCenterController> {
                 Text(
                   'Painel editorial'.tr,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.98),
+                    color: theme.colorScheme.onSurface,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
@@ -161,7 +193,7 @@ class NewsCenterPage extends GetView<NewsCenterController> {
                 Text(
                   'Crie e organize as matérias em um único lugar.'.tr,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.82),
+                    color: theme.colorScheme.onSurfaceVariant,
                     fontSize: 15,
                     height: 1.35,
                   ),
@@ -196,80 +228,108 @@ class _ActionCard extends StatefulWidget {
 }
 
 class _ActionCardState extends State<_ActionCard> {
-  // Controle do estado do toque para a animação
   bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final themeController = Get.find<ThemeController>();
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final cardWidth = constraints.maxWidth;
 
-        // Multiplicadores responsivos
-        final paddingValue = (cardWidth * 0.09).clamp(12.0, 20.0);
-        final iconSize = (cardWidth * 0.16).clamp(24.0, 36.0);
-        final titleFontSize = (cardWidth * 0.09).clamp(13.0, 18.0);
-        final subtitleFontSize = (cardWidth * 0.07).clamp(11.0, 14.0);
+        final paddingValue =
+        (cardWidth * 0.09).clamp(12.0, 20.0);
+
+        final iconSize =
+        (cardWidth * 0.16).clamp(24.0, 36.0);
+
+        final titleFontSize =
+        (cardWidth * 0.09).clamp(13.0, 18.0);
+
+        final subtitleFontSize =
+        (cardWidth * 0.07).clamp(11.0, 14.0);
+
+        final bool isLight = themeController.isLight;
 
         return GestureDetector(
-          // Detecta quando o usuário toca e segura
-          onTapDown: (_) => setState(() => _isPressed = true),
-          // Detecta quando o usuário solta o toque
-          onTapUp: (_) => setState(() => _isPressed = false),
-          // Detecta se o usuário arrastou o dedo para fora do card (cancela o toque)
-          onTapCancel: () => setState(() => _isPressed = false),
+          onTapDown: (_) {
+            setState(() => _isPressed = true);
+          },
+          onTapUp: (_) {
+            setState(() => _isPressed = false);
+          },
+          onTapCancel: () {
+            setState(() => _isPressed = false);
+          },
           onTap: widget.onTap,
           child: AnimatedScale(
             scale: _isPressed ? 0.96 : 1.0,
             duration: const Duration(milliseconds: 100),
             curve: Curves.easeInOut,
             child: AnimatedOpacity(
-              // Opacidade reduz levemente no toque para dar feedback de clique
               opacity: _isPressed ? 0.85 : 1.0,
               duration: const Duration(milliseconds: 100),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  filter: ImageFilter.blur(
+                    sigmaX: 10,
+                    sigmaY: 10,
+                  ),
                   child: Container(
                     padding: EdgeInsets.all(paddingValue),
                     decoration: BoxDecoration(
+                      // ==============================
+                      // COR DO CARD
+                      // ==============================
+                      color: isLight
+                          ? theme.colorScheme.surface
+                          : Colors.white.withOpacity(0.06),
+
                       borderRadius: BorderRadius.circular(24),
-                      gradient: LinearGradient(
-                        colors: [
-                          widget.accentColor.withOpacity(0.20),
-                          Colors.white.withOpacity(0.04),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+
+                      // ==============================
+                      // BORDA
+                      // ==============================
                       border: Border.all(
                         color: _isPressed
-                            ? widget.accentColor
-                                .withOpacity(0.5) // Borda brilha no toque
-                            : Colors.white.withOpacity(0.18),
-                        width: 1.0,
+                            ? widget.accentColor.withOpacity(0.55)
+                            : isLight
+                            ? theme.colorScheme.outlineVariant
+                            : Colors.white.withOpacity(0.14),
+                        width: 1,
                       ),
+
+                      // ==============================
+                      // SOMBRA
+                      // ==============================
                       boxShadow: [
                         BoxShadow(
-                          color: widget.accentColor
-                              .withOpacity(_isPressed ? 0.15 : 0.08),
+                          color: Colors.black.withOpacity(
+                            _isPressed ? 0.20 : 0.12,
+                          ),
                           blurRadius: _isPressed ? 25 : 20,
                           offset: const Offset(0, 8),
                         ),
                       ],
                     ),
+
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Linha do topo com Ícone Principal e Indicador de Ação Visual
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                              padding: EdgeInsets.all(paddingValue * 0.6),
+                              padding: EdgeInsets.all(
+                                paddingValue * 0.6,
+                              ),
                               decoration: BoxDecoration(
-                                color: widget.accentColor.withOpacity(0.15),
+                                color: widget.accentColor
+                                    .withOpacity(0.15),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
@@ -278,15 +338,14 @@ class _ActionCardState extends State<_ActionCard> {
                                 color: widget.accentColor,
                               ),
                             ),
-                            // Indicador de toque sutil (Seta/Chevron que brilha no toque)
                           ],
                         ),
 
                         const Spacer(),
 
-                        // Textos inferiores
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
@@ -294,20 +353,27 @@ class _ActionCardState extends State<_ActionCard> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                color: Colors.white,
+                                color:
+                                theme.colorScheme.onSurface,
                                 fontSize: titleFontSize,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: -0.3,
                                 height: 1.2,
                               ),
                             ),
-                            SizedBox(height: paddingValue * 0.3),
+
+                            SizedBox(
+                              height: paddingValue * 0.3,
+                            ),
+
                             Text(
                               widget.subtitle,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.65),
+                                color: theme
+                                    .colorScheme
+                                    .onSurfaceVariant,
                                 fontSize: subtitleFontSize,
                                 fontWeight: FontWeight.w400,
                                 height: 1.3,
