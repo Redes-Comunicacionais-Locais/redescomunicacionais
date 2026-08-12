@@ -8,6 +8,7 @@ import 'package:redescomunicacionais/app/services/image_base64_service.dart';
 import 'package:redescomunicacionais/app/modules/news/utils/news_states.dart';
 import 'package:redescomunicacionais/app/utils/components/popups.dart';
 import 'package:redescomunicacionais/app/modules/news/ui/publication_terms_dialog.dart';
+import 'package:redescomunicacionais/app/modules/news/ui/publication_opinion_terms_dialog.dart';
 
 class CreateNewsFormController extends GetxController {
 final _formKey = GlobalKey<FormState>();
@@ -153,10 +154,17 @@ _selectedCities.isNotEmpty &&
 _type.value != null) {
 
 
-final Map<String, dynamic>? terms =
-await Get.dialog<Map<String, dynamic>>(
-const PublicationTermsDialog(),
-);
+  final Map<String, dynamic>? terms;
+
+  if (_type.value == 'Opinião') {
+    terms = await Get.dialog<Map<String, dynamic>>(
+      const PublicationOpinionTermsDialog(),
+    );
+  } else {
+    terms = await Get.dialog<Map<String, dynamic>>(
+      const PublicationTermsDialog(),
+    );
+  }
 
 
 if (terms != null) {
