@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:redescomunicacionais/app/modules/mesh/model/news_package_model.dart';
 import 'package:redescomunicacionais/app/modules/news/data/model/news_model.dart';
 import 'package:redescomunicacionais/app/modules/news/utils/news_states.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
@@ -20,6 +21,18 @@ class NewsProvider {
       throw Exception("Erro no Firebase (${e.code}): ${e.message}");
     } catch (e) {
       throw Exception("Erro desconhecido ao salvar: $e");
+    }
+  }
+
+  Future<NewsPackageModel? > _getPackageNews(String id) async{
+    try {
+       var box = Hive.isBoxOpen('news_packages')
+          ? Hive.box<NewsPackageModel>('news_packages')
+          : await Hive.openBox<NewsPackageModel>('news_packages');
+
+      return box.get(id);
+    } catch (e) {
+      throw Exception("Erro ao buscar pacote de notícias: $e");
     }
   }
 

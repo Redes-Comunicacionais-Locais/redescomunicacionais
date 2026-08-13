@@ -1,4 +1,4 @@
-import 'package:redescomunicacionais/app/services/keys_services/public_key_model.dart';
+import 'package:redescomunicacionais/app/modules/mesh/model/public_key_model.dart';
 
 class PublicKeyPackage {
   final List<PublicKeyModel> publicKeys;

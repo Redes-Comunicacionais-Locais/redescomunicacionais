@@ -1,6 +1,6 @@
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/modules/user/data/provider/user_provider.dart';
-import 'package:redescomunicacionais/app/services/keys_services/public_key_model.dart';
+import 'package:redescomunicacionais/app/modules/mesh/model/public_key_model.dart';
 
 class UserRepository {
   UserRepository();

@@ -5,9 +5,9 @@ import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart
 import 'package:redescomunicacionais/app/modules/user/data/repository/user_repository.dart';
 import 'package:redescomunicacionais/app/modules/login/data/repository/login_repository.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
-import 'package:redescomunicacionais/app/services/keys_services/key_storage_service.dart';
-import 'package:redescomunicacionais/app/services/keys_services/keys_service.dart';
-import 'package:redescomunicacionais/app/services/keys_services/public_key_model.dart';
+import 'package:redescomunicacionais/app/modules/mesh/services/key_storage_service.dart';
+import 'package:redescomunicacionais/app/modules/mesh/services/keys_service.dart';
+import 'package:redescomunicacionais/app/modules/mesh/model/public_key_model.dart';
 import 'package:redescomunicacionais/app/utils/components/popups.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -143,7 +143,6 @@ class LoginController extends GetxController {
     try {
       privateKey = await _userRepository.getPrivateKeyInStorage() ?? '';
     } catch (e) {
-      //TODO: VERIFICAR OQUE FAZER SE DER ERRO AO BUSCAR A CHAVE
       debugPrint("Erro ao buscar chave privada do usuario");
     }
 
@@ -158,6 +157,7 @@ class LoginController extends GetxController {
 
         bool isUpdatePublicKey = await _userRepository
             .updatePublicKeyInFirebase(user.email, publicKeyString);
+            
         if (!isUpdatePublicKey) {
           final publicKeyModel =
               await _createPublicKeyModel(publicKeyString, user);

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
-import 'package:redescomunicacionais/app/services/keys_services/key_storage_service.dart';
-import 'package:redescomunicacionais/app/services/keys_services/public_key_model.dart';
+import 'package:redescomunicacionais/app/modules/mesh/services/key_storage_service.dart';
+import 'package:redescomunicacionais/app/modules/mesh/model/public_key_model.dart';
 
 class UserProvider {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -374,9 +374,9 @@ class UserProvider {
         'lastUpdated': DateTime.now(),
       };
 
-      // Se existir uma chave pública atual, move para a lista de revogadas
+      // Se existir uma chave pública atual, move para a lista de antigas
       if (currentPublicKey != null && currentPublicKey.isNotEmpty) {
-        updateData['revokedPublicKeys'] =
+        updateData['oldPublicKeys'] =
             FieldValue.arrayUnion([currentPublicKey]);
       }
 

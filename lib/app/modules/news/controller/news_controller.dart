@@ -175,6 +175,7 @@ class NewsController extends GetxController {
       );
 
       await _repository.saveNewsToHive(news);
+      await _repository.saveNewsToPackage(news);
 
       await syncNews(null);
 
