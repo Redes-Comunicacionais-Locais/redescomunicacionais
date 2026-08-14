@@ -356,7 +356,25 @@ class NewsProvider {
     return NewsModel.fromMap(data);
   }
 
+
+  Future<void> savePublicationTerms({
+    required String newsId,
+    required Map<String, dynamic> terms,
+  }) async {
+    await _firestore
+        .collection(collectionPath)
+        .doc(newsId)
+        .collection('publication_terms')
+        .add({
+      ...terms,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   DateTime trimDateTime(DateTime dt) {
     return DateTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second);
+
+
+
   }
 }

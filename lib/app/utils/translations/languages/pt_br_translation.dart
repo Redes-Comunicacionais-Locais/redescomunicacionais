@@ -200,4 +200,5 @@ final Map<String, String> ptBrTranslation = {
   'Painel editorial': 'Painel editorial',
   'Crie e organize as matérias em um único lugar.':
       'Crie e organize as matérias em um único lugar.',
+  'Carregar mais Matérias': 'Carregar mais Matérias'
 };

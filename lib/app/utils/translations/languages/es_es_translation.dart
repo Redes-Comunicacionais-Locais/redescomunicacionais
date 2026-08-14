@@ -199,4 +199,5 @@ final Map<String, String> esEsTranslation = {
   'Painel editorial': 'Panel editorial',
   'Crie e organize as matérias em um único lugar.':
       'Cree y organice las noticias en un solo lugar.',
+  'Carregar mais Matérias': 'Cargar más noticias'
 };

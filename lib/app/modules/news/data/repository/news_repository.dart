@@ -57,5 +57,16 @@ class NewsRepository {
       validatorName: validatorName,
       newsType: newsType,
     );
+
   }
+  Future<void> savePublicationTerms({
+    required String newsId,
+    required Map<String, dynamic> terms,
+  }) async {
+    await newsProvider.savePublicationTerms(
+      newsId: newsId,
+      terms: terms,
+    );
+  }
+
 }
