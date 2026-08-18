@@ -37,7 +37,6 @@ class NewsPackageModel {
     
 
     return NewsPackageModel(
-      // Assumindo que seu NewsModel possui um método fromJson
       news: NewsModel.fromMap(Map<String, dynamic>.from(json['news'] ?? {})),
       signature: json['signature'] ?? '',
       email: json['email'] ?? '',

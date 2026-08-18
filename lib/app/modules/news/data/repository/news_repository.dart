@@ -10,29 +10,25 @@ class NewsRepository {
   final OfflinePackageService _offlinePackageService = OfflinePackageService();
 
   Future<void> saveNewsToHive(NewsModel news) async {
-    await newsProvider.saveNewsToHive(news);
+    await newsProvider.saveNewsToHive([news]);
   }
 
   Future<void> syncNewsHiveAndFirebase(UserModel user) async {
     await newsProvider.syncNewsHiveAndFirebase(user);
   }
 
-  Future<List<NewsModel>> getPublicNewsFromHive() {
-    return newsProvider.getPublicNewsFromHive();
+  Future<List<NewsModel>> getNewsFromHive({bool isPublic = false}) async {
+    return newsProvider.getNewsFromHive(isPublic: isPublic);
   }
 
-  Future<List<NewsModel>> getOuthersNewsFromHive() {
-    return newsProvider.getOuthersNewsFromHive();
-  }
-
-  Future<QueryDocumentSnapshot<Map<String, dynamic>>?> getPublicNewsPaginated(
+  Future<QueryDocumentSnapshot<Map<String, dynamic>>?> getPublicNewsPaginatedFromFirebase(
       QueryDocumentSnapshot<Map<String, dynamic>>? lastDocument) async {
-    return await newsProvider.getPublicNewsPaginated(
+    return await newsProvider.getPublicNewsPaginatedFromFirebase(
         lastDocument: lastDocument);
   }
 
-  Future<void> getOuthersNews(UserModel user) async {
-    await newsProvider.getOuthersNews(user);
+  Future<void> getOuthersNewsFromFirebase(UserModel user) async {
+    await newsProvider.getOuthersNewsFromFirebase(user);
   }
 
   Future<void> hideNews(String newsId, String status, String userEmail) async {
@@ -61,11 +57,12 @@ class NewsRepository {
     );
 
   }
-  Future<void> savePublicationTerms({
+  
+  Future<void> savePublicationTermsToFirebase({
     required String newsId,
     required Map<String, dynamic> terms,
   }) async {
-    await newsProvider.savePublicationTerms(
+    await newsProvider.savePublicationTermsToFirebase(
       newsId: newsId,
       terms: terms,
     );
