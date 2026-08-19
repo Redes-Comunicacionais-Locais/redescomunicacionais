@@ -11,8 +11,8 @@ class UserRepository {
     return _userProvider.createUserDoc(email, name, uid, urlImage);
   }
 
-  Future<void> updateRole(String userId, String role, String adminEmail) {
-    return _userProvider.updateUserRole(userId, role, adminEmail);
+  Future<void> updateRole(String userId, String role, String adminEmail, Map<String, String> operationsCities) {
+    return _userProvider.updateUserRole(userId, role, adminEmail, operationsCities);
   }
 
   Future<List<UserModel>> getAllUsers() {

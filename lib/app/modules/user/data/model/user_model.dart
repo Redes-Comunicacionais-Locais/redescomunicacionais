@@ -43,6 +43,9 @@ class UserModel extends HiveObject {
   @HiveField(12)
   DateTime? lastUpdated;
 
+  @HiveField(13)
+  Map<String, String>? operationsCities;
+
   UserModel({
     required this.id,
     this.name,
@@ -57,9 +60,9 @@ class UserModel extends HiveObject {
     this.statusUpdatedBy,
     this.statusObservation,
     this.lastUpdated,
+    this.operationsCities,
   });
 
-  // Factory para criar um usuário vazio com campos required
   factory UserModel.empty() {
     return UserModel(
       id: '',
@@ -124,6 +127,7 @@ class UserModel extends HiveObject {
       'lastUpdated',
       lastUpdated != null ? Timestamp.fromDate(lastUpdated!) : null,
     );
+    addIfNotEmpty('operationsCities', operationsCities);
 
     return data;
   }
@@ -161,6 +165,9 @@ class UserModel extends HiveObject {
               json['lastUpdated'],
               fallback: DateTime.now(),
             )
+          : null,
+      operationsCities: json['operationsCities'] != null
+          ? Map<String, String>.from(json['operationsCities'])
           : null,
     );
   }

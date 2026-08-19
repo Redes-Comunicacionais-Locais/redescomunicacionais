@@ -237,11 +237,12 @@ class UserProvider {
   }
 
   Future<void> updateUserRole(
-      String userId, String role, String adminEmail) async {
+      String userId, String role, String adminEmail, Map<String, String> operationsCities) async {
     try {
       final docRef = _firestore.collection(userCollection).doc(userId);
 
       await docRef.update({
+        'operationsCities': operationsCities,
         'role': role,
         'roleUpdatedAt': FieldValue.serverTimestamp(),
         'roleUpdatedBy': adminEmail,
@@ -252,7 +253,7 @@ class UserProvider {
       UserModel updatedUser =
           UserModel.fromJson(updatedDoc.data() as Map<String, dynamic>);
           
-      await _updateUserRoleinRoles(userId, role, adminEmail);
+      await _updateUserRoleinRoles(userId, role, adminEmail, operationsCities, updatedUser.email);
 
       if(updatedUser.email == adminEmail) {
         await updateUserInHive(updatedUser);
@@ -263,13 +264,15 @@ class UserProvider {
   }
 
   Future<void> _updateUserRoleinRoles(
-      String userId, String role, String adminEmail) async {
+      String userId, String role, String adminEmail, Map<String, String> operationsCities, String userEmail) async {
     try {
       final docRef = _firestore.collection('roles').doc(userId);
 
       await docRef.set({
         'userId': userId,
         'role': role,
+        'operationsCities': operationsCities,
+        'userEmail': userEmail,
         'roleUpdatedAt': FieldValue.serverTimestamp(),
         'roleUpdatedBy': adminEmail,
         'lastUpdated': FieldValue.serverTimestamp(),

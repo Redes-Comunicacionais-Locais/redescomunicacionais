@@ -4,6 +4,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'dart:convert';
 import 'package:redescomunicacionais/app/modules/news/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/controller/home_controller.dart';
+import 'package:redescomunicacionais/app/modules/news/utils/cities_codes.dart';
 import 'package:redescomunicacionais/app/services/image_base64_service.dart';
 import 'package:redescomunicacionais/app/modules/news/utils/news_states.dart';
 import 'package:redescomunicacionais/app/utils/components/popups.dart';
@@ -65,16 +66,7 @@ final List<String> categories = [
 'Ação comunitária'
 ];
 
-
-final List<String> cities = [
-'São Sebastião do Alto',
-'Macuco',
-'Rio das Flores',
-'Comendador Levy Gasparian',
-'Laje do Muriaé',
-'São José de Ubá',
-];
-
+final List<String> cities = CitiesCodes().cities.values.toList();
 
 final List<String> types = [
 'Notícia',
