@@ -17,34 +17,20 @@ class UserController extends GetxController {
 
   UserModel currentUser = UserModel.empty();
 
+
   @override
   Future<void> onInit() async {
-    await loadCurrentUserData();
+    currentUser = await _repository.getCurrentUserFromHive();
     super.onInit();
   }
 
-  Future<void> loadCurrentUserData() async {
-    try {
-      isDataLoading.value = true;
-      UserModel user = await _repository.getCurrentUser();
 
-      if (isClosed) {
-        return;
-      }
+  Future<void> saveCurrentUserName(String newName) async {
+    isSavingData.value = true;
 
-      currentUser = user;
-    } catch (e) {
-      PopUps.snackbar(
-        texto: 'Não foi possível carregar seus dados.',
-        cor: Colors.red,
-      );
-    } finally {
-      isDataLoading.value = false;
-    }
-  }
+    UserModel currentUser = await _repository.getCurrentUserFromHive();
 
-  Future<void> saveCurrentUserName() async {
-    if (currentUser.name == null || currentUser.name!.trim().isEmpty) {
+    if (newName.trim().isEmpty) {
       PopUps.snackbar(
         texto: 'Informe um nome válido.',
         cor: Colors.orange,
@@ -53,14 +39,8 @@ class UserController extends GetxController {
     }
 
     try {
-      isSavingData.value = true;
-      await _repository.updateUserName(
-          currentUser.id, currentUser.name!.trim());
-      currentUser = await _repository.getCurrentUser();
-
-      if (isClosed) {
-        return;
-      }
+      await _repository.updateUserNameToFirebase(
+          currentUser.id, newName.trim());
 
       PopUps.snackbar(
         texto: 'Nome atualizado com sucesso.',
@@ -79,7 +59,7 @@ class UserController extends GetxController {
   Future<void> deleteCurrentUserAccount() async {
     try {
       isDeletingAccount.value = true;
-      await _repository.deleteCurrentUserAccount();
+      await _repository.deleteCurrentUserAccountFromFirebase();
       Get.offAllNamed(Routes.LOGIN);
       PopUps.snackbar(
         texto: 'Sua conta foi excluída com sucesso.',

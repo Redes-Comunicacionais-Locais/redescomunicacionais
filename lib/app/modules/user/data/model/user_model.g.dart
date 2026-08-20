@@ -25,18 +25,15 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       createdAt: fields[5] as DateTime,
       roleUpdatedAt: fields[6] as DateTime?,
       roleUpdatedBy: fields[7] as String?,
-      status: fields[8] as String,
-      statusUpdatedAt: fields[9] as DateTime?,
-      statusUpdatedBy: fields[10] as String?,
-      statusObservation: fields[11] as String?,
       lastUpdated: fields[12] as DateTime?,
+      operationsCities: (fields[13] as Map?)?.cast<String, String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, UserModel obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,16 +50,10 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..write(obj.roleUpdatedAt)
       ..writeByte(7)
       ..write(obj.roleUpdatedBy)
-      ..writeByte(8)
-      ..write(obj.status)
-      ..writeByte(9)
-      ..write(obj.statusUpdatedAt)
-      ..writeByte(10)
-      ..write(obj.statusUpdatedBy)
-      ..writeByte(11)
-      ..write(obj.statusObservation)
       ..writeByte(12)
-      ..write(obj.lastUpdated);
+      ..write(obj.lastUpdated)
+      ..writeByte(13)
+      ..write(obj.operationsCities);
   }
 
   @override

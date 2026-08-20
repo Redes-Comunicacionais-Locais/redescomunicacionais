@@ -15,28 +15,25 @@ class UserRepository {
     return _userProvider.updateUserRole(userId, role, adminEmail, operationsCities);
   }
 
-  Future<List<UserModel>> getAllUsers() {
-    return _userProvider.getAllUsers();
+  Future<List<UserModel>> getAllUsersFromFirebase() {
+    return _userProvider.getAllUsersFromFirebase();
   }
 
-  Future<UserModel> getCurrentUser() {
+  Future<UserModel> getCurrentUserFromHive() {
     return _userProvider.getCurrentUserFromHive();
   }
 
-  Future<void> updateUserInHive(UserModel user) {
-    return _userProvider.updateUserInHive(user);
-  }
 
   Future<void> deleteCurrentUserFromHive() {
     return _userProvider.deleteCurrentUserFromHive();
   }
 
-  Future<void> deleteCurrentUserAccount() {
-    return _userProvider.deleteCurrentUserAccount();
+  Future<void> deleteCurrentUserAccountFromFirebase() {
+    return _userProvider.deleteCurrentUserAccountFromFirebase();
   }
 
-  Future<void> updateUserName(String userId, String name) {
-    return _userProvider.updateUserName(userId, name);
+  Future<void> updateUserNameToFirebase(String userId, String name) {
+    return _userProvider.updateUserNameToFirebase(userId, name);
   }
 
   Future<String?> getPrivateKeyInStorage() async {

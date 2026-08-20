@@ -39,7 +39,7 @@ class NewsController extends GetxController {
   @override
   onInit() async {
     super.onInit();
-    user = await _userRepository.getCurrentUser();
+    user = await _userRepository.getCurrentUserFromHive();
     homeController = Get.find<HomeController>();
     await syncNews(null);
   }

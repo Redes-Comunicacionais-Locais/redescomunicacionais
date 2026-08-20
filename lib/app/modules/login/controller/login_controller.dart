@@ -4,6 +4,7 @@ import 'package:pointycastle/api.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/modules/user/data/repository/user_repository.dart';
 import 'package:redescomunicacionais/app/modules/login/data/repository/login_repository.dart';
+import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/modules/mesh/services/key_storage_service.dart';
 import 'package:redescomunicacionais/app/modules/mesh/services/keys_service.dart';
@@ -76,27 +77,32 @@ class LoginController extends GetxController {
   }
 
   Future<void> tryLogin() async {
-    try {
+     try {
       await _repository.trySignInGoogle().timeout(const Duration(seconds: 10),
           onTimeout: () =>
               throw Exception("Tempo esgotado para login silencioso"));
       await _createKeys();
-      Get.offAllNamed(Routes.HOME);
     } catch (e) {
-      debugPrint("Erro no tryLogin: $e");
-      loginAnonymous();
+      final user = await _userRepository.getCurrentUserFromHive();
+      if (user.role == UserRoles.guest) {
+        await loginAnonymous();
+      }
     }
+
+    Get.offAllNamed(Routes.HOME);
   }
 
   Future<void> tryLoginMicrosoft() async {
     try {
       await _repository.trySignInMicrosoft();
       await _createKeys();
-      Get.offAllNamed(Routes.HOME);
     } catch (e) {
-      debugPrint("Erro no tryLoginMicrosoft: $e");
-      loginAnonymous();
+      final user = await _userRepository.getCurrentUserFromHive();
+      if (user.role == UserRoles.guest) {
+        await loginAnonymous();
+      }
     }
+    Get.offAllNamed(Routes.HOME);
   }
 
   void logout() async {
@@ -129,7 +135,7 @@ class LoginController extends GetxController {
     }
   }
 
-  void loginAnonymous() async {
+  Future<void> loginAnonymous() async {
     await _repository.logoutGoogle();
     await _repository.logoutMicrosoft();
     UserModel anonymousUser = UserModel.empty();
@@ -148,7 +154,7 @@ class LoginController extends GetxController {
 
     if (privateKey.isEmpty) {
       try {
-        final user = await _userRepository.getCurrentUser();
+        final user = await _userRepository.getCurrentUserFromHive();
 
         final keys = KeysServices.generateKeyPair();
 
@@ -157,7 +163,7 @@ class LoginController extends GetxController {
 
         bool isUpdatePublicKey = await _userRepository
             .updatePublicKeyInFirebase(user.email, publicKeyString);
-            
+
         if (!isUpdatePublicKey) {
           final publicKeyModel =
               await _createPublicKeyModel(publicKeyString, user);
