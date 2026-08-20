@@ -176,7 +176,7 @@ class NewsController extends GetxController {
 
       await _repository.saveNewsToHive(news);
 
-      if (status == NewsStates.emAnalise || status == NewsStates.publicado) {
+      if (status == NewsStates.emAnalise || status == NewsStates.publicado || status == NewsStates.rascunho) {
         await _repository.saveNewsToPackage(news);
       }
 

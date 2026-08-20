@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:redescomunicacionais/app/modules/news/utils/categories.dart';
 import 'package:redescomunicacionais/app/modules/news/utils/cities_codes.dart';
+import 'package:redescomunicacionais/app/modules/news/utils/news_types.dart';
 import 'package:redescomunicacionais/app/services/image_base64_service.dart';
 import 'package:redescomunicacionais/app/modules/news/controller/update_news_controller.dart';
 import 'package:redescomunicacionais/app/modules/news/utils/news_states.dart';
@@ -43,30 +45,11 @@ class _EditNewsPageState extends State<EditNewsPage> {
   final RxBool showCityError = false.obs;
   final RxBool showTypeError = false.obs;
 
-  final List<String> categories = [
-    'Política',
-    'Segurança',
-    'Educação',
-    'Saúde',
-    'Transporte público e trânsito',
-    'Economia',
-    'Emprego e oportunidades',
-    'Cultura',
-    'Turismo e lazer',
-    'Esportes',
-    'Meio Ambiente',
-    'Infraestrutura da cidade',
-    'Habitação',
-    'Tecnologia',
-    'Ação comunitária'
-  ];
+  final List<String> categories = Categories().categories;
 
   final List<String> cities = CitiesCodes().cities.values.toList();
 
-  final List<String> types = [
-    'Notícia',
-    'Opinião',
-  ];
+  final List<String> types = NewsTypes().types;
 
   @override
   void initState() {
