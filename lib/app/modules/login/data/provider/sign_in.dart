@@ -21,7 +21,7 @@ class SignInService {
     try {
       await _init;
       var account = await _googleSignIn.authenticate();
-      _signIn(account);
+      await _signIn(account);
     } catch (e) {
       debugPrint('Error initializing GoogleSignIn: $e');
       throw Exception("Erro ao fazer login com Google");

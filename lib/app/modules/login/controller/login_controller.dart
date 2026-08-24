@@ -32,7 +32,7 @@ class LoginController extends GetxController {
     }
   }
 
-  void loginGoogle() async {
+  Future<void> loginGoogle() async {
     try {
       await _repository.logoutGoogle();
       await _repository.signInGoogle();
