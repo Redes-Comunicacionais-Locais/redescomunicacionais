@@ -205,9 +205,8 @@ class _UserPageState extends State<UserPage> {
                           onPressed: controller.isSavingData.value
                               ? null
                               : () async {
-                                  controller.currentUser.name =
-                                      _nameController.text;
-                                  await controller.saveCurrentUserName();
+                                  await controller.saveCurrentUserName(
+                                      _nameController.text);
                                   {
                                     Get.offAllNamed(
                                       Routes.HOME,

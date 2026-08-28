@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:redescomunicacionais/app/modules/mesh/model/news_package_model.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/modules/news/data/model/news_model.dart';
 
@@ -11,10 +12,12 @@ class HiveInitializer {
       // Registra os adaptadores
       Hive.registerAdapter(UserModelAdapter());
       Hive.registerAdapter(NewsModelAdapter());
+      Hive.registerAdapter(NewsPackageModelAdapter());
 
       // Abre as caixas com proteção contra arquivos corrompidos
       await _openBoxSafe<UserModel>('users');
       await _openBoxSafe<NewsModel>('news');
+      await _openBoxSafe<NewsPackageModel>('news_packages');
     } catch (e) {
       rethrow;
     }

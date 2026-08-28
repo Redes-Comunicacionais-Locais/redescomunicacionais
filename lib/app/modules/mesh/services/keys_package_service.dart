@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:pointycastle/asymmetric/api.dart';
-import 'package:redescomunicacionais/app/services/keys_services/key_storage_service.dart';
-import 'package:redescomunicacionais/app/services/keys_services/keys_service.dart';
-import 'package:redescomunicacionais/app/services/keys_services/public_key_model.dart';
-import 'keys_package_model.dart';
+import 'package:redescomunicacionais/app/modules/mesh/services/key_storage_service.dart';
+import 'package:redescomunicacionais/app/modules/mesh/services/keys_service.dart';
+import 'package:redescomunicacionais/app/modules/mesh/model/public_key_model.dart';
+import '../model/keys_package_model.dart';
 
 class KeysPackageService {
   final KeyStorageService _keyStorageService = KeyStorageService();

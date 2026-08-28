@@ -106,6 +106,7 @@ class NewsModel {
 
   @HiveField(20)
   String? excludedObservation;
+  
 
   NewsModel({
     String? id,

@@ -21,7 +21,7 @@ class SignInService {
     try {
       await _init;
       var account = await _googleSignIn.authenticate();
-      return _signIn(account);
+      await _signIn(account);
     } catch (e) {
       debugPrint('Error initializing GoogleSignIn: $e');
       throw Exception("Erro ao fazer login com Google");
@@ -63,55 +63,20 @@ class SignInService {
   }
 
   Future<void> trySignInGoogle() async {
-    final User? firebaseUser = FirebaseAuth.instance.currentUser;
-
-    if (firebaseUser != null) {
-      try {
-        // Busca o documento completo do usuário no Firestore
-        final userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(firebaseUser.uid)
-            .get();
-
-        if (userDoc.exists) {
-          return await _userRepository.createUserDoc(
-            firebaseUser.email ?? '',
-            userDoc.get('name') ?? '',
-            userDoc.get('id') ?? firebaseUser.uid,
-            userDoc.get('urlImage') ?? firebaseUser.photoURL ?? '',
-          );
-        }
-      } catch (err) {
-        debugPrint("Erro ao buscar dados do usuário: $err");
-      }
-    }
-
-    return await _trySignSilentlyInGoogle();
-  }
-
-  Future<void> _trySignSilentlyInGoogle() async {
     try {
-      final Future<GoogleSignInAccount?>? account =
-          _googleSignIn.attemptLightweightAuthentication();
-
-      if (account == null) {
-        throw Exception("Erro ao tentar fazer login silenciosamente");
-      }
-
-      final googleUser = await account;
+      final googleUser = await _googleSignIn.attemptLightweightAuthentication(); 
 
       if (googleUser == null) {
         debugPrint("Nenhum usuário encontrado durante login silencioso.");
-        throw Exception("Nenhum usuário encontrado durante login silencioso");
-      } else {
-        debugPrint(
-            "Usuário encontrado durante login silencioso: ${googleUser.email}");
-
-        return await _signIn(googleUser);
-      }
+        throw Exception("Nenhum usuário logado anteriormente");
+      } 
+        
+      debugPrint("Usuário encontrado durante login silencioso: ${googleUser.email}");
+      return await _signIn(googleUser);
+      
     } catch (e) {
       debugPrint('Error initializing GoogleSignIn: $e');
-      throw Exception("Erro ao tentar fazer login silenciosamente");
+      throw Exception("Erro ao tentar fazer login silenciosamente: $e");
     }
   }
 

@@ -31,8 +31,6 @@ class KeysServices {
     keyGenerator.init(params);
 
     final pair = keyGenerator.generateKeyPair();
-    debugPrint("Chave Publica: ${pair.publicKey.toString()}");
-    debugPrint("Chave Privada: ${pair.privateKey}");
     return AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey>(
       pair.publicKey,
       pair.privateKey,
@@ -108,7 +106,6 @@ class KeysServices {
 
     final bytesToSign = utf8.encode(newsBody);
     final signature = signer.generateSignature(Uint8List.fromList(bytesToSign));
-    debugPrint("Assinatura: ${base64.encode(signature.bytes)}");
     return base64.encode(signature.bytes);
   }
 

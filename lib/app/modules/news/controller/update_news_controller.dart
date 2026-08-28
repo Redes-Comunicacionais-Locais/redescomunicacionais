@@ -5,10 +5,16 @@ import 'package:redescomunicacionais/app/modules/news/data/repository/news_repos
 class UpdateNewsController extends GetxController {
   // Repository para acessar os dados
   final NewsRepository newsRepository = NewsRepository();
-  final NewsController newsController = Get.find<NewsController>();
+  late final NewsController newsController;
 
   // Estado de carregamento
   final RxBool isLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    newsController = Get.find<NewsController>();
+  }
 
   // Método para atualizar notícia
   Future<String> updateNews(
@@ -27,32 +33,4 @@ class UpdateNewsController extends GetxController {
     }
   }
 
-  // Método para validar dados antes de salvar (opcional)
-  bool validateNewsData(Map<String, dynamic> data) {
-    if (data['title'] == null || data['title'].toString().isEmpty) {
-      return false;
-    }
-    if (data['subtitle'] == null || data['subtitle'].toString().isEmpty) {
-      return false;
-    }
-    if (data['author'] == null || data['author'].toString().isEmpty) {
-      return false;
-    }
-    if (data['body'] == null || data['body'].toString().isEmpty) {
-      return false;
-    }
-    if (data['cities'] == null || (data['cities'] as List).isEmpty) {
-      return false;
-    }
-    if (data['categories'] == null || (data['categories'] as List).isEmpty) {
-      return false;
-    }
-    return true;
-  }
-
-  @override
-  void onClose() {
-    // Cleanup se necessário
-    super.onClose();
-  }
 }

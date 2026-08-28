@@ -39,7 +39,7 @@ class NewsController extends GetxController {
   @override
   onInit() async {
     super.onInit();
-    user = await _userRepository.getCurrentUser();
+    user = await _userRepository.getCurrentUserFromHive();
     homeController = Get.find<HomeController>();
     await syncNews(null);
   }
@@ -72,19 +72,19 @@ class NewsController extends GetxController {
   Future<void> getOuthersNewsFromHive() async {
     try {
       isLoading(true);
-      await _repository
-          .getOuthersNews(user); // Atualiza o Hive com os dados do Firebase
-
-      List<NewsModel> outhersNews = await _repository.getOuthersNewsFromHive();
-
-      outhersNews.sort((a, b) {
-        final dateA = a.lastUpdated;
-        final dateB = b.lastUpdated;
-        return dateB.compareTo(dateA);
-      });
-
-      // So admin e editor veem as listas de análise, rascunho, rejeitado e deletado
+       // So admin e editor veem as listas de análise, rascunho, rejeitado e deletado
       if (user.role == UserRoles.admin || user.role == UserRoles.editor) {
+        await _repository
+            .getOuthersNewsFromFirebase(user); // Atualiza o Hive com os dados do Firebase
+
+        List<NewsModel> outhersNews = await _repository.getNewsFromHive(isPublic: false);
+
+        outhersNews.sort((a, b) {
+          final dateA = a.lastUpdated;
+          final dateB = b.lastUpdated;
+          return dateB.compareTo(dateA);
+        });
+
         inAnalysisNewsList.assignAll(
           outhersNews
               .where((news) => news.status == NewsStates.emAnalise)
@@ -120,9 +120,9 @@ class NewsController extends GetxController {
       if (!isGetMoreNews) {
         isLoading(true);
       }
-      lastDocument = await _repository.getPublicNewsPaginated(
+      lastDocument = await _repository.getPublicNewsPaginatedFromFirebase(
           ld); // Atualiza o Hive com os dados do Firebase e obtém o próximo ponteiro de paginação
-      List<NewsModel> publicNews = await _repository.getPublicNewsFromHive();
+      List<NewsModel> publicNews = await _repository.getNewsFromHive(isPublic: true);
 
       publicNews.sort((a, b) {
         final dateA = a.createdAt;
@@ -176,6 +176,10 @@ class NewsController extends GetxController {
 
       await _repository.saveNewsToHive(news);
 
+      if (status == NewsStates.emAnalise || status == NewsStates.publicado || status == NewsStates.rascunho) {
+        await _repository.saveNewsToPackage(news);
+      }
+
       await syncNews(null);
 
       return news.id;
@@ -193,7 +197,7 @@ class NewsController extends GetxController {
     required Map<String, dynamic> terms,
   }) async {
     try {
-      await _repository.savePublicationTerms(
+      await _repository.savePublicationTermsToFirebase(
         newsId: newsId,
         terms: terms,
       );

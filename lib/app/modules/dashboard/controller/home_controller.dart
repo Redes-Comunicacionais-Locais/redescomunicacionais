@@ -6,6 +6,7 @@ import 'package:redescomunicacionais/app/modules/news/controller/news_controller
 import 'package:redescomunicacionais/app/modules/news/data/repository/news_repository.dart';
 import 'package:redescomunicacionais/app/modules/user/data/repository/user_repository.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
+import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/modules/connections/controller/connections_controller.dart';
 
@@ -40,8 +41,8 @@ class HomeController extends GetxController {
   @override
   Future<void> onInit() async {
     connectionsController = Get.find<ConnectionsController>();
-    user = await _userRepository.getCurrentUser();
-    if (user.status == 'anonymous') {
+    user = await _userRepository.getCurrentUserFromHive();
+    if (user.role == UserRoles.guest) {
       isAnonymousUser = true;
     } else {
       isAnonymousUser = false;

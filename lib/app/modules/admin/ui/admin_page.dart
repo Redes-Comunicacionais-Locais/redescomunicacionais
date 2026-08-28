@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/admin/controller/admin_controller.dart';
+import 'package:redescomunicacionais/app/modules/news/utils/cities_codes.dart';
 import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
 import 'package:redescomunicacionais/app/modules/user/data/model/user_model.dart';
 import 'package:redescomunicacionais/app/utils/components/popups.dart';
@@ -39,10 +40,10 @@ class AdminPage extends GetView<AdminController> {
           children: [
             // Cabeçalho
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Text(
                 'registered_users'.tr,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -91,7 +92,7 @@ class AdminPage extends GetView<AdminController> {
                   return Center(
                     child: Text(
                       'no_user_found'.tr,
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   );
                 }
@@ -207,15 +208,18 @@ class AdminPage extends GetView<AdminController> {
                       value: 'admin', child: Text('role_admin'.tr)),
                 ],
                 onChanged: (newRole) async {
-                  if (newRole != null) {
-                    // Confirma a alteração
-                    bool? confirm =
-                        await _showConfirmDialog(email, currentRole, newRole);
-                    if (confirm == true) {
+                  if (newRole != null && newRole != currentRole) {
+                    // Confirma a alteração e pega as cidades (se aplicável)
+                    final result =
+                        await _showRoleChangeDialog(email, currentRole, newRole);
+                    
+                    if (result != null && result['confirmed'] == true) {
+                      Map<String, String> operationsCities = result['cities'] ?? <String, String>{};
+
                       if (userId.isNotEmpty) {
                         try {
                           await controller.userRepository.updateRole(
-                              userId, newRole, controller.user.email);
+                              userId, newRole, controller.user.email, operationsCities);
                           PopUps.snackbar(
                             texto: 'Cargo atualizado com sucesso'.tr,
                             cor: Colors.green,
@@ -288,34 +292,111 @@ class AdminPage extends GetView<AdminController> {
     }
   }
 
-  Future<bool?> _showConfirmDialog(
+  Future<Map<String, dynamic>?> _showRoleChangeDialog(
       String email, String currentRole, String newRole) {
-    return showDialog<bool>(
+    
+    Map<String, String> selectedCities = {};
+    final citiesMap = CitiesCodes().cities;
+
+    return showDialog<Map<String, dynamic>>(
       context: Get.context!,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.black87,
-        title: Text(
-          'confirm_change'.tr,
-          style: TextStyle(color: Colors.white),
-        ),
-        content: Text(
-          '${'change_role_of'.tr} $email\n${'from_label'.tr}: ${_getRoleDisplayName(currentRole)}\n${'to_label'.tr}: ${_getRoleDisplayName(newRole)}',
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('cancel'.tr,
-                style: const TextStyle(color: Colors.white70)),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-            child:
-                Text('confirm'.tr, style: const TextStyle(color: Colors.black)),
-          ),
-        ],
-      ),
+      builder: (context) {
+        // StatefulBuilder para gerenciar o estado dos checkboxes dentro do modal
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: Colors.black87,
+              title: Text(
+                'confirm_change'.tr,
+                style: const TextStyle(color: Colors.white),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${'change_role_of'.tr} $email\n${'from_label'.tr}: ${_getRoleDisplayName(currentRole)}\n${'to_label'.tr}: ${_getRoleDisplayName(newRole)}',
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    // Mostra as opções de cidades apenas se a nova role for "editor"
+                    if (newRole == 'editor') ...[
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Cidades de atuação:',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      ...citiesMap.entries.map((entry) {
+                        return Theme(
+                          data: ThemeData(
+                              unselectedWidgetColor: Colors.white70),
+                          child: CheckboxListTile(
+                            title: Text(
+                              entry.value,
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 14),
+                            ),
+                            // Verifica se a chave existe no map para marcar o checkbox
+                            value: selectedCities.containsKey(entry.key),
+                            activeColor: Colors.white,
+                            checkColor: Colors.black,
+                            dense: true,
+                            controlAffinity:
+                                ListTileControlAffinity.leading,
+                            contentPadding: EdgeInsets.zero,
+                            onChanged: (bool? checked) {
+                              setState(() {
+                                if (checked == true) {
+                                  // Adiciona ao map se marcado
+                                  selectedCities[entry.key] = entry.value;
+                                } else {
+                                  // Remove do map se desmarcado
+                                  selectedCities.remove(entry.key);
+                                }
+                              });
+                            },
+                          ),
+                        );
+                      }),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(null),
+                  child: Text('cancel'.tr,
+                      style: const TextStyle(color: Colors.white70)),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Validação opcional: exigir pelo menos uma cidade se for editor
+                    if (newRole == 'editor' && selectedCities.isEmpty) {
+                      PopUps.snackbar(
+                        texto: 'Selecione pelo menos uma cidade para o editor.',
+                        cor: Colors.orange,
+                      );
+                      return;
+                    }
+                    Navigator.of(context).pop({
+                      'confirmed': true,
+                      'cities': selectedCities, // Retorna o Map
+                    });
+                  },
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                  child: Text('confirm'.tr,
+                      style: const TextStyle(color: Colors.black)),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
