@@ -1,17 +1,37 @@
 import * as admin from "firebase-admin";
-import { PublicKey } from "../model/PublicKey";
 import { firestore } from "firebase-admin";
+import { firestoreToPublicKey, PublicKey, toFirestore } from "../model/PublicKey";
+import { User } from "../model/User";
 import Firestore = firestore.Firestore;
-import {User} from "../model/User";
 
-export const publicKeyRepository = {
-  save: async (data: PublicKey, loggedUser: User): Promise<string> => {
-    const fs: Firestore = admin.firestore();
+export const PublicKeyRepository = {
 
-    const docRef = await fs.collection("public_keys").add({
-      ...data,
-    });
+  save: async (data: PublicKey, loggedUser: User): Promise<void> => {
+    const db: Firestore = admin.firestore();
 
-    return docRef.id;
+    try {
+      const docRef = db.collection("public_keys");
+      await docRef.doc(loggedUser.email).set(toFirestore(data));
+    } catch (e) {
+      // TO DO
+    }
+  },
+
+  getAll: async (): Promise<PublicKey[]> => {
+    const db: Firestore = admin.firestore();
+
+    try {
+      const snapshot = await db.collection("public_keys").get();
+      if (snapshot.empty) {
+        return [];
+      }
+
+      return snapshot.docs.map((doc) => {
+        return firestoreToPublicKey(doc.id, doc.data());
+      });
+    } catch (e) {
+      return [];
+      // TO DO
+    }
   }
-};
+}

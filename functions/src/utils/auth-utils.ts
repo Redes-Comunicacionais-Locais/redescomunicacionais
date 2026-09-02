@@ -1,5 +1,5 @@
-import {CallableRequest, HttpsError} from "firebase-functions/v2/https";
-import {User} from "../model/User";
+import { CallableRequest, HttpsError } from "firebase-functions/v2/https";
+import { User } from "../model/User";
 
 type AuthData = CallableRequest['auth'];
 
