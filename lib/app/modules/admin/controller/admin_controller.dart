@@ -9,6 +9,8 @@ class AdminController extends GetxController {
   UserRepository userRepository = UserRepository();
   List<UserModel> users = [];
   UserModel user = UserModel.empty();
+  final RxnString selectedCity = RxnString(null);
+
 
   RxBool isLoading = false.obs;
 

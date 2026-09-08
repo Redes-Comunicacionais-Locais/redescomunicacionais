@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/admin/bindings/admin_binding.dart';
+import 'package:redescomunicacionais/app/modules/admin/ui/admin_page.dart';
 import 'package:redescomunicacionais/app/modules/central_de_comunicacao/bindings/cdc_bindings.dart';
 import 'package:redescomunicacionais/app/modules/central_de_comunicacao/ui/cdc_page.dart';
 import 'package:redescomunicacionais/app/modules/connections/bindings/connections_bindings.dart';
@@ -14,11 +15,9 @@ import 'package:redescomunicacionais/app/modules/splash/bindings/splash_bindings
 import 'package:redescomunicacionais/app/modules/user/bindings/user_bindings.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/modules/news/ui/create_news_form_page.dart';
-import 'package:redescomunicacionais/app/modules/admin/ui/admin_page.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/ui/home_page.dart';
 import 'package:redescomunicacionais/app/modules/splash/ui/splash_page.dart';
 import 'package:redescomunicacionais/app/modules/login/ui/login_page.dart';
-import 'package:redescomunicacionais/app/modules/news/ui/news_widgets.dart';
 import 'package:redescomunicacionais/app/modules/news/ui/news_page.dart';
 import 'package:redescomunicacionais/app/modules/user/ui/user_page.dart';
 import 'package:redescomunicacionais/app/modules/web/ui/webview_page.dart';
