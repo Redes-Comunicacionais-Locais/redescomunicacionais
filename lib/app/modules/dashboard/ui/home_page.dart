@@ -7,9 +7,13 @@ import 'package:redescomunicacionais/app/utils/responsive_utils.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/utils/menu_drawer.dart';
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
+import 'package:redescomunicacionais/app/utils/widgets/city_selector_widget.dart'; // Importe o widget de cidades
 
 class HomePage extends GetView<HomeController> {
-  const HomePage({super.key});
+  HomePage({super.key});
+
+  // Variável reativa local para controlar a cidade selecionada na Home
+  final RxnString selectedCity = RxnString(null);
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +28,6 @@ class HomePage extends GetView<HomeController> {
     double appBarTitleSize = ResponsiveUtils.calculateAppBarTitleSize(
         screenWidth, isTablet, useHorizontalLayout);
     double iconSize = ResponsiveUtils.calculateIconSize(screenWidth, isTablet);
-    ResponsiveUtils.calculateBottomBarHeight(screenHeight, isTablet);
-    ResponsiveUtils.calculateBottomBarFontSize(screenWidth, isTablet);
 
     return Scaffold(
       appBar: useHorizontalLayout
@@ -155,30 +157,77 @@ class HomePage extends GetView<HomeController> {
         onRefresh: () async {
           await controller.refreshDashboardData();
         },
-        child: Obx(
-          () => false
-              ? Container(
-                  decoration: BoxDecoration(
-                    gradient: AppColors.darkBlueToBlackGradient(),
-                  ),
-                  child: const Center(
-                    child: BlinkingLoadingIcon(
-                      size: 38,
-                      color: Colors.white,
+        child: Obx(() {
+          // 1. Se nenhuma cidade foi selecionada, exibe a tela de seleção de cidades
+          if (selectedCity.value == null) {
+            return Container(
+              width: double.infinity,
+              height: double.infinity,
+              decoration: BoxDecoration(
+                gradient: AppColors.darkBlueToBlackGradient(),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'Escolha a Cidade para Visualizar as Matérias'.tr,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
+
+                  // Widget com a lista das cidades em formato de cards com imagens
+                  Expanded(
+                    child: CitySelectorWidget(
+                      onCitySelected: (String cityName) {
+                        debugPrint('Cidade selecionada na Home: $cityName');
+                        selectedCity.value = cityName;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          selectedCity.value = 'Todas';
+                        },
+                        label: const Text(
+                          'Visualizar todas as cidades',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent.withOpacity(0.8),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return useHorizontalLayout
+              ? _buildHorizontalLayout(
+                  context,
+                  screenWidth,
+                  screenHeight,
+                  isTablet,
+                  appBarTitleSize,
+                  iconSize,
                 )
-              : useHorizontalLayout
-                  ? _buildHorizontalLayout(
-                      context,
-                      screenWidth,
-                      screenHeight,
-                      isTablet,
-                      appBarTitleSize,
-                      iconSize,
-                    )
-                  : _buildVerticalLayout(),
-        ),
+              : _buildVerticalLayout();
+        }),
       ),
     );
   }
@@ -198,7 +247,6 @@ class HomePage extends GetView<HomeController> {
       ),
       child: Row(
         children: [
-          // Menu responsivo para layout horizontal
           Container(
             width: screenWidth * (isTablet ? 0.25 : 0.2),
             decoration: BoxDecoration(
@@ -217,7 +265,6 @@ class HomePage extends GetView<HomeController> {
                   iconSize: iconSize,
                   isTablet: isTablet,
                 ),
-                // Footer com localização no final do sidebar
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -235,17 +282,18 @@ class HomePage extends GetView<HomeController> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          '',
-                          style: TextStyle(
-                            fontSize: isTablet ? 12.0 : 10.0,
-                            color: Colors.white.withOpacity(0.8),
-                            fontWeight: FontWeight.w500,
+                        // Botão de voltar para a seleção de cidades no menu lateral horizontal
+                        TextButton.icon(
+                          onPressed: () => selectedCity.value = null,
+                          icon: const Icon(Icons.arrow_back, color: Colors.white70, size: 16),
+                          label: Text(
+                            'Trocar Cidade',
+                            style: TextStyle(
+                              fontSize: isTablet ? 12.0 : 10.0,
+                              color: Colors.white.withOpacity(0.8),
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -253,11 +301,17 @@ class HomePage extends GetView<HomeController> {
               ],
             ),
           ),
-
-          // Lado direito - Conteúdo principal
           Expanded(
-            child: NewsWidgets(
-              key: ValueKey(controller.recreateKey),
+            child: Column(
+              children: [
+                _buildCityIndicatorHeader(),
+                Expanded(
+                  child: NewsWidgets(
+                    key: ValueKey(controller.recreateKey),
+                    selectedCity: selectedCity.value,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -271,8 +325,53 @@ class HomePage extends GetView<HomeController> {
       decoration: BoxDecoration(
         gradient: AppColors.darkBlueToBlackGradient(),
       ),
-      child: NewsWidgets(
-        key: ValueKey(controller.recreateKey),
+      child: Column(
+        children: [
+          _buildCityIndicatorHeader(),
+          Expanded(
+            child: NewsWidgets(
+              key: ValueKey(controller.recreateKey),
+              selectedCity: selectedCity.value,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Cabeçalho sutil exibindo a cidade selecionada com botão para voltar
+  Widget _buildCityIndicatorHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      color: Colors.black.withOpacity(0.3),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.location_on, color: Colors.blueAccent, size: 18),
+              const SizedBox(width: 6),
+              Text(
+                'Cidade: ${selectedCity.value}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          TextButton.icon(
+            onPressed: () {
+              selectedCity.value = null; // Reseta para voltar à escolha de cidades
+            },
+            icon: const Icon(Icons.swap_horiz, color: Colors.white70, size: 16),
+            label: const Text(
+              'Alterar',
+              style: TextStyle(color: Colors.white70, fontSize: 13),
+            ),
+          ),
+        ],
       ),
     );
   }

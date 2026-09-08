@@ -5,11 +5,13 @@ import 'package:redescomunicacionais/app/modules/news/utils/news_states.dart';
 import 'package:redescomunicacionais/app/modules/news/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/modules/news/data/model/news_model.dart';
 import 'package:intl/intl.dart';
-import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart'; // Para formatar datas
+import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
 
 class NewsWidgets extends GetView<NewsController> {
-  const NewsWidgets({super.key});
+  final String? selectedCity; // Recebe a cidade selecionada na Home
+
+  const NewsWidgets({super.key, this.selectedCity});
 
   @override
   Widget build(BuildContext context) {
@@ -30,18 +32,24 @@ class NewsWidgets extends GetView<NewsController> {
             }
             List<NewsModel> selectedNewss = controller.getNewsForCurrentMode();
 
+            // Filtra as notícias pela cidade selecionada (se não for nula e nem 'Todas')
+            if (selectedCity != null && selectedCity != 'Todas') {
+              selectedNewss = selectedNewss.where((news) {
+                return news.cities.isNotEmpty && news.cities.contains(selectedCity);
+              }).toList();
+            }
+
             if (selectedNewss.isEmpty) {
               return Center(
                 child: Text(
                   'no_news_found'.tr,
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
               );
             }
 
             return GestureDetector(
-              // Detecta toque fora dos cards para fechar o menu
               behavior: HitTestBehavior.translucent,
               onTap: () {
                 controller.selectedCardIndex.value = null;
@@ -50,7 +58,6 @@ class NewsWidgets extends GetView<NewsController> {
                 controller: ScrollController(),
                 children: [
                   const SizedBox(height: 16.0),
-                  // Lista vertical de notícias
                   ..._buildNewsList(selectedNewss),
 
                   if (controller.homeController.isPublishedMode.value &&
@@ -76,7 +83,6 @@ class NewsWidgets extends GetView<NewsController> {
 
           return Column(
             children: [
-              // Barra de ações (aparece apenas quando o card está selecionado)
               if (isSelected)
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -94,7 +100,6 @@ class NewsWidgets extends GetView<NewsController> {
                     spacing: 8.0,
                     runSpacing: 4.0,
                     children: [
-                      // Ícone de editar (lápis)
                       if (controller.canEdit(news))
                         GestureDetector(
                           onTap: () {
@@ -105,15 +110,15 @@ class NewsWidgets extends GetView<NewsController> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.edit,
                                   color: Colors.white,
                                   size: 30,
                                 ),
-                                SizedBox(width: 8.0),
+                                const SizedBox(width: 8.0),
                                 Text(
                                   'edit'.tr,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 25.0,
                                     fontWeight: FontWeight.w600,
@@ -134,15 +139,15 @@ class NewsWidgets extends GetView<NewsController> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.delete,
                                   color: Colors.red,
                                   size: 30,
                                 ),
-                                SizedBox(width: 8.0),
+                                const SizedBox(width: 8.0),
                                 Text(
                                   'delete'.tr,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.red,
                                     fontSize: 25.0,
                                     fontWeight: FontWeight.w600,
@@ -160,15 +165,15 @@ class NewsWidgets extends GetView<NewsController> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.rate_review,
                                   color: Colors.yellowAccent,
                                   size: 30,
                                 ),
-                                SizedBox(width: 8.0),
+                                const SizedBox(width: 8.0),
                                 Text(
                                   'review'.tr,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.yellowAccent,
                                     fontSize: 25.0,
                                     fontWeight: FontWeight.w600,
@@ -188,15 +193,15 @@ class NewsWidgets extends GetView<NewsController> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.sticky_note_2_outlined,
                                   color: Colors.orangeAccent,
                                   size: 30,
                                 ),
-                                SizedBox(width: 8.0),
+                                const SizedBox(width: 8.0),
                                 Text(
                                   'observations'.tr,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.orangeAccent,
                                     fontSize: 25.0,
                                     fontWeight: FontWeight.w600,
@@ -210,7 +215,6 @@ class NewsWidgets extends GetView<NewsController> {
                   ),
                 ),
 
-              // Card da notícia
               GestureDetector(
                 onTap: () => controller.openNews(news),
                 onLongPress: () => controller.toggleSelected(index),
@@ -255,7 +259,6 @@ class NewsWidgets extends GetView<NewsController> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Imagem da notícia
                         ClipRRect(
                           borderRadius: BorderRadius.only(
                             topLeft: isSelected
@@ -268,8 +271,7 @@ class NewsWidgets extends GetView<NewsController> {
                           child: news.urlImages.isNotEmpty &&
                                   news.urlImages[0].isNotEmpty
                               ? _buildSafeImage(news.urlImages[0], 200.0)
-                              : // se não houver base64, usa asset local por city
-                              Image.asset(
+                              : Image.asset(
                                   controller.getCityImageAsset(
                                       news.cities.isNotEmpty
                                           ? news.cities[0]
@@ -284,7 +286,6 @@ class NewsWidgets extends GetView<NewsController> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Título da notícia
                               Text(
                                 news.title,
                                 style: const TextStyle(
@@ -296,7 +297,6 @@ class NewsWidgets extends GetView<NewsController> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 8.0),
-                              // Subtítulo ou descrição curta
                               Text(
                                 news.subtitle ?? '',
                                 style: const TextStyle(
@@ -307,7 +307,6 @@ class NewsWidgets extends GetView<NewsController> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 8.0),
-                              // Data formatada
                               Text(
                                 _getFormattedDate(news.createdAt.toString()),
                                 style: const TextStyle(
@@ -347,7 +346,7 @@ class NewsWidgets extends GetView<NewsController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('Carregar mais Matérias'.tr,
-                style: TextStyle(color: Colors.white))
+                style: const TextStyle(color: Colors.white))
           ],
         ),
       ),
@@ -405,11 +404,10 @@ class NewsWidgets extends GetView<NewsController> {
           style: const TextStyle(color: Colors.white70),
         ),
         actions: [
-          // Botão de voltar adicionado para manter a consistência do fluxo
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
-              'cancel'.tr, // Usa o "Cancelar" mapeado nas suas traduções
+              'cancel'.tr,
               style: TextStyle(color: Colors.grey[400]),
             ),
           ),
@@ -533,7 +531,6 @@ class NewsWidgets extends GetView<NewsController> {
     );
   }
 
-  // Função para calcular e formatar a data
   String _getFormattedDate(String dataCriacao) {
     try {
       final creationDate = DateTime.parse(dataCriacao);
@@ -554,7 +551,6 @@ class NewsWidgets extends GetView<NewsController> {
     }
   }
 
-  // Função para construir imagem segura com tratamento de erro
   Widget _buildSafeImage(String base64String, double height) {
     try {
       return Image.memory(
@@ -562,18 +558,16 @@ class NewsWidgets extends GetView<NewsController> {
         fit: BoxFit.cover,
         width: double.infinity,
         height: height,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            width: double.infinity,
-            height: height,
-            color: Colors.grey[800],
-            child: const Icon(
-              Icons.image_not_supported,
-              color: Colors.grey,
-              size: 40,
-            ),
-          );
-        },
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: double.infinity,
+          height: height,
+          color: Colors.grey[800],
+          child: const Icon(
+            Icons.image_not_supported,
+            color: Colors.grey,
+            size: 40,
+          ),
+        ),
       );
     } catch (e) {
       return Container(
