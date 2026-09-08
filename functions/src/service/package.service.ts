@@ -1,4 +1,4 @@
-import { KeysService } from './keys-service';
+import { KeysService } from './keys.service';
 import { KeysPackage } from '../model/KeysPackage';
 import { PublicKey } from '../model/PublicKey';
 

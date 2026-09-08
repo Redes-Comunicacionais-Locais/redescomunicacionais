@@ -13,7 +13,7 @@ export const PublicKeyRepository = {
       const docRef = db.collection("public_keys");
       await docRef.doc(loggedUser.email).set(toFirestore(data));
     } catch (e) {
-      // TO DO
+      throw e;
     }
   },
 
@@ -30,8 +30,7 @@ export const PublicKeyRepository = {
         return firestoreToPublicKey(doc.id, doc.data());
       });
     } catch (e) {
-      return [];
-      // TO DO
+      throw e;
     }
   }
 }

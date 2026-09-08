@@ -1,9 +1,13 @@
 import { onCall } from "firebase-functions/https";
 import { getLoggedUser } from "../utils/auth-utils";
 import { User } from "../model/User";
-import { CallableRequest } from "firebase-functions/v2/https";
+import {CallableRequest, HttpsError} from "firebase-functions/v2/https";
 import { PublicKey } from "../model/PublicKey";
 import { publicKeyService } from "../service/public-key.service";
+import { defineSecret } from "firebase-functions/params";
+import {KeysPackage} from "../model/KeysPackage";
+
+const apiPrivateKey = defineSecret("API_PRIVATE_KEY");
 
 export const savePublicKey = onCall<PublicKey>(async (request: CallableRequest<any>): Promise<void> => {
   try {
@@ -12,18 +16,24 @@ export const savePublicKey = onCall<PublicKey>(async (request: CallableRequest<a
 
     await publicKeyService.saveNewKey(data, loggedUser);
   } catch (e) {
-    // TO DO
+    throw new HttpsError(
+      "internal",
+      "Internal server error."
+    );
   }
 });
 
-export const getPublicKeysPackage = onCall<PublicKey>(
-  async (request: CallableRequest<any>): Promise<void> => {
+export const getPublicKeysPackage = onCall<void>({ secrets: [apiPrivateKey] },
+  async (request: CallableRequest<any>): Promise<KeysPackage> => {
     try {
-      let loggedUser: User = getLoggedUser(request.auth);
-      let data: PublicKey = request.data;
+      getLoggedUser(request.auth);
+      const privateKeyStr = apiPrivateKey.value();
 
-      await publicKeyService.saveNewKey(data, loggedUser);
+      return await publicKeyService.getPublicKeysPackage(privateKeyStr);
     } catch (e) {
-      // TO DO
+      throw new HttpsError(
+        "internal",
+        "Internal server error."
+      );
     }
 });
