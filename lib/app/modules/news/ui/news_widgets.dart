@@ -135,7 +135,7 @@ class NewsWidgets extends GetView<NewsController> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.edit,
                                   color: theme.colorScheme.onSurface,
                                   size: 30,
