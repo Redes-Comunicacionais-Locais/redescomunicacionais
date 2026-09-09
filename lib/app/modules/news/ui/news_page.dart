@@ -1,30 +1,40 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:intl/intl.dart';
+
 import 'package:redescomunicacionais/app/services/youtube_service.dart';
 import 'package:redescomunicacionais/app/utils/responsive_utils.dart';
 import 'package:redescomunicacionais/app/modules/news/controller/news_controller.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
+import 'package:redescomunicacionais/app/utils/theme/theme_controller.dart';
 
 class NewsPage extends GetView<NewsController> {
   const NewsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Configurações responsivas
+    final theme = Theme.of(context);
+    final themeController = Get.find<ThemeController>();
+
+    final bool isLight = themeController.isLight;
+
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
     final double screenHeight = screenSize.height;
-    final bool isTablet = ResponsiveUtils.isTablet(screenWidth);
-    final bool isWideScreen = screenWidth > 900; // Para modo horizontal/web
 
-    bool hasMoreThanTwoCategories =
+    final bool isTablet = ResponsiveUtils.isTablet(screenWidth);
+    final bool isWideScreen = screenWidth > 900;
+
+    final bool hasMoreThanTwoCategories =
         controller.selectedNews.categories.length > 2;
-    List<String> visibleCategories = hasMoreThanTwoCategories
-        ? controller.selectedNews.categories.take(2).toList()
-        : controller.selectedNews.categories;
+
+    final List<String> visibleCategories = controller.selectedNews.categories
+        .map<String>((e) => e.toString())
+        .take(2)
+        .toList();
 
     return GetBuilder<NewsController>(
       init: controller,
@@ -42,17 +52,22 @@ class NewsPage extends GetView<NewsController> {
       },
       builder: (_) {
         if (controller.quillController == null) {
-          return const Scaffold(
-            backgroundColor: Colors.black,
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
             body: Center(
-              child: CircularProgressIndicator(color: Colors.white),
+              child: CircularProgressIndicator(
+                color: theme.colorScheme.primary,
+              ),
             ),
           );
         }
+
         return Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: theme.scaffoldBackgroundColor,
           appBar: AppBar(
-            flexibleSpace: Container(
+            flexibleSpace: isLight
+                ? null
+                : Container(
               decoration: BoxDecoration(
                 gradient: AppColors.appBarBottomGradient(),
               ),
@@ -60,54 +75,75 @@ class NewsPage extends GetView<NewsController> {
             title: Text(
               '${'full_type'.tr} ${controller.selectedNews.type}',
               style: TextStyle(
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
                 fontSize: ResponsiveUtils.calculateAppBarTitleSize(
-                    screenWidth, isTablet, false),
+                  screenWidth,
+                  isTablet,
+                  false,
+                ),
               ),
             ),
             iconTheme: IconThemeData(
-              color: Colors.white,
-              size: ResponsiveUtils.calculateIconSize(screenWidth, isTablet),
+              color: theme.colorScheme.onSurface,
+              size: ResponsiveUtils.calculateIconSize(
+                screenWidth,
+                isTablet,
+              ),
             ),
             centerTitle: true,
             toolbarHeight: isTablet ? 70.0 : 56.0,
           ),
           body: isWideScreen
               ? _buildWideScreenLayout(
-                  screenWidth,
-                  screenHeight,
-                  isTablet,
-                  visibleCategories,
-                  hasMoreThanTwoCategories,
-                  context,
-                )
+            screenWidth,
+            screenHeight,
+            isTablet,
+            visibleCategories,
+            hasMoreThanTwoCategories,
+            context,
+            isLight,
+          )
               : _buildMobileLayout(
-                  screenWidth,
-                  screenHeight,
-                  isTablet,
-                  visibleCategories,
-                  hasMoreThanTwoCategories,
-                  context,
-                ),
+            screenWidth,
+            screenHeight,
+            isTablet,
+            visibleCategories,
+            hasMoreThanTwoCategories,
+            context,
+            isLight,
+          ),
         );
       },
     );
   }
 
-  // Layout para telas grandes (modo horizontal/web)
+  // ============================================================
+  // LAYOUT WIDE SCREEN
+  // ============================================================
+
   Widget _buildWideScreenLayout(
-    double screenWidth,
-    double screenHeight,
-    bool isTablet,
-    List<String> visibleCategories,
-    bool hasMoreThanTwoCategories,
-    BuildContext context,
-  ) {
-    String urlImages = controller.selectedNews.urlImages[0];
-    List<String> cities = controller.selectedNews.cities;
+      double screenWidth,
+      double screenHeight,
+      bool isTablet,
+      List<String> visibleCategories,
+      bool hasMoreThanTwoCategories,
+      BuildContext context,
+      bool isLight,
+      ) {
+    final theme = Theme.of(context);
+
+    final String urlImages = controller.selectedNews.urlImages.isNotEmpty
+        ? controller.selectedNews.urlImages.first
+        : '';
+
+    final List<String> cities = controller.selectedNews.cities;
+
     return Row(
       children: [
-        // Lado esquerdo - Informações da notícia
+        // ======================================================
+        // LADO ESQUERDO
+        // ======================================================
+
         SizedBox(
           width: screenWidth * 0.4,
           height: screenHeight,
@@ -116,114 +152,95 @@ class NewsPage extends GetView<NewsController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Container da imagem (usa asset se imgurl vazio)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                      ResponsiveUtils.calculateResponsiveBorderRadius(
-                              isTablet) *
-                          0.8),
-                  child: urlImages
-                          .isNotEmpty // Garanta que a condição inicial está aqui
-                      ? Image.memory(
-                          base64Decode(urlImages),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: isTablet ? 250 : 200,
-                        )
-                      : (cities.isNotEmpty &&
-                              cities[0]
-                                  .isNotEmpty) // Proteção para não quebrar o app se a lista sumir
-                          ? Image.asset(
-                              controller.getCityImageAsset(cities[0]),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: isTablet ? 250 : 200,
-                            )
-                          : Image.asset(
-                              // Um "fallback" caso não tenha imagem em base64 E nem cidade válida
-                              controller.getCityImageAsset('default'),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: isTablet ? 250 : 200,
-                            ),
+                _buildNewsImage(
+                  urlImages: urlImages,
+                  cities: cities,
+                  isTablet: isTablet,
                 ),
+
                 SizedBox(height: isTablet ? 25 : 20),
 
-                // Container do título
+                // TÍTULO
                 Text(
                   controller.selectedNews.title,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: theme.colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                     fontSize: isTablet ? 32 : 28,
                   ),
                   textAlign: TextAlign.center,
                 ),
+
                 SizedBox(height: isTablet ? 12 : 10),
 
-                // Container do subtítulo
+                // SUBTÍTULO
                 Text(
                   controller.selectedNews.subtitle ?? '',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: theme.colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.w500,
                     fontSize: isTablet ? 20 : 18,
                   ),
                   textAlign: TextAlign.center,
                 ),
+
                 SizedBox(height: isTablet ? 25 : 20),
 
-                // Container com informações da notícia
+                // INFORMAÇÕES
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white24, width: 1),
+                    border: Border.all(
+                      color: theme.colorScheme.outlineVariant,
+                      width: 1,
+                    ),
                     borderRadius: BorderRadius.circular(
-                        ResponsiveUtils.calculateResponsiveBorderRadius(
-                                isTablet) *
-                            0.8),
-                    color: Colors.white.withOpacity(0.05),
+                      ResponsiveUtils.calculateResponsiveBorderRadius(
+                        isTablet,
+                      ) *
+                          0.8,
+                    ),
+                    color: theme.colorScheme.surfaceContainerHighest,
                   ),
                   padding: EdgeInsets.all(isTablet ? 16 : 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Título da seção
                       Row(
                         children: [
                           Icon(
                             Icons.info_outline,
-                            color: Colors.white70,
+                            color: theme.colorScheme.onSurfaceVariant,
                             size: isTablet ? 20 : 18,
                           ),
                           SizedBox(width: isTablet ? 8 : 6),
                           Text(
                             '${'info_of'.tr} ${controller.selectedNews.type}',
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: theme.colorScheme.onSurfaceVariant,
                               fontSize: isTablet ? 16 : 14,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
+
                       SizedBox(height: isTablet ? 12 : 10),
 
-                      // Linha divisória
                       Container(
                         height: 1,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
                               Colors.transparent,
-                              Colors.white24,
+                              theme.colorScheme.outlineVariant,
                               Colors.transparent,
                             ],
                           ),
                         ),
                       ),
+
                       SizedBox(height: isTablet ? 12 : 10),
 
-                      // Informações organizadas
                       _buildInfoRowWideScreen(
                         isTablet,
                         visibleCategories,
@@ -233,21 +250,27 @@ class NewsPage extends GetView<NewsController> {
                     ],
                   ),
                 ),
-                // Espaçamento extra no final
+
                 SizedBox(height: isTablet ? 40 : 32),
               ],
             ),
           ),
         ),
 
-        // Divisor vertical
+        // ======================================================
+        // DIVISOR
+        // ======================================================
+
         Container(
           width: 1,
           height: screenHeight,
-          color: Colors.white24,
+          color: theme.colorScheme.outlineVariant,
         ),
 
-        // Lado direito
+        // ======================================================
+        // LADO DIREITO
+        // ======================================================
+
         Expanded(
           child: Container(
             height: screenHeight,
@@ -256,24 +279,23 @@ class NewsPage extends GetView<NewsController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Título da seção do conteúdo
-                  Container(
-                    child: Text(
-                      '${'content_of'.tr} ${controller.selectedNews.type}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: isTablet ? 24 : 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Text(
+                    '${'content_of'.tr} ${controller.selectedNews.type}',
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                      fontSize: isTablet ? 24 : 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+
                   SizedBox(height: isTablet ? 20 : 16),
 
-                  if (controller.selectedNews.videoUrl != '' &&
-                      controller.selectedNews.videoUrl != null)
-                    // Mini player do YouTube
+                  if (controller.selectedNews.videoUrl != null &&
+                      controller.selectedNews.videoUrl!.isNotEmpty)
                     Container(
-                      margin: EdgeInsets.only(bottom: isTablet ? 20 : 16),
+                      margin: EdgeInsets.only(
+                        bottom: isTablet ? 20 : 16,
+                      ),
                       child: YouTubeMiniPlayer(
                         videoUrl: controller.selectedNews.videoUrl!,
                         width: double.infinity,
@@ -284,87 +306,11 @@ class NewsPage extends GetView<NewsController> {
                         captionLanguage: 'pt',
                       ),
                     ),
-                  // Container com o conteúdo da notícia
-                  Container(
-                    constraints: BoxConstraints(
-                      minHeight: 400, // Altura mínima para o conteúdo
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white24),
-                      borderRadius: BorderRadius.circular(
-                          ResponsiveUtils.calculateResponsiveBorderRadius(
-                                  isTablet) *
-                              0.5),
-                    ),
-                    child: AbsorbPointer(
-                      child: QuillEditor.basic(
-                        controller: controller.quillController,
-                        focusNode: FocusNode(),
-                        scrollController: ScrollController(),
-                        config: QuillEditorConfig(
-                          padding: EdgeInsets.all(isTablet ? 20 : 16),
-                          autoFocus: false,
-                          expands: false,
-                          enableInteractiveSelection: false,
-                          customStyles: DefaultStyles(
-                            paragraph: DefaultTextBlockStyle(
-                              TextStyle(
-                                color: Colors.white,
-                                fontSize: isTablet ? 18 : 16,
-                              ),
-                              HorizontalSpacing.zero,
-                              const VerticalSpacing(6, 0),
-                              const VerticalSpacing(0, 0),
-                              null,
-                            ),
-                            bold: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: isTablet ? 18 : 16,
-                            ),
-                            italic: TextStyle(
-                              color: Colors.white,
-                              fontStyle: FontStyle.italic,
-                              fontSize: isTablet ? 18 : 16,
-                            ),
-                            underline: TextStyle(
-                              color: Colors.white,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Colors.white,
-                              fontSize: isTablet ? 18 : 16,
-                            ),
-                            quote: DefaultTextBlockStyle(
-                              TextStyle(
-                                color: Colors.white70,
-                                fontSize: isTablet ? 18 : 16,
-                              ),
-                              HorizontalSpacing.zero,
-                              const VerticalSpacing(6, 6),
-                              const VerticalSpacing(0, 0),
-                              BoxDecoration(
-                                border: Border(
-                                  left:
-                                      BorderSide(color: Colors.white, width: 4),
-                                ),
-                              ),
-                            ),
-                            lists: DefaultListBlockStyle(
-                              TextStyle(
-                                color: Colors.white,
-                                fontSize: isTablet ? 18 : 16,
-                              ),
-                              HorizontalSpacing.zero,
-                              const VerticalSpacing(6, 0),
-                              const VerticalSpacing(0, 0),
-                              const BoxDecoration(
-                                color: Colors.transparent,
-                              ),
-                              null,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+
+                  _buildQuillContent(
+                    context: context,
+                    isTablet: isTablet,
+                    isLight: isLight,
                   ),
                 ],
               ),
@@ -375,128 +321,134 @@ class NewsPage extends GetView<NewsController> {
     );
   }
 
-  // Layout para dispositivos móveis (layout vertical original)
+  // ============================================================
+  // LAYOUT MOBILE
+  // ============================================================
+
   Widget _buildMobileLayout(
-    double screenWidth,
-    double screenHeight,
-    bool isTablet,
-    List<String> visibleCategories,
-    bool hasMoreThanTwoCategories,
-    BuildContext context,
-  ) {
-    String urlImages = controller.selectedNews.urlImages[0];
-    List<String> cities = controller.selectedNews.cities;
+      double screenWidth,
+      double screenHeight,
+      bool isTablet,
+      List<String> visibleCategories,
+      bool hasMoreThanTwoCategories,
+      BuildContext context,
+      bool isLight,
+      ) {
+    final theme = Theme.of(context);
+
+    final String urlImages = controller.selectedNews.urlImages.isNotEmpty
+        ? controller.selectedNews.urlImages.first
+        : '';
+
+    final List<String> cities = controller.selectedNews.cities;
+
     return ListView(
       padding: ResponsiveUtils.calculateResponsivePadding(
-          screenWidth, screenHeight, isTablet),
+        screenWidth,
+        screenHeight,
+        isTablet,
+      ),
       children: [
-        Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(
-                  ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) *
-                      0.8),
-              child: urlImages
-                      .isNotEmpty // Garanta que a condição inicial está aqui
-                  ? Image.memory(
-                      base64Decode(urlImages),
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: isTablet ? 250 : 200,
-                    )
-                  : (cities.isNotEmpty &&
-                          cities[0]
-                              .isNotEmpty) // Proteção para não quebrar o app se a lista sumir
-                      ? Image.asset(
-                          controller.getCityImageAsset(cities[0]),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: isTablet ? 250 : 200,
-                        )
-                      : Image.asset(
-                          // Um "fallback" caso não tenha imagem em base64 E nem cidade válida
-                          controller.getCityImageAsset('default'),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: isTablet ? 250 : 200,
-                        ),
-            ),
-          ],
+        // ======================================================
+        // IMAGEM
+        // ======================================================
+
+        _buildNewsImage(
+          urlImages: urlImages,
+          cities: cities,
+          isTablet: isTablet,
         ),
+
         SizedBox(height: isTablet ? 25 : 20),
-        //Título
+
+        // ======================================================
+        // TÍTULO
+        // ======================================================
+
         Text(
           controller.selectedNews.title,
           style: TextStyle(
-            color: Colors.white,
+            color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.bold,
             fontSize: isTablet ? 32 : 28,
           ),
           textAlign: TextAlign.center,
         ),
+
         SizedBox(height: isTablet ? 12 : 10),
-        //Subtítulo
+
+        // ======================================================
+        // SUBTÍTULO
+        // ======================================================
+
         Text(
           controller.selectedNews.subtitle ?? '',
           style: TextStyle(
-            color: Colors.white70,
+            color: theme.colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w500,
             fontSize: isTablet ? 20 : 18,
           ),
           textAlign: TextAlign.center,
         ),
+
         SizedBox(height: isTablet ? 25 : 20),
 
-        // Container com informações da notícia
+        // ======================================================
+        // INFORMAÇÕES
+        // ======================================================
+
         Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.white24, width: 1),
+            border: Border.all(
+              color: theme.colorScheme.outlineVariant,
+              width: 1,
+            ),
             borderRadius: BorderRadius.circular(
-                ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) *
-                    0.8),
-            color: Colors.white.withOpacity(0.05),
+              ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) *
+                  0.8,
+            ),
+            color: theme.colorScheme.surfaceContainerHighest,
           ),
           padding: EdgeInsets.all(isTablet ? 16 : 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Título da seção
               Row(
                 children: [
                   Icon(
                     Icons.info_outline,
-                    color: Colors.white70,
+                    color: theme.colorScheme.onSurfaceVariant,
                     size: isTablet ? 20 : 18,
                   ),
                   SizedBox(width: isTablet ? 8 : 6),
                   Text(
                     '${'info_of'.tr} ${controller.selectedNews.type}',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: theme.colorScheme.onSurfaceVariant,
                       fontSize: isTablet ? 16 : 14,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
+
               SizedBox(height: isTablet ? 12 : 10),
 
-              // Linha divisória
               Container(
                 height: 1,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
                       Colors.transparent,
-                      Colors.white24,
+                      theme.colorScheme.outlineVariant,
                       Colors.transparent,
                     ],
                   ),
                 ),
               ),
+
               SizedBox(height: isTablet ? 12 : 10),
 
-              // Informações organizadas
               _buildInfoRow(
                 isTablet,
                 visibleCategories,
@@ -506,16 +458,20 @@ class NewsPage extends GetView<NewsController> {
             ],
           ),
         ),
+
         SizedBox(height: isTablet ? 25 : 20),
 
-        if (controller.selectedNews.videoUrl != '' &&
-            controller.selectedNews.videoUrl != null)
-          // Mini player do YouTube
+        // ======================================================
+        // YOUTUBE
+        // ======================================================
+
+        if (controller.selectedNews.videoUrl != null &&
+            controller.selectedNews.videoUrl!.isNotEmpty)
           Container(
             padding: EdgeInsets.all(isTablet ? 16 : 12),
             child: YouTubeMiniPlayer(
               videoUrl: controller.selectedNews.videoUrl!,
-              width: screenWidth * 0.9, // 90% da largura da tela
+              width: screenWidth * 0.9,
               height: isTablet ? 220 : 180,
               autoPlay: false,
               mute: false,
@@ -523,160 +479,322 @@ class NewsPage extends GetView<NewsController> {
               captionLanguage: 'pt',
             ),
           ),
+
         SizedBox(height: isTablet ? 25 : 20),
 
-        // Container com o conteúdo da notícia
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.white24),
-            borderRadius: BorderRadius.circular(
-                ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) *
-                    0.5),
-          ),
-          child: AbsorbPointer(
-            // ← BLOQUEIA TODA INTERAÇÃO
-            child: QuillEditor.basic(
-              controller: controller.quillController,
-              focusNode: FocusNode(),
-              scrollController: ScrollController(),
-              config: QuillEditorConfig(
-                padding: EdgeInsets.all(isTablet ? 20 : 16),
-                autoFocus: false,
-                expands: false,
-                customStyles: DefaultStyles(
-                  paragraph: DefaultTextBlockStyle(
-                    TextStyle(
-                      color: Colors.white,
-                      fontSize: isTablet ? 18 : 16,
-                    ),
-                    HorizontalSpacing.zero,
-                    const VerticalSpacing(6, 0),
-                    const VerticalSpacing(0, 0),
-                    null,
-                  ),
-                  bold: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: isTablet ? 18 : 16,
-                  ),
-                  italic: TextStyle(
-                    color: Colors.white,
-                    fontStyle: FontStyle.italic,
-                    fontSize: isTablet ? 18 : 16,
-                  ),
-                  underline: TextStyle(
-                    color: Colors.white,
-                    decoration: TextDecoration.underline,
-                    decorationColor: Colors.white,
-                    fontSize: isTablet ? 18 : 16,
-                  ),
-                  quote: DefaultTextBlockStyle(
-                    TextStyle(
-                      color: Colors.white70,
-                      fontSize: isTablet ? 18 : 16,
-                    ),
-                    HorizontalSpacing.zero,
-                    const VerticalSpacing(6, 6),
-                    const VerticalSpacing(0, 0),
-                    BoxDecoration(
-                      border: Border(
-                        left: BorderSide(color: Colors.white, width: 4),
-                      ),
-                    ),
-                  ),
-                  lists: DefaultListBlockStyle(
-                    TextStyle(
-                      color: Colors.white,
-                      fontSize: isTablet ? 18 : 16,
-                    ),
-                    HorizontalSpacing.zero,
-                    const VerticalSpacing(6, 0),
-                    const VerticalSpacing(0, 0),
-                    const BoxDecoration(
-                      color: Colors.transparent,
-                    ),
-                    null,
-                  ),
-                ),
-              ),
-            ),
-          ),
+        // ======================================================
+        // CONTEÚDO
+        // ======================================================
+
+        _buildQuillContent(
+          context: context,
+          isTablet: isTablet,
+          isLight: isLight,
         ),
       ],
     );
   }
 
-  // Widget para construir a linha de informações com categorias responsivas (layout wide screen)
+  // ============================================================
+  // IMAGEM DA NOTÍCIA
+  // ============================================================
+
+  Widget _buildNewsImage({
+    required String urlImages,
+    required List<String> cities,
+    required bool isTablet,
+  }) {
+    final double imageHeight = isTablet ? 250 : 200;
+
+    Widget image;
+
+    if (urlImages.isNotEmpty) {
+      try {
+        image = Image.memory(
+          base64Decode(urlImages),
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: imageHeight,
+          errorBuilder: (_, __, ___) {
+            return _buildFallbackImage(
+              cities: cities,
+              isTablet: isTablet,
+            );
+          },
+        );
+      } catch (_) {
+        image = _buildFallbackImage(
+          cities: cities,
+          isTablet: isTablet,
+        );
+      }
+    } else {
+      image = _buildFallbackImage(
+        cities: cities,
+        isTablet: isTablet,
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(
+        ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) * 0.8,
+      ),
+      child: image,
+    );
+  }
+
+  // ============================================================
+  // FALLBACK DA IMAGEM
+  // ============================================================
+
+  Widget _buildFallbackImage({
+    required List<String> cities,
+    required bool isTablet,
+  }) {
+    final double imageHeight = isTablet ? 250 : 200;
+
+    final String asset = cities.isNotEmpty && cities.first.isNotEmpty
+        ? controller.getCityImageAsset(cities.first)
+        : controller.getCityImageAsset('default');
+
+    return Image.asset(
+      asset,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: imageHeight,
+      errorBuilder: (_, __, ___) {
+        return Container(
+          width: double.infinity,
+          height: imageHeight,
+          color: Colors.grey.shade300,
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.image_not_supported_outlined,
+            size: 50,
+            color: Colors.grey,
+          ),
+        );
+      },
+    );
+  }
+
+  // ============================================================
+  // CONTEÚDO QUILL
+  // ============================================================
+
+  Widget _buildQuillContent({
+    required BuildContext context,
+    required bool isTablet,
+    required bool isLight,
+  }) {
+    final theme = Theme.of(context);
+
+    final Color contentBackground =
+    isLight ? Colors.white : const Color(0xFF1E1E1E);
+
+    final Color contentTextColor =
+    isLight ? Colors.black87 : Colors.white;
+
+    final Color borderColor =
+    isLight ? Colors.grey.shade300 : const Color(0xFF333333);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: contentBackground,
+        border: Border.all(
+          color: borderColor,
+        ),
+        borderRadius: BorderRadius.circular(
+          ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) * 0.5,
+        ),
+      ),
+      child: AbsorbPointer(
+        child: QuillEditor.basic(
+          controller: controller.quillController!,
+          focusNode: FocusNode(),
+          scrollController: ScrollController(),
+          config: QuillEditorConfig(
+            padding: EdgeInsets.all(isTablet ? 20 : 16),
+            autoFocus: false,
+            expands: false,
+            enableInteractiveSelection: false,
+            customStyles: DefaultStyles(
+              // ==================================================
+              // PARÁGRAFO
+              // ==================================================
+
+              paragraph: DefaultTextBlockStyle(
+                TextStyle(
+                  color: contentTextColor,
+                  fontSize: isTablet ? 18 : 16,
+                ),
+                HorizontalSpacing.zero,
+                const VerticalSpacing(6, 0),
+                const VerticalSpacing(0, 0),
+                null,
+              ),
+
+              // ==================================================
+              // NEGRITO
+              // ==================================================
+
+              bold: TextStyle(
+                color: contentTextColor,
+                fontWeight: FontWeight.bold,
+                fontSize: isTablet ? 18 : 16,
+              ),
+
+              // ==================================================
+              // ITÁLICO
+              // ==================================================
+
+              italic: TextStyle(
+                color: contentTextColor,
+                fontStyle: FontStyle.italic,
+                fontSize: isTablet ? 18 : 16,
+              ),
+
+              // ==================================================
+              // SUBLINHADO
+              // ==================================================
+
+              underline: TextStyle(
+                color: contentTextColor,
+                decoration: TextDecoration.underline,
+                decorationColor: contentTextColor,
+                fontSize: isTablet ? 18 : 16,
+              ),
+
+              // ==================================================
+              // CITAÇÃO
+              // ==================================================
+
+              quote: DefaultTextBlockStyle(
+                TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: isTablet ? 18 : 16,
+                ),
+                HorizontalSpacing.zero,
+                const VerticalSpacing(6, 6),
+                const VerticalSpacing(0, 0),
+                BoxDecoration(
+                  border: Border(
+                    left: BorderSide(
+                      color: theme.colorScheme.primary,
+                      width: 4,
+                    ),
+                  ),
+                ),
+              ),
+
+              // ==================================================
+              // LISTAS
+              // ==================================================
+
+              lists: DefaultListBlockStyle(
+                TextStyle(
+                  color: contentTextColor,
+                  fontSize: isTablet ? 18 : 16,
+                ),
+                HorizontalSpacing.zero,
+                const VerticalSpacing(6, 0),
+                const VerticalSpacing(0, 0),
+                const BoxDecoration(
+                  color: Colors.transparent,
+                ),
+                null,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // INFORMAÇÕES - WIDE SCREEN
+  // ============================================================
+
   Widget _buildInfoRowWideScreen(
-    bool isTablet,
-    List<String> visibleCategories,
-    bool hasMoreThanTwoCategories,
-    BuildContext context,
-  ) {
+      bool isTablet,
+      List<String> visibleCategories,
+      bool hasMoreThanTwoCategories,
+      BuildContext context,
+      ) {
     return Column(
       children: [
-        // Primeira linha: Autor
         _buildInfoItem(
           icon: Icons.person_outline,
           label: 'author'.tr,
           value: controller.selectedNews.author,
           isTablet: isTablet,
+          theme: Theme.of(context),
         ),
+
         SizedBox(height: isTablet ? 12 : 10),
 
-        // Segunda linha: Data
         _buildInfoItem(
           icon: Icons.schedule,
           label: 'date'.tr,
-          value: DateFormat('dd/MM/yyyy')
-              .format(controller.selectedNews.createdAt),
+          value: DateFormat('dd/MM/yyyy').format(
+            controller.selectedNews.createdAt,
+          ),
           isTablet: isTablet,
+          theme: Theme.of(context),
         ),
+
         SizedBox(height: isTablet ? 12 : 10),
 
-        // Terceira linha: Cidade
         _buildInfoItem(
           icon: Icons.location_city,
           label: 'city'.tr,
           value: controller.selectedNews.cities.isNotEmpty
-              ? controller.selectedNews.cities[0]
+              ? controller.selectedNews.cities.first
               : '',
           isTablet: isTablet,
+          theme: Theme.of(context),
         ),
+
         SizedBox(height: isTablet ? 12 : 10),
 
-        // Quarta linha: Tipo
         _buildInfoItem(
           icon: Icons.category,
           label: 'type'.tr,
           value: controller.selectedNews.type,
           isTablet: isTablet,
+          theme: Theme.of(context),
         ),
+
         SizedBox(height: isTablet ? 12 : 10),
-        _buildInfoItem(
-          icon: Icons.category,
-          label: 'type'.tr,
-          value: controller.selectedNews.type,
-          isTablet: isTablet,
+
+        _buildCategoriesItem(
+          isTablet,
+          controller.selectedNews.categories
+              .map<String>((e) => e.toString())
+              .toList(),
+          visibleCategories,
+          hasMoreThanTwoCategories,
+          context,
         ),
-        SizedBox(height: isTablet ? 12 : 10),
-        // Quinta linha: Categorias
-        _buildCategoriesItem(isTablet, controller.selectedNews.categories,
-            visibleCategories, hasMoreThanTwoCategories, context),
       ],
     );
   }
 
-  // Widget para construir a linha de informações com categorias responsivas
+  // ============================================================
+  // INFORMAÇÕES - MOBILE
+  // ============================================================
+
   Widget _buildInfoRow(
-    bool isTablet,
-    List<String> visibleCategories,
-    bool hasMoreThanTwoCategories,
-    BuildContext context,
-  ) {
+      bool isTablet,
+      List<String> visibleCategories,
+      bool hasMoreThanTwoCategories,
+      BuildContext context,
+      ) {
+    final theme = Theme.of(context);
+
     return Column(
       children: [
-        // Primeira linha: Autor e Data
+        // AUTOR + DATA
         Row(
           children: [
             Expanded(
@@ -685,6 +803,7 @@ class NewsPage extends GetView<NewsController> {
                 label: 'author'.tr,
                 value: controller.selectedNews.author,
                 isTablet: isTablet,
+                theme: theme,
               ),
             ),
             SizedBox(width: isTablet ? 12 : 8),
@@ -692,16 +811,19 @@ class NewsPage extends GetView<NewsController> {
               child: _buildInfoItem(
                 icon: Icons.schedule,
                 label: 'date'.tr,
-                value: DateFormat('dd/MM/yyyy')
-                    .format(controller.selectedNews.createdAt),
+                value: DateFormat('dd/MM/yyyy').format(
+                  controller.selectedNews.createdAt,
+                ),
                 isTablet: isTablet,
+                theme: theme,
               ),
             ),
           ],
         ),
+
         SizedBox(height: isTablet ? 12 : 10),
 
-        // Segunda linha: Cidade e Tipo
+        // CIDADE + TIPO
         Row(
           children: [
             Expanded(
@@ -709,9 +831,10 @@ class NewsPage extends GetView<NewsController> {
                 icon: Icons.location_city,
                 label: 'city'.tr,
                 value: controller.selectedNews.cities.isNotEmpty
-                    ? controller.selectedNews.cities[0]
+                    ? controller.selectedNews.cities.first
                     : '',
                 isTablet: isTablet,
+                theme: theme,
               ),
             ),
             SizedBox(width: isTablet ? 12 : 8),
@@ -721,44 +844,67 @@ class NewsPage extends GetView<NewsController> {
                 label: 'type'.tr,
                 value: controller.selectedNews.type,
                 isTablet: isTablet,
+                theme: theme,
               ),
             ),
           ],
         ),
+
         SizedBox(height: isTablet ? 12 : 10),
 
-        // Terceira linha: Categorias
-        _buildCategoriesItem(isTablet, controller.selectedNews.categories,
-            visibleCategories, hasMoreThanTwoCategories, context),
+        // CATEGORIAS
+        _buildCategoriesItem(
+          isTablet,
+          controller.selectedNews.categories
+              .map<String>((e) => e.toString())
+              .toList(),
+          visibleCategories,
+          hasMoreThanTwoCategories,
+          context,
+        ),
+
+        SizedBox(height: isTablet ? 12 : 10),
+
+        // REVISOR
         Row(
           children: [
             Expanded(
               child: _buildInfoItem(
-                  icon: Icons.supervisor_account,
-                  label: 'reviewer'.tr,
-                  value: controller.selectedNews.validatedByName ?? '',
-                  isTablet: isTablet),
-            )
+                icon: Icons.supervisor_account,
+                label: 'reviewer'.tr,
+                value: controller.selectedNews.validatedByName ?? '',
+                isTablet: isTablet,
+                theme: theme,
+              ),
+            ),
           ],
-        )
+        ),
       ],
     );
   }
 
-  // Widget para criar um item de informação individual
+  // ============================================================
+  // ITEM DE INFORMAÇÃO
+  // ============================================================
+
   Widget _buildInfoItem({
     required IconData icon,
     required String label,
     required String value,
     required bool isTablet,
+    required ThemeData theme,
   }) {
     return Container(
       padding: EdgeInsets.all(isTablet ? 10 : 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(
-            ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) * 0.5),
-        border: Border.all(color: Colors.white12, width: 0.5),
+          ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) * 0.5,
+        ),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+          width: 0.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -767,25 +913,30 @@ class NewsPage extends GetView<NewsController> {
             children: [
               Icon(
                 icon,
-                color: Colors.white60,
+                color: theme.colorScheme.onSurfaceVariant,
                 size: isTablet ? 16 : 14,
               ),
               SizedBox(width: isTablet ? 6 : 4),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.white60,
-                  fontSize: isTablet ? 12 : 10,
-                  fontWeight: FontWeight.w500,
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: isTablet ? 12 : 10,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
+
           SizedBox(height: isTablet ? 4 : 2),
+
           Text(
             value,
             style: TextStyle(
-              color: Colors.white,
+              color: theme.colorScheme.onSurface,
               fontSize: isTablet ? 14 : 12,
               fontWeight: FontWeight.w600,
             ),
@@ -797,21 +948,31 @@ class NewsPage extends GetView<NewsController> {
     );
   }
 
-  // Widget específico para categorias
+  // ============================================================
+  // CATEGORIAS
+  // ============================================================
+
   Widget _buildCategoriesItem(
       bool isTablet,
       List<String> categorias,
       List<String> visibleCategories,
       bool hasMoreThanTwoCategories,
-      BuildContext context) {
+      BuildContext context,
+      ) {
+    final theme = Theme.of(context);
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(isTablet ? 10 : 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(
-            ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) * 0.5),
-        border: Border.all(color: Colors.white12, width: 0.5),
+          ResponsiveUtils.calculateResponsiveBorderRadius(isTablet) * 0.5,
+        ),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant,
+          width: 0.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -820,52 +981,68 @@ class NewsPage extends GetView<NewsController> {
             children: [
               Icon(
                 Icons.label_outline,
-                color: Colors.white60,
+                color: theme.colorScheme.onSurfaceVariant,
                 size: isTablet ? 16 : 14,
               ),
               SizedBox(width: isTablet ? 6 : 4),
               Text(
-                categorias.length > 1 ? 'categories'.tr : 'category'.tr,
+                categorias.length > 1
+                    ? 'categories'.tr
+                    : 'category'.tr,
                 style: TextStyle(
-                  color: Colors.white60,
+                  color: theme.colorScheme.onSurfaceVariant,
                   fontSize: isTablet ? 12 : 10,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
+
           SizedBox(height: isTablet ? 4 : 2),
+
           Wrap(
             spacing: 6,
             runSpacing: 4,
             children: [
-              ...visibleCategories.map((cat) => Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isTablet ? 8 : 6,
-                      vertical: isTablet ? 4 : 2,
+              ...visibleCategories.map(
+                    (cat) => Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isTablet ? 8 : 6,
+                    vertical: isTablet ? 4 : 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(
+                      ResponsiveUtils.calculateResponsiveBorderRadius(
+                        isTablet,
+                      ) *
+                          0.3,
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(
-                          ResponsiveUtils.calculateResponsiveBorderRadius(
-                                  isTablet) *
-                              0.3),
-                      border: Border.all(
-                          color: Colors.blue.withOpacity(0.5), width: 0.5),
+                    border: Border.all(
+                      color: Colors.blue.withOpacity(0.5),
+                      width: 0.5,
                     ),
-                    child: Text(
-                      cat,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: isTablet ? 13 : 11,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  ),
+                  child: Text(
+                    cat,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                      fontSize: isTablet ? 13 : 11,
+                      fontWeight: FontWeight.w600,
                     ),
-                  )),
+                  ),
+                ),
+              ),
+
               if (hasMoreThanTwoCategories)
                 GestureDetector(
-                  onTap: () =>
-                      _showAllCategoriesDialog(context, categorias, isTablet),
+                  onTap: () {
+                    _showAllCategoriesDialog(
+                      context,
+                      categorias,
+                      isTablet,
+                    );
+                  },
                   child: Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: isTablet ? 8 : 6,
@@ -874,23 +1051,28 @@ class NewsPage extends GetView<NewsController> {
                     decoration: BoxDecoration(
                       color: Colors.orange.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(
-                          ResponsiveUtils.calculateResponsiveBorderRadius(
-                                  isTablet) *
-                              0.3),
-                      border: Border.all(color: Colors.orange, width: 1),
+                        ResponsiveUtils.calculateResponsiveBorderRadius(
+                          isTablet,
+                        ) *
+                            0.3,
+                      ),
+                      border: Border.all(
+                        color: Colors.orange,
+                        width: 1,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "+${categorias.length - 2}",
+                          '+${categorias.length - 2}',
                           style: TextStyle(
                             color: Colors.orange,
                             fontSize: isTablet ? 13 : 11,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(width: 2),
+                        const SizedBox(width: 2),
                         Icon(
                           Icons.more_horiz,
                           color: Colors.orange,
@@ -907,16 +1089,22 @@ class NewsPage extends GetView<NewsController> {
     );
   }
 
-  // Método para mostrar popup com todas as categorias
+  // ============================================================
+  // DIALOG CATEGORIAS
+  // ============================================================
+
   void _showAllCategoriesDialog(
-      BuildContext context, List<String> categorias, bool isTablet) {
+      BuildContext context,
+      List<String> categorias,
+      bool isTablet,
+      ) {
     showDialog(
       context: context,
       builder: (context) {
         return ResponsiveUtils.createResponsiveDialog(
           context: context,
           title: 'all_categories'.tr,
-          content: categorias.join(", "),
+          content: categorias.join(', '),
           onConfirm: () => Navigator.of(context).pop(),
           confirmText: 'close'.tr,
         );

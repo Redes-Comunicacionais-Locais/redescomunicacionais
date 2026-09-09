@@ -1,70 +1,107 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:redescomunicacionais/app/modules/connections/controller/connections_controller.dart';
-import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 
 class ConnectionsPage extends GetView<ConnectionsController> {
   const ConnectionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
+      backgroundColor: Colors.white,
+
+      // AppBar totalmente branco
       appBar: AppBar(
         centerTitle: true,
-        elevation: 8,
-        foregroundColor: Colors.white,
-        title: const Text('Conexões'),
-        actions: [],
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+        elevation: 2,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        foregroundColor: Colors.black87,
+
+        title: const Text(
+          'Conexões',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: AppColors.appBarBottomGradient(),
+
+        actions: const [],
+
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(10),
           ),
         ),
       ),
+
       body: Obx(
-        () => Container(
+            () => Container(
           width: double.infinity,
           height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: AppColors.darkBlueToBlackGradient(),
-          ),
+          color: Colors.white,
+
           child: controller.isLoading.value
-              ? const Center(child: CircularProgressIndicator())
-              : _buildConnectionsContent(),
+              ? Center(
+            child: CircularProgressIndicator(
+              color: theme.colorScheme.primary,
+            ),
+          )
+              : _buildConnectionsContent(context),
         ),
       ),
     );
   }
 
-  Widget _buildConnectionsContent() {
+  Widget _buildConnectionsContent(BuildContext context) {
     return SafeArea(
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+        padding: const EdgeInsets.fromLTRB(
+          16,
+          20,
+          16,
+          24,
+        ),
         children: [
-          _buildConnectionsHeader(),
+          _buildConnectionsHeader(context),
+
           const SizedBox(height: 16),
-          _buildInternetConnectionCard(),
+
+          _buildInternetConnectionCard(context),
+
           const SizedBox(height: 12),
         ],
       ),
     );
   }
 
-  Widget _buildConnectionsHeader() {
+  Widget _buildConnectionsHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 14,
+      ),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+        border: Border.all(
+          color: Colors.grey.shade300,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: const Text(
         'Gerencie e acompanhe o status das suas conexões externas.',
         style: TextStyle(
-          color: Colors.white,
+          color: Colors.black87,
           fontSize: 14,
           height: 1.35,
           fontWeight: FontWeight.w500,
@@ -73,19 +110,22 @@ class ConnectionsPage extends GetView<ConnectionsController> {
     );
   }
 
-  Widget _buildInternetConnectionCard() {
+  Widget _buildInternetConnectionCard(BuildContext context) {
     return Obx(
-      () => _buildConnectionCard(
+          () => _buildConnectionCard(
+        context: context,
         title: 'Internet',
-        description: 'Conectividade geral para os módulos do aplicativo.',
+        description:
+        'Conectividade geral para os módulos do aplicativo.',
         icon: Icons.wifi_rounded,
-        accentColor: Colors.cyan.shade300,
+        accentColor: Colors.cyan.shade700,
         isConnected: controller.isInternetConnected.value,
       ),
     );
   }
 
   Widget _buildConnectionCard({
+    required BuildContext context,
     required String title,
     required String description,
     required IconData icon,
@@ -94,31 +134,45 @@ class ConnectionsPage extends GetView<ConnectionsController> {
   }) {
     return Container(
       padding: const EdgeInsets.all(14),
+
       decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        color: Colors.white.withValues(alpha: 0.08),
-        border:
-            Border.all(color: accentColor.withValues(alpha: 0.65), width: 1.4),
+
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.55),
+          width: 1.2,
+        ),
+
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.22),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
+            color: Colors.black.withValues(alpha: 0.07),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
+
       child: Row(
         children: [
+          // Ícone
           Container(
             height: 46,
             width: 46,
             decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: 0.18),
+              color: accentColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: accentColor, size: 26),
+            child: Icon(
+              icon,
+              color: accentColor,
+              size: 26,
+            ),
           ),
+
           const SizedBox(width: 12),
+
+          // Informações
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,16 +180,18 @@ class ConnectionsPage extends GetView<ConnectionsController> {
                 Text(
                   title,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Colors.black87,
                     fontWeight: FontWeight.w700,
                     fontSize: 16,
                   ),
                 ),
+
                 const SizedBox(height: 4),
+
                 Text(
                   description,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.82),
+                    color: Colors.grey.shade700,
                     fontSize: 13,
                     height: 1.25,
                   ),
@@ -143,10 +199,14 @@ class ConnectionsPage extends GetView<ConnectionsController> {
               ],
             ),
           ),
+
           const SizedBox(width: 8),
+
+          // Status
           _buildStatusBadge(
             isConnected: isConnected,
             accentColor: accentColor,
+            context: context,
           ),
         ],
       ),
@@ -156,24 +216,52 @@ class ConnectionsPage extends GetView<ConnectionsController> {
   Widget _buildStatusBadge({
     required bool isConnected,
     required Color accentColor,
+    required BuildContext context,
   }) {
-    final Color badgeColor = isConnected ? accentColor : Colors.redAccent;
+    final Color badgeColor =
+    isConnected ? Colors.green.shade600 : Colors.red.shade600;
+
     final String label = isConnected ? 'Ativo' : 'Falha';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: badgeColor.withValues(alpha: 0.7)),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 6,
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: badgeColor,
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
+
+      decoration: BoxDecoration(
+        color: badgeColor.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(999),
+
+        border: Border.all(
+          color: badgeColor.withValues(alpha: 0.45),
+          width: 1,
         ),
+      ),
+
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 7,
+            height: 7,
+            decoration: BoxDecoration(
+              color: badgeColor,
+              shape: BoxShape.circle,
+            ),
+          ),
+
+          const SizedBox(width: 6),
+
+          Text(
+            label,
+            style: TextStyle(
+              color: badgeColor,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }

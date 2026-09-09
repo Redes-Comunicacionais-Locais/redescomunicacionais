@@ -5,6 +5,7 @@ import 'package:redescomunicacionais/app/modules/login/controller/login_controll
 import 'package:redescomunicacionais/app/modules/user/utils/userRoles.dart';
 import 'package:redescomunicacionais/app/routes/app_routes.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
+import 'package:redescomunicacionais/app/utils/theme/theme_controller.dart';
 
 class MenuPage extends GetView<HomeController> {
   final bool isHorizontal;
@@ -47,9 +48,17 @@ class MenuPage extends GetView<HomeController> {
   }
 
   Widget _buildDrawerMenu(BuildContext context) {
+    final theme = Theme.of(context);
+    final themeController = Get.find<ThemeController>();
+    final isLight = themeController.isLight;
+
     return Drawer(
       child: Container(
-        decoration: BoxDecoration(
+        decoration: isLight
+            ? BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+        )
+            : BoxDecoration(
           gradient: AppColors.darkBlueToBlackGradient(),
         ),
         child: ListView(
@@ -61,7 +70,8 @@ class MenuPage extends GetView<HomeController> {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundColor: Colors.white12,
+                    backgroundColor:
+                    theme.colorScheme.surfaceContainerHighest,
                     backgroundImage: NetworkImage(
                       _profileImageUrl,
                     ),
@@ -74,9 +84,9 @@ class MenuPage extends GetView<HomeController> {
                       children: [
                         Text(
                           _profileName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13.0,
-                            color: Colors.white,
+                            color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Montserrat',
                           ),
@@ -85,9 +95,9 @@ class MenuPage extends GetView<HomeController> {
                         ),
                         Text(
                           _profileEmail,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10.0,
-                            color: Colors.white,
+                            color: theme.colorScheme.onSurfaceVariant,
                             fontStyle: FontStyle.italic,
                             fontFamily: 'Montserrat',
                           ),
@@ -100,88 +110,158 @@ class MenuPage extends GetView<HomeController> {
                 ],
               ),
             ),
-            _buildAdminItem(context, isDrawer: true),
+
+            // ADMIN
+            _buildAdminItem(
+              context,
+              isDrawer: true,
+            ),
+
+            // CENTRAL DA MATÉRIA
             _buildRestrictedMenuItem(
               context,
               icon: Icons.newspaper,
               title: 'central_da_materia'.tr,
               onTap: () => Get.toNamed(Routes.NEWSCENTER),
             ),
+
+            // CENTRAL DE COMUNICAÇÃO
             if (!controller.isAnonymousUser)
               ListTile(
-                leading:
-                    const Icon(Icons.chat_bubble_outline, color: Colors.white),
+                leading: Icon(
+                  Icons.chat_bubble_outline,
+                  color: theme.colorScheme.onSurface,
+                ),
                 title: Text(
                   'central_de_comunicacao'.tr,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
                 onTap: () {
                   Get.back();
-                  Get.toNamed(Routes.CENTRAL_DE_COMUNICACAO);
+                  Get.toNamed(
+                    Routes.CENTRAL_DE_COMUNICACAO,
+                  );
                 },
               ),
+
+            // SEUS DADOS
             if (!controller.isAnonymousUser)
               ListTile(
-                leading: const Icon(Icons.person_outline, color: Colors.white),
+                leading: Icon(
+                  Icons.person_outline,
+                  color: theme.colorScheme.onSurface,
+                ),
                 title: Text(
                   'Seus Dados'.tr,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
                 onTap: () {
                   Get.back();
                   Get.toNamed(Routes.USER);
                 },
               ),
+
+            // TEMA
             ListTile(
-              leading: const Icon(Icons.wifi, color: Colors.white),
+              leading: Icon(
+                Icons.palette_outlined,
+                color: theme.colorScheme.onSurface,
+              ),
+              title: Text(
+                'Tema'.tr,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              onTap: () {
+                _showThemeSelector(context);
+              },
+            ),
+
+            // CONEXÕES
+            ListTile(
+              leading: Icon(
+                Icons.wifi,
+                color: theme.colorScheme.onSurface,
+              ),
               title: Text(
                 'Conexões'.tr,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
               onTap: () {
                 Get.back();
                 Get.toNamed(Routes.CONNECTIONS);
               },
             ),
+
+            // SOBRE
             ListTile(
-              leading: const Icon(Icons.info_outline, color: Colors.white),
+              leading: Icon(
+                Icons.info_outline,
+                color: theme.colorScheme.onSurface,
+              ),
               title: Text(
                 'Sobre'.tr,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
               onTap: () {
                 Get.back();
                 _showAboutDialog(context);
               },
             ),
+
+            // IDIOMA
             ListTile(
-              leading: const Icon(Icons.language, color: Colors.white),
+              leading: Icon(
+                Icons.language,
+                color: theme.colorScheme.onSurface,
+              ),
               title: Text(
                 'language'.tr,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
               trailing: DropdownButtonHideUnderline(
                 child: DropdownButton<Locale>(
-                  dropdownColor: Colors.black,
+                  dropdownColor: theme.colorScheme.surface,
                   value: _safeCurrentLocale(),
-                  iconEnabledColor: Colors.white,
-                  style: const TextStyle(color: Colors.white),
+                  iconEnabledColor: theme.colorScheme.onSurface,
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                  ),
                   items: [
                     DropdownMenuItem(
                       value: const Locale('pt', 'BR'),
-                      child: Text('language_portuguese_brazil'.tr),
+                      child: Text(
+                        'language_portuguese_brazil'.tr,
+                      ),
                     ),
                     DropdownMenuItem(
                       value: const Locale('en', 'US'),
-                      child: Text('language_english_us'.tr),
+                      child: Text(
+                        'language_english_us'.tr,
+                      ),
                     ),
                     DropdownMenuItem(
                       value: const Locale('it', 'IT'),
-                      child: Text('language_italian'.tr),
+                      child: Text(
+                        'language_italian'.tr,
+                      ),
                     ),
                     DropdownMenuItem(
                       value: const Locale('es', 'ES'),
-                      child: Text('language_spanish'.tr),
+                      child: Text(
+                        'language_spanish'.tr,
+                      ),
                     ),
                   ],
                   onChanged: (newValue) {
@@ -192,17 +272,26 @@ class MenuPage extends GetView<HomeController> {
                 ),
               ),
             ),
+
+            // SAIR
             ListTile(
               leading: Icon(
-                controller.isAnonymousUser ? Icons.login : Icons.exit_to_app,
-                color: Colors.white,
+                controller.isAnonymousUser
+                    ? Icons.login
+                    : Icons.exit_to_app,
+                color: theme.colorScheme.onSurface,
               ),
               title: Text(
-                controller.isAnonymousUser ? 'Entrar'.tr : 'Sair'.tr,
-                style: const TextStyle(color: Colors.white),
+                controller.isAnonymousUser
+                    ? 'Entrar'.tr
+                    : 'Sair'.tr,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
               onTap: () {
                 Get.back();
+
                 if (controller.isAnonymousUser) {
                   Get.toNamed(Routes.LOGIN);
                 } else {
@@ -217,6 +306,9 @@ class MenuPage extends GetView<HomeController> {
   }
 
   Widget _buildHorizontalMenu(BuildContext context) {
+    final theme = Theme.of(context);
+    final isLight = Get.find<ThemeController>().isLight;
+
     return Column(
       children: [
         Container(
@@ -230,7 +322,7 @@ class MenuPage extends GetView<HomeController> {
                 children: [
                   CircleAvatar(
                     radius: isTablet! ? 25 : 20,
-                    backgroundColor: Colors.white12,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     backgroundImage: NetworkImage(_profileImageUrl),
                   ),
                   SizedBox(width: isTablet! ? 12.0 : 8.0),
@@ -242,7 +334,7 @@ class MenuPage extends GetView<HomeController> {
                           _profileName,
                           style: TextStyle(
                             fontSize: isTablet! ? 12.0 : 10.0,
-                            color: Colors.white,
+                            color: theme.colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                           ),
                           maxLines: 1,
@@ -252,7 +344,7 @@ class MenuPage extends GetView<HomeController> {
                           _profileEmail,
                           style: TextStyle(
                             fontSize: isTablet! ? 10.0 : 8.0,
-                            color: Colors.white70,
+                            color: theme.colorScheme.onSurfaceVariant,
                             fontStyle: FontStyle.italic,
                           ),
                           maxLines: 1,
@@ -265,7 +357,7 @@ class MenuPage extends GetView<HomeController> {
               ),
               SizedBox(height: isTablet! ? 15.0 : 10.0),
               Divider(
-                color: Colors.white.withOpacity(0.3),
+                color: theme.colorScheme.outline.withOpacity(0.3),
                 thickness: 1.0,
               ),
             ],
@@ -290,11 +382,17 @@ class MenuPage extends GetView<HomeController> {
                   onTap: () => _showFilterDialog(context),
                 ),
                 SizedBox(height: isTablet! ? 15.0 : 10.0),
-                Divider(color: Colors.white.withOpacity(0.2), thickness: 0.5),
+                Divider(
+                  color: theme.colorScheme.outline.withOpacity(0.2),
+                  thickness: 0.5,
+                ),
                 SizedBox(height: isTablet! ? 15.0 : 10.0),
                 _buildAdminItem(context, isDrawer: false),
                 SizedBox(height: isTablet! ? 15.0 : 10.0),
-                Divider(color: Colors.white.withOpacity(0.2), thickness: 0.5),
+                Divider(
+                  color: theme.colorScheme.outline.withOpacity(0.2),
+                  thickness: 0.5,
+                ),
                 SizedBox(height: isTablet! ? 15.0 : 10.0),
                 _buildRestrictedHorizontalMenuTile(
                   icon: Icons.newspaper,
@@ -307,17 +405,19 @@ class MenuPage extends GetView<HomeController> {
                     title: 'Central de Comnunicação'.tr,
                     onTap: () => Get.toNamed(Routes.CENTRAL_DE_COMUNICACAO),
                   ),
-                _buildHorizontalMenuTile(
-                  icon: Icons.info_outline,
-                  title: 'Sobre'.tr,
-                  onTap: () => _showAboutDialog(context),
-                ),
                 if (!controller.isAnonymousUser)
                   _buildHorizontalMenuTile(
                     icon: Icons.person_outline,
                     title: 'Seus Dados'.tr,
                     onTap: () => Get.toNamed(Routes.USER),
                   ),
+
+                _buildHorizontalMenuTile(
+                  icon: Icons.palette_outlined,
+                  title: 'Tema',
+                  onTap: () => _showThemeSelector(context),
+                ),
+
                 _buildHorizontalMenuTile(
                   icon: Icons.language,
                   title: 'language'.tr,
@@ -353,10 +453,15 @@ class MenuPage extends GetView<HomeController> {
 
     if (isDrawer) {
       return ListTile(
-        leading: const Icon(Icons.person_outline, color: Colors.white),
+        leading: Icon(
+          Icons.person_outline,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
         title: Text(
           'Admin'.tr,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
         onTap: () {
           Get.back();
@@ -369,7 +474,6 @@ class MenuPage extends GetView<HomeController> {
       icon: Icons.person_outline,
       title: 'Admin'.tr,
       onTap: () => Get.toNamed(Routes.ADMIN),
-      iconColor: Colors.white,
     );
   }
 
@@ -385,10 +489,15 @@ class MenuPage extends GetView<HomeController> {
     }
 
     return ListTile(
-      leading: Icon(icon, color: Colors.white),
+      leading: Icon(
+        icon,
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
       title: Text(
         title,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       ),
       onTap: () {
         Get.back();
@@ -411,7 +520,6 @@ class MenuPage extends GetView<HomeController> {
       icon: icon,
       title: title,
       onTap: onTap,
-      iconColor: Colors.white,
     );
   }
 
@@ -419,8 +527,10 @@ class MenuPage extends GetView<HomeController> {
     required IconData icon,
     required String title,
     VoidCallback? onTap,
-    Color iconColor = Colors.white,
+    Color? iconColor,
   }) {
+    final theme = Theme.of(Get.context!);
+
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -430,13 +540,17 @@ class MenuPage extends GetView<HomeController> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: iconColor, size: iconSize),
+            Icon(
+              icon,
+              color: iconColor ?? theme.colorScheme.onSurface,
+              size: iconSize,
+            ),
             SizedBox(width: isTablet! ? 12.0 : 10.0),
             Expanded(
               child: Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                   fontSize: isTablet! ? 12.0 : 11.0,
                 ),
                 maxLines: 1,
@@ -449,15 +563,74 @@ class MenuPage extends GetView<HomeController> {
     );
   }
 
+  void _showThemeSelector(BuildContext context) {
+    final themeController = Get.find<ThemeController>();
+
+    Get.bottomSheet(
+      SafeArea(
+        child: Material(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(20),
+          ),
+          child: Obx(
+                () => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 16),
+
+                Text(
+                  'Escolha o tema',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+
+                const SizedBox(height: 16),
+
+                RadioListTile<bool>(
+                  value: false,
+                  groupValue: themeController.isLight,
+                  title: const Text('Tema Clássico'),
+                  subtitle: const Text('Interface original'),
+                  onChanged: (_) {
+                    themeController.setClassicTheme();
+                    Get.back();
+                  },
+                ),
+
+                RadioListTile<bool>(
+                  value: true,
+                  groupValue: themeController.isLight,
+                  title: const Text('Tema Branco'),
+                  subtitle: const Text('Interface clara'),
+                  onChanged: (_) {
+                    themeController.setWhiteTheme();
+                    Get.back();
+                  },
+                ),
+
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
   void _showAboutDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final theme = Theme.of(context);
+
         return AlertDialog(
-          backgroundColor: Colors.black,
+          backgroundColor: theme.colorScheme.surface,
           title: Text(
             'Sobre'.tr,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(
+              color: theme.colorScheme.onSurface,
+            ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -466,7 +639,9 @@ class MenuPage extends GetView<HomeController> {
                 leading: const Icon(Icons.info, color: Colors.blue),
                 title: Text(
                   'Quem Somos?'.tr,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
                 onTap: () {
                   Get.back();
@@ -477,7 +652,9 @@ class MenuPage extends GetView<HomeController> {
                 leading: const Icon(Icons.book, color: Colors.blue),
                 title: Text(
                   'Guia do Usuário'.tr,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
                 onTap: () {
                   Get.back();
@@ -488,7 +665,9 @@ class MenuPage extends GetView<HomeController> {
                 leading: const Icon(Icons.help, color: Colors.blue),
                 title: Text(
                   'Perguntas Frequentes'.tr,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
                 onTap: () {
                   Get.back();
@@ -552,11 +731,15 @@ class MenuPage extends GetView<HomeController> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final theme = Theme.of(context);
+
         return AlertDialog(
-          backgroundColor: Colors.black,
+          backgroundColor: theme.colorScheme.surface,
           title: Text(
             'language'.tr,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(
+              color: theme.colorScheme.onSurface,
+            ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -585,6 +768,8 @@ class MenuPage extends GetView<HomeController> {
   }
 
   Widget _buildLanguageOption(String label, Locale locale) {
+    final theme = Theme.of(Get.context!);
+
     return InkWell(
       onTap: () {
         Get.updateLocale(locale);
@@ -594,7 +779,9 @@ class MenuPage extends GetView<HomeController> {
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Text(
           label,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+          ),
         ),
       ),
     );

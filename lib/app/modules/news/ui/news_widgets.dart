@@ -7,6 +7,7 @@ import 'package:redescomunicacionais/app/modules/news/data/model/news_model.dart
 import 'package:intl/intl.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
+import 'package:redescomunicacionais/app/utils/theme/theme_controller.dart';
 
 class NewsWidgets extends GetView<NewsController> {
   final String? selectedCity; // Recebe a cidade selecionada na Home
@@ -15,21 +16,39 @@ class NewsWidgets extends GetView<NewsController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final themeController = Get.find<ThemeController>();
+    final bool isLight = themeController.isLight;
+
+    final Color pageBackground = isLight
+        ? theme.scaffoldBackgroundColor
+        : Colors.transparent;
+
+    final Color newsCardColor = isLight
+        ? theme.colorScheme.surface
+        : const Color(0xFF121212);
+
     return Scaffold(
+      backgroundColor: pageBackground,
       body: Container(
-        decoration: BoxDecoration(
+        decoration: isLight
+            ? BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+        )
+            : BoxDecoration(
           gradient: AppColors.darkBlueToBlackGradient(),
         ),
         child: Obx(
-          () {
+              () {
             if (controller.isLoading.value || controller.isAllListsEmpty()) {
-              return const Center(
+              return Center(
                 child: BlinkingLoadingIcon(
                   size: 36,
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                 ),
               );
             }
+
             List<NewsModel> selectedNewss = controller.getNewsForCurrentMode();
 
             // Filtra as notícias pela cidade selecionada (se não for nula e nem 'Todas')
@@ -43,7 +62,9 @@ class NewsWidgets extends GetView<NewsController> {
               return Center(
                 child: Text(
                   'no_news_found'.tr,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               );
@@ -58,11 +79,12 @@ class NewsWidgets extends GetView<NewsController> {
                 controller: ScrollController(),
                 children: [
                   const SizedBox(height: 16.0),
-                  ..._buildNewsList(selectedNewss),
+                  // Lista vertical de notícias
+                  ..._buildNewsList(selectedNewss, theme),
 
                   if (controller.homeController.isPublishedMode.value &&
                       selectedNewss.isNotEmpty)
-                    _buildCreateMoreItem(),
+                    _buildCreateMoreItem(theme),
                 ],
               ),
             );
@@ -72,7 +94,10 @@ class NewsWidgets extends GetView<NewsController> {
     );
   }
 
-  List<Widget> _buildNewsList(List<NewsModel> validNews) {
+  List<Widget> _buildNewsList(
+      List<NewsModel> validNews,
+      ThemeData theme,
+      ) {
     return validNews.asMap().entries.map<Widget>(
       (entry) {
         int index = entry.key;
@@ -88,8 +113,8 @@ class NewsWidgets extends GetView<NewsController> {
                   margin: const EdgeInsets.symmetric(horizontal: 16.0),
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12.0, vertical: 8.0),
-                  decoration: const BoxDecoration(
-                    color: Colors.black,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(12.0),
                       topRight: Radius.circular(12.0),
@@ -112,14 +137,13 @@ class NewsWidgets extends GetView<NewsController> {
                               children: [
                                 const Icon(
                                   Icons.edit,
-                                  color: Colors.white,
+                                  color: theme.colorScheme.onSurface,
                                   size: 30,
                                 ),
                                 const SizedBox(width: 8.0),
                                 Text(
                                   'edit'.tr,
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: theme.textTheme.bodyLarge?.copyWith(
                                     fontSize: 25.0,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -228,10 +252,13 @@ class NewsWidgets extends GetView<NewsController> {
                           ? Radius.zero
                           : const Radius.circular(12.0),
                       bottomLeft: const Radius.circular(12.0),
-                      bottomRight: const Radius.circular(12.0),
+
                     ),
                     border: isSelected
-                        ? Border.all(color: Colors.blue, width: 2.0)
+                        ? Border.all(
+                      color: theme.colorScheme.primary,
+                      width: 2.0,
+                    )
                         : null,
                   ),
                   margin: EdgeInsets.only(
@@ -241,7 +268,7 @@ class NewsWidgets extends GetView<NewsController> {
                     top: isSelected ? 0.0 : 8.0,
                   ),
                   child: Card(
-                    color: Colors.black,
+                    color: theme.colorScheme.surface,
                     margin: EdgeInsets.zero,
                     elevation: isSelected ? 8.0 : 4.0,
                     shape: RoundedRectangleBorder(
@@ -288,10 +315,8 @@ class NewsWidgets extends GetView<NewsController> {
                             children: [
                               Text(
                                 news.title,
-                                style: const TextStyle(
-                                  fontSize: 18.0,
+                                style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -299,9 +324,8 @@ class NewsWidgets extends GetView<NewsController> {
                               const SizedBox(height: 8.0),
                               Text(
                                 news.subtitle ?? '',
-                                style: const TextStyle(
+                                style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 14.0,
-                                  color: Colors.grey,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -309,9 +333,8 @@ class NewsWidgets extends GetView<NewsController> {
                               const SizedBox(height: 8.0),
                               Text(
                                 _getFormattedDate(news.createdAt.toString()),
-                                style: const TextStyle(
+                                style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 12.0,
-                                  color: Colors.grey,
                                 ),
                               ),
                             ],
@@ -329,7 +352,7 @@ class NewsWidgets extends GetView<NewsController> {
     ).toList();
   }
 
-  Widget _buildCreateMoreItem() {
+  Widget _buildCreateMoreItem(ThemeData theme) {
     return GestureDetector(
       onTap: () {
         controller.getMoreNews();
@@ -338,15 +361,20 @@ class NewsWidgets extends GetView<NewsController> {
         margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 16.0),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.06),
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12.0),
-          border: Border.all(color: Colors.white24, width: 1.5),
+          border: Border.all(
+            color: theme.colorScheme.outlineVariant,
+            width: 1.5,
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Carregar mais Matérias'.tr,
-                style: const TextStyle(color: Colors.white))
+            Text(
+              'Carregar mais Matérias'.tr,
+              style: theme.textTheme.bodyLarge,
+            )
           ],
         ),
       ),
@@ -355,22 +383,32 @@ class NewsWidgets extends GetView<NewsController> {
 
   Future<void> _hideNewsPopup(
       String newsId, String userEmail, String authorEmail, String type) async {
+    final theme = Theme.of(Get.context!);
+
     await Get.dialog(
       AlertDialog(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: theme.colorScheme.surface,
         title: Text(
           '${'delete'.tr} $type',
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+          ),
         ),
         content: Text(
           '${'confirm_delete_this'.tr} $type?',
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child:
-                Text('cancel'.tr, style: const TextStyle(color: Colors.blue)),
+            child: Text(
+              'cancel'.tr,
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () async {
@@ -383,7 +421,10 @@ class NewsWidgets extends GetView<NewsController> {
                 creator: authorEmail,
               );
             },
-            child: Text('delete'.tr, style: const TextStyle(color: Colors.red)),
+            child: const Text(
+              'delete',
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -392,23 +433,31 @@ class NewsWidgets extends GetView<NewsController> {
   }
 
   Future<void> _showReviewDialog(NewsModel news) async {
+    final theme = Theme.of(Get.context!);
+
     await Get.dialog(
       AlertDialog(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: theme.colorScheme.surface,
         title: Text(
           'news_review'.tr,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+          ),
         ),
         content: Text(
           'choose_action_for_news'.tr,
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
             child: Text(
               'cancel'.tr,
-              style: TextStyle(color: Colors.grey[400]),
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
           if (news.status != NewsStates.publicado)
@@ -417,9 +466,9 @@ class NewsWidgets extends GetView<NewsController> {
                 Get.back();
                 await _showReasonDialog(news, true);
               },
-              child: Text(
-                'accept'.tr,
-                style: const TextStyle(color: Colors.green),
+              child: const Text(
+                'accept',
+                style: TextStyle(color: Colors.green),
               ),
             ),
           TextButton(
@@ -427,9 +476,9 @@ class NewsWidgets extends GetView<NewsController> {
               Get.back();
               await _showReasonDialog(news, false);
             },
-            child: Text(
-              'reject'.tr,
-              style: const TextStyle(color: Colors.red),
+            child: const Text(
+              'reject',
+              style: TextStyle(color: Colors.red),
             ),
           ),
         ],
@@ -440,22 +489,32 @@ class NewsWidgets extends GetView<NewsController> {
 
   Future<void> _showObservationDialog(String? observation) async {
     final text = (observation ?? '').trim();
+    final theme = Theme.of(Get.context!);
 
     await Get.dialog(
       AlertDialog(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: theme.colorScheme.surface,
         title: Text(
           'observations'.tr,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+          ),
         ),
         content: Text(
           text.isEmpty ? 'no_observation_available'.tr : text,
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('close'.tr, style: const TextStyle(color: Colors.blue)),
+            child: Text(
+              'close'.tr,
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+              ),
+            ),
           ),
         ],
       ),
@@ -464,32 +523,41 @@ class NewsWidgets extends GetView<NewsController> {
   }
 
   Future<void> _showReasonDialog(NewsModel news, bool accepted) async {
-    final TextEditingController _reasonController = TextEditingController();
+    final TextEditingController reasonController = TextEditingController();
+    final theme = Theme.of(Get.context!);
 
     await Get.dialog(
       AlertDialog(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: theme.colorScheme.surface,
         title: Text(
           accepted ? 'reason_to_accept'.tr : 'reason_to_reject'.tr,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+          ),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               'write_reason'.tr,
-              style: const TextStyle(color: Colors.white70),
+              style: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 8.0),
             TextField(
-              controller: _reasonController,
+              controller: reasonController,
               maxLines: 4,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+              ),
               decoration: InputDecoration(
                 hintText: 'write_reason_here'.tr,
-                hintStyle: const TextStyle(color: Colors.white38),
+                hintStyle: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
                 filled: true,
-                fillColor: Colors.grey[850],
+                fillColor: theme.colorScheme.surfaceContainerHighest,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: BorderSide.none,
@@ -503,13 +571,17 @@ class NewsWidgets extends GetView<NewsController> {
             onPressed: () => Get.back(),
             child: Text(
               'cancel'.tr,
-              style: TextStyle(color: Colors.grey[400]),
+              style: TextStyle(
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
           TextButton(
             onPressed: () async {
-              final reason = _reasonController.text.trim();
+              final reason = reasonController.text.trim();
+
               Get.back();
+
               await controller.reviewNews(
                 newsId: news.id,
                 isApproved: accepted,
@@ -522,7 +594,9 @@ class NewsWidgets extends GetView<NewsController> {
             },
             child: Text(
               'send'.tr,
-              style: TextStyle(color: accepted ? Colors.green : Colors.red),
+              style: TextStyle(
+                color: accepted ? Colors.green : Colors.red,
+              ),
             ),
           ),
         ],

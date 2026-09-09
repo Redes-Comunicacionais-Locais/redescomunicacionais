@@ -42,10 +42,6 @@ class UserController extends GetxController {
       await _repository.updateUserNameToFirebase(
           currentUser.id, newName.trim());
 
-      PopUps.snackbar(
-        texto: 'Nome atualizado com sucesso.',
-        cor: Colors.green,
-      );
     } catch (e) {
       PopUps.snackbar(
         texto: 'Não foi possível atualizar o nome: $e',
