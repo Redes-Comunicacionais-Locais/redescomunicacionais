@@ -315,4 +315,42 @@ class UserProvider {
       throw Exception("Erro ao criar public Key");
     }
   }
+
+  Future<void> saveLocalSelectedCity(String cityName) async {
+    try {
+      var box = Hive.isBoxOpen(userCollection)
+          ? Hive.box<UserModel>(userCollection)
+          : await Hive.openBox<UserModel>(userCollection);
+
+      if (box.containsKey(hiveUserKey)) {
+        UserModel user = box.get(hiveUserKey)!;
+        user.selectedAppCity = cityName;
+        
+        await user.save(); 
+        
+        debugPrint("Cidade salva no Hive do usuário: $cityName");
+      }
+    } catch (e) {
+      debugPrint("Erro ao salvar cidade localmente: $e");
+    }
+  }
+
+  Future<void> clearLocalSelectedCity() async {
+    try {
+      var box = Hive.isBoxOpen(userCollection)
+          ? Hive.box<UserModel>(userCollection)
+          : await Hive.openBox<UserModel>(userCollection);
+
+      if (box.containsKey(hiveUserKey)) {
+        UserModel user = box.get(hiveUserKey)!;
+        user.selectedAppCity = null;
+        
+        await user.save();
+        
+        debugPrint("Cidade removida do Hive do usuário.");
+      }
+    } catch (e) {
+      debugPrint("Erro ao limpar cidade local: $e");
+    }
+  }
 }

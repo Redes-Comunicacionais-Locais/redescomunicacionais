@@ -24,6 +24,8 @@ class HomeController extends GetxController {
 
   final RxString appVersion = 'Carregando...'.obs;
   final RxString connectionTypeLabel = 'Sem conexão'.obs;
+  final RxnString selectedCity = RxnString(null);
+
 
   RxBool isRevisionMode = false.obs;
   RxBool isDraftMode = false.obs;
@@ -48,6 +50,7 @@ class HomeController extends GetxController {
       isAnonymousUser = false;
     }
     _loadPackageInfo();
+    _checkSavedCity(); 
     super.onInit();
   }
 
@@ -102,5 +105,28 @@ class HomeController extends GetxController {
       'url': 'https://redescomunicacionaislocais.uff.br/',
       'title': 'Sobre Nós',
     });
+  }
+
+   // Busca no Hive se o usuário já escolheu a cidade anteriormente
+  Future<void> _checkSavedCity() async {
+    UserModel currentUser = await _userRepository.getCurrentUserFromHive();
+    
+    if (currentUser.selectedAppCity != null && currentUser.selectedAppCity!.isNotEmpty) {
+      selectedCity.value = currentUser.selectedAppCity;
+      debugPrint("Cidade carregada automaticamente do Hive: ${selectedCity.value}");
+    }
+  }
+
+  // Função para ser chamada pelos botões da interface (HomePage)
+  Future<void> updateSelectedCity(String? cityName) async {
+    selectedCity.value = cityName;
+    
+    if (cityName != null) {
+      // Salva a nova cidade no Hive
+      await _userRepository.saveLocalSelectedCity(cityName);
+    } else {
+      // Se passou null (clicou em voltar/alterar), limpa a cidade do Hive
+      await _userRepository.clearLocalSelectedCity();
+    }
   }
 }

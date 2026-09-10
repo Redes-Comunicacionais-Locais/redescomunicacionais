@@ -6,15 +6,11 @@ import 'package:redescomunicacionais/app/modules/news/ui/news_widgets.dart';
 import 'package:redescomunicacionais/app/utils/responsive_utils.dart';
 import 'package:redescomunicacionais/app/utils/theme/color_pallete.dart';
 import 'package:redescomunicacionais/app/modules/dashboard/utils/menu_drawer.dart';
-import 'package:redescomunicacionais/app/utils/widgets/blinking_loading_icon.dart';
 import 'package:redescomunicacionais/app/utils/theme/theme_controller.dart';
 import 'package:redescomunicacionais/app/utils/widgets/city_selector_widget.dart'; // Importe o widget de cidades
 
 class HomePage extends GetView<HomeController> {
-  HomePage({super.key});
-
-  // Variável reativa local para controlar a cidade selecionada na Home
-  final RxnString selectedCity = RxnString(null);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -68,16 +64,16 @@ class HomePage extends GetView<HomeController> {
                     BorderRadius.vertical(bottom: Radius.circular(10)),
               ),
               flexibleSpace: Get.find<ThemeController>().isLight
-                ? null
-                : Container(
-                  decoration: BoxDecoration(
-                    gradient: AppColors.appBarBottomGradient(),
-                  ),
-                ),
-        iconTheme: IconThemeData(
-          color: theme.colorScheme.onSurface,
-          size: iconSize,
-        ),
+                  ? null
+                  : Container(
+                      decoration: BoxDecoration(
+                        gradient: AppColors.appBarBottomGradient(),
+                      ),
+                    ),
+              iconTheme: IconThemeData(
+                color: theme.colorScheme.onSurface,
+                size: iconSize,
+              ),
               toolbarHeight: isTablet ? 82.0 : 74.0,
               actions: [
                 Obx(() => controller.isRevisionMode.value ||
@@ -165,12 +161,14 @@ class HomePage extends GetView<HomeController> {
           await controller.refreshDashboardData();
         },
         child: Obx(() {
-          // 1. Se nenhuma cidade foi selecionada, exibe a tela de seleção de cidades
-          if (selectedCity.value == null) {
+          // 1. Se nenhuma cidade foi selecionada (e verificada no Hive pelo controller), exibe a tela de seleção
+          if (controller.selectedCity.value == null) {
             return Container(
               width: double.infinity,
               height: double.infinity,
-              decoration: BoxDecoration(
+              decoration: Get.find<ThemeController>().isLight 
+              ? BoxDecoration(color: theme.scaffoldBackgroundColor)
+              : BoxDecoration(
                 gradient: AppColors.darkBlueToBlackGradient(),
               ),
               child: Column(
@@ -180,31 +178,25 @@ class HomePage extends GetView<HomeController> {
                     child: Text(
                       'Escolha a Cidade para Visualizar as Matérias'.tr,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: Colors.white,
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
 
-                  // Widget com a lista das cidades em formato de cards com imagens
-                  Expanded(
-                    child: CitySelectorWidget(
-                      onCitySelected: (String cityName) {
-                        debugPrint('Cidade selecionada na Home: $cityName');
-                        selectedCity.value = cityName;
-                      },
-                    ),
-                  ),
+                  // Botão de "Visualizar todas as cidades"
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     child: SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          selectedCity.value = 'Todas';
+                          // Passa o valor para o controller, que atualiza a tela e o Hive
+                          controller.updateSelectedCity('Todas');
                         },
+                        icon: const Icon(Icons.public, color: Colors.white),
                         label: const Text(
                           'Visualizar todas as cidades',
                           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -219,11 +211,23 @@ class HomePage extends GetView<HomeController> {
                       ),
                     ),
                   ),
+
+                  // Widget com a lista das cidades em formato de cards com imagens
+                  Expanded(
+                    child: CitySelectorWidget(
+                      onCitySelected: (String cityName) {
+                        debugPrint('Cidade selecionada na Home: $cityName');
+                        // Passa a cidade selecionada para o controller (salvando no Hive)
+                        controller.updateSelectedCity(cityName);
+                      },
+                    ),
+                  ),
                 ],
               ),
             );
           }
 
+          // 2. Se a cidade foi selecionada, exibe o layout normal de notícias filtrando por ela
           return useHorizontalLayout
               ? _buildHorizontalLayout(
                   context,
@@ -249,7 +253,9 @@ class HomePage extends GetView<HomeController> {
     double iconSize,
   ) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: Get.find<ThemeController>().isLight 
+      ? BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor)
+      : BoxDecoration(
         gradient: AppColors.darkBlueToBlackGradient(),
       ),
       child: Row(
@@ -257,10 +263,10 @@ class HomePage extends GetView<HomeController> {
           Container(
             width: screenWidth * (isTablet ? 0.25 : 0.2),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3),
+              color: Get.find<ThemeController>().isLight ? Colors.transparent : Colors.black.withOpacity(0.3),
               border: Border(
                 right: BorderSide(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Get.find<ThemeController>().isLight ? Colors.grey.shade300 : Colors.white.withOpacity(0.2),
                   width: 1.0,
                 ),
               ),
@@ -281,7 +287,7 @@ class HomePage extends GetView<HomeController> {
                     decoration: BoxDecoration(
                       border: Border(
                         top: BorderSide(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Get.find<ThemeController>().isLight ? Colors.grey.shade300 : Colors.white.withOpacity(0.2),
                           width: 1.0,
                         ),
                       ),
@@ -291,13 +297,17 @@ class HomePage extends GetView<HomeController> {
                       children: [
                         // Botão de voltar para a seleção de cidades no menu lateral horizontal
                         TextButton.icon(
-                          onPressed: () => selectedCity.value = null,
-                          icon: const Icon(Icons.arrow_back, color: Colors.white70, size: 16),
+                          onPressed: () => controller.updateSelectedCity(null),
+                          icon: Icon(
+                            Icons.arrow_back, 
+                            color: Get.find<ThemeController>().isLight ? Colors.black54 : Colors.white70, 
+                            size: 16
+                          ),
                           label: Text(
                             'Trocar Cidade',
                             style: TextStyle(
                               fontSize: isTablet ? 12.0 : 10.0,
-                              color: Colors.white.withOpacity(0.8),
+                              color: Get.find<ThemeController>().isLight ? Colors.black87 : Colors.white.withOpacity(0.8),
                             ),
                           ),
                         ),
@@ -311,11 +321,11 @@ class HomePage extends GetView<HomeController> {
           Expanded(
             child: Column(
               children: [
-                _buildCityIndicatorHeader(),
+                _buildCityIndicatorHeader(context),
                 Expanded(
                   child: NewsWidgets(
                     key: ValueKey(controller.recreateKey),
-                    selectedCity: selectedCity.value,
+                    selectedCity: controller.selectedCity.value,
                   ),
                 ),
               ],
@@ -328,6 +338,7 @@ class HomePage extends GetView<HomeController> {
 
   // Layout vertical para mobile portrait
   Widget _buildVerticalLayout() {
+    final context = Get.context!;
     return Container(
       color: Get.find<ThemeController>().isLight
           ? Colors.white
@@ -339,11 +350,11 @@ class HomePage extends GetView<HomeController> {
       ),
       child: Column(
         children: [
-          _buildCityIndicatorHeader(),
+          _buildCityIndicatorHeader(context),
           Expanded(
             child: NewsWidgets(
               key: ValueKey(controller.recreateKey),
-              selectedCity: selectedCity.value,
+              selectedCity: controller.selectedCity.value,
             ),
           ),
         ],
@@ -352,10 +363,12 @@ class HomePage extends GetView<HomeController> {
   }
 
   // Cabeçalho sutil exibindo a cidade selecionada com botão para voltar
-  Widget _buildCityIndicatorHeader() {
+  Widget _buildCityIndicatorHeader(BuildContext context) {
+    final isLight = Get.find<ThemeController>().isLight;
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      color: Colors.black.withOpacity(0.3),
+      color: isLight ? Colors.grey.shade200 : Colors.black.withOpacity(0.3),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -364,9 +377,9 @@ class HomePage extends GetView<HomeController> {
               const Icon(Icons.location_on, color: Colors.blueAccent, size: 18),
               const SizedBox(width: 6),
               Text(
-                'Cidade: ${selectedCity.value}',
-                style: const TextStyle(
-                  color: Colors.white,
+                'Cidade: ${controller.selectedCity.value}',
+                style: TextStyle(
+                  color: isLight ? Colors.black87 : Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
@@ -375,12 +388,20 @@ class HomePage extends GetView<HomeController> {
           ),
           TextButton.icon(
             onPressed: () {
-              selectedCity.value = null; // Reseta para voltar à escolha de cidades
+              // Limpa a tela e o Hive
+              controller.updateSelectedCity(null); 
             },
-            icon: const Icon(Icons.swap_horiz, color: Colors.white70, size: 16),
-            label: const Text(
+            icon: Icon(
+              Icons.swap_horiz, 
+              color: isLight ? Colors.black54 : Colors.white70, 
+              size: 16
+            ),
+            label: Text(
               'Alterar',
-              style: TextStyle(color: Colors.white70, fontSize: 13),
+              style: TextStyle(
+                color: isLight ? Colors.black54 : Colors.white70, 
+                fontSize: 13
+              ),
             ),
           ),
         ],

@@ -27,13 +27,14 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       roleUpdatedBy: fields[7] as String?,
       lastUpdated: fields[12] as DateTime?,
       operationsCities: (fields[13] as Map?)?.cast<String, String>(),
+      selectedAppCity: fields[14] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserModel obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,7 +54,9 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       ..writeByte(12)
       ..write(obj.lastUpdated)
       ..writeByte(13)
-      ..write(obj.operationsCities);
+      ..write(obj.operationsCities)
+      ..writeByte(14)
+      ..write(obj.selectedAppCity);
   }
 
   @override

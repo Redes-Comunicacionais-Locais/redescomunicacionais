@@ -48,4 +48,11 @@ class UserRepository {
       String email, String newPublicKey) async {
     return _userProvider.updatePublicKeyInFirebase(email, newPublicKey);
   }
+
+   Future<void> saveLocalSelectedCity(String cityName) async {
+    return _userProvider.saveLocalSelectedCity(cityName);}
+
+     Future<void> clearLocalSelectedCity() async {
+    return _userProvider.clearLocalSelectedCity();
+  }
 }

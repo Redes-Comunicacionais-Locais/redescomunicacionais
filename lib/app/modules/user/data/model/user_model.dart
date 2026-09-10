@@ -41,6 +41,9 @@ class UserModel extends HiveObject {
   @HiveField(13)
   Map<String, String>? operationsCities;
 
+  @HiveField(14)
+  String? selectedAppCity; 
+
   UserModel({
     required this.id,
     this.name,
@@ -52,6 +55,7 @@ class UserModel extends HiveObject {
     this.roleUpdatedBy,
     this.lastUpdated,
     this.operationsCities,
+    this.selectedAppCity,
   });
 
   factory UserModel.empty() {
@@ -69,15 +73,12 @@ class UserModel extends HiveObject {
       id: json['id'] as String? ?? '', 
       email: json['email'] as String? ?? '',
       role: json['role'] as String? ?? 'user', 
-      
       name: json['name'] as String?,
       urlImage: json['urlImage'] as String?,
       roleUpdatedBy: json['roleUpdatedBy'] as String?,
-      
       createdAt: _readDateTime(json['createdAt'], fallback: DateTime.now()),
       roleUpdatedAt: _readNullableDateTime(json['roleUpdatedAt']),
       lastUpdated: _readNullableDateTime(json['lastUpdated']),
-      
       operationsCities: json['operationsCities'] != null
           ? (json['operationsCities'] as Map<dynamic, dynamic>).map(
               (key, value) => MapEntry(key.toString(), value.toString()),
@@ -93,18 +94,14 @@ class UserModel extends HiveObject {
       'email': email,
       'urlImage': urlImage,
       'role': role,
-      
       'createdAt': createdAt,
-      
       'roleUpdatedAt': roleUpdatedAt,
       'roleUpdatedBy': roleUpdatedBy,
       'lastUpdated': lastUpdated,
-      
       'operationsCities': operationsCities,
     };
   }
 
-  
   static DateTime _readDateTime(dynamic value, {required DateTime fallback}) {
     if (value == null) return fallback;
     if (value is Timestamp) return value.toDate();

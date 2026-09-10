@@ -32,7 +32,6 @@ class NewsController extends GetxController {
   RxList<NewsModel> publishedNewsList = <NewsModel>[].obs;
 
   late NewsModel selectedNews;
-
   RxBool isLoading = false.obs;
   RxnInt selectedCardIndex = RxnInt();
 
@@ -401,4 +400,6 @@ class NewsController extends GetxController {
     }
     return publishedNewsList.toList();
   }
+
+
 }
