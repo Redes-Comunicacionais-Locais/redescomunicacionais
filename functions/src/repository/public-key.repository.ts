@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import { firestore } from "firebase-admin";
-import { firestoreToPublicKey, PublicKey, toFirestore } from "../model/PublicKey";
+import { firestoreToPublicKey, PublicKey, publicKeyToFirestore } from "../model/PublicKey";
 import { User } from "../model/User";
 import Firestore = firestore.Firestore;
 
@@ -11,7 +11,7 @@ export const PublicKeyRepository = {
 
     try {
       const docRef = db.collection("public_keys");
-      await docRef.doc(loggedUser.email).set(toFirestore(data));
+      await docRef.doc(loggedUser.email).set(publicKeyToFirestore(data));
     } catch (e) {
       throw e;
     }

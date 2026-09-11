@@ -2,19 +2,24 @@ import { onCall } from "firebase-functions/https";
 import { getLoggedUser } from "../utils/auth-utils";
 import { User } from "../model/User";
 import {CallableRequest, HttpsError} from "firebase-functions/v2/https";
-import { PublicKey } from "../model/PublicKey";
+import {jsonToPublicKey} from "../model/PublicKey";
 import { publicKeyService } from "../service/public-key.service";
 import { defineSecret } from "firebase-functions/params";
-import {KeysPackage} from "../model/KeysPackage";
+import { KeysPackageJson} from "../model/KeysPackage";
 
 const apiPrivateKey = defineSecret("API_PRIVATE_KEY");
 
-export const savePublicKey = onCall<PublicKey>(async (request: CallableRequest<any>): Promise<void> => {
+export const savePublicKey = onCall<any>(
+  async (request: CallableRequest<any>): Promise<{message: string}> => {
   try {
-    let loggedUser: User = getLoggedUser(request.auth);
-    let data: PublicKey = request.data;
+    const loggedUser: User = getLoggedUser(request.auth);
+    const publicKey = jsonToPublicKey(request.data);
 
-    await publicKeyService.saveNewKey(data, loggedUser);
+    await publicKeyService.saveNewKey(publicKey, loggedUser);
+
+    return {
+      message: "Public key saved successfully."
+    }
   } catch (e) {
     throw new HttpsError(
       "internal",
@@ -23,13 +28,13 @@ export const savePublicKey = onCall<PublicKey>(async (request: CallableRequest<a
   }
 });
 
-export const getPublicKeysPackage = onCall<void>({ secrets: [apiPrivateKey] },
-  async (request: CallableRequest<any>): Promise<KeysPackage> => {
+export const getPublicKeysPackage = onCall<any>({ secrets: [apiPrivateKey] },
+  async (request: CallableRequest<any>): Promise<KeysPackageJson> => {
     try {
       getLoggedUser(request.auth);
       const privateKeyStr = apiPrivateKey.value();
 
-      return await publicKeyService.getPublicKeysPackage(privateKeyStr);
+      return await publicKeyService.getPublicKeysPackage(privateKeyStr)
     } catch (e) {
       throw new HttpsError(
         "internal",
